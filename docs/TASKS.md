@@ -38,7 +38,7 @@ Current phase: **Phase 1: Design foundations**
 
 ## Phase 1: Design foundations (tag v0.2.0)
 
-- **T-010** · todo · Design token contract
+- **T-010** · doing · Design token contract
   `app/styles/tokens.css` defining semantic tokens: surface, surface-raised, fg, fg-muted, line, accent, accent-fg, focus, radii, font families, type scale, spacing scale, motion durations/easing. Map to the Tailwind theme.
   Done when: the contract is documented in the file header and no component uses raw color/font/radius values.
   Notes: F-002: Claude chooses a modern accent and type pairing; radius is soft (12-16 px).

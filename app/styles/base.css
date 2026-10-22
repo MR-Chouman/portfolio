@@ -1,3 +1,21 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
-/* Semantic tokens and skins arrive in Phase 1 (T-010, T-011). */
+@layer base {
+  html {
+    background-color: var(--surface);
+    color: var(--fg);
+  }
+
+  *,
+  ::before,
+  ::after {
+    border-color: var(--line);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-family-display);
+  }
+}
