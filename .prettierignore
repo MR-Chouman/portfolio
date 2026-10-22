@@ -1,0 +1,13 @@
+build/
+.react-router/
+playwright-report/
+test-results/
+coverage/
+package-lock.json
+
+# Hand-maintained project docs: never reformatted by tooling
+# (REQUIREMENTS.md changes need the owner's approval).
+docs/
+CLAUDE.md
+.github/
+.claude/
