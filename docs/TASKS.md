@@ -49,7 +49,7 @@ Current phase: **Phase 1: Design foundations**
   Header with navigation, footer with "last updated", skip link, container and grid, `:focus-visible` styles, reduced-motion handling.
   Done when: layout works at 375 px and 1440 px, keyboard-only navigation works, axe is clean.
   Notes: D-021. Navigation links to `/work`, `/about` and `/lab` show the not-found page until those routes land (T-022, T-023, Phase 5).
-- **T-013** · todo · UI primitives
+- **T-013** · done · UI primitives
   Button, Link, Badge/Tag, Section, Metric, Prose, WorkRow, with unit tests.
   Done when: primitives are documented by usage in the style tile and tested.
 - **T-014** · todo · Pre-paint script and light/dark toggle
