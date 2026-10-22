@@ -183,3 +183,11 @@
     }
   }
 }
+
+/* Light/dark switch (T-014): a short cross-fade of the whole page. The
+   reduced-motion rules above remove it. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-base);
+  animation-timing-function: var(--easing-standard);
+}
