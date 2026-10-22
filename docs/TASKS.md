@@ -20,7 +20,7 @@ Current phase: **Phase 0: Foundation**
 - **T-001** · done · Scaffold the app
   Official React Router scaffold (TypeScript, Tailwind v4). In `react-router.config.ts` set `ssr: false` and a `prerender` list. TypeScript strict. Add `.nvmrc` (24) and `engines`. If the CLI refuses a non-empty directory, scaffold in a temp folder and move files in, leaving `CLAUDE.md`, `docs/`, `.github/`, `.claude/` untouched.
   Done when: `npm run dev` serves the home route and `npm run build` writes `build/client/index.html`.
-- **T-002** · doing · Tooling and scripts
+- **T-002** · done · Tooling and scripts
   ESLint (flat config), Prettier, Vitest + React Testing Library + jsdom, Playwright + `@axe-core/playwright`, `sirv-cli`. Scripts: `lint`, `typecheck`, `test`, `test:e2e`, `build`, `preview` (`sirv build/client --single __spa-fallback.html --port 4173`). Playwright config builds and serves on `:4173`.
   Done when: every script passes on the scaffold, with one unit test and one Playwright smoke test (home loads, no axe violations).
 - **T-003** · todo · Git hooks and CI verification
