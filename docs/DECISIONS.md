@@ -167,3 +167,17 @@ Status: Accepted · 2026-10-22 · Resolves F-005
 - Dependabot alerts are on. Dependabot security-update PRs stay off, because they always target the default branch. Alerts are handled through a normal task branch into `dev`.
 
 **Consequences.** Scheduled updates start once this config reaches `main` (Phase 0 release, `v0.1.0`). Dependabot PRs go through the light `dev` CI and are merged by hand, not by `/finish-task`. Dependabot commit messages use `chore(deps)` and `ci` prefixes to fit Conventional Commits.
+
+## D-018 · Content and contact policy from the owner's answers
+Status: Accepted · 2026-10-23 · Resolves F-001, F-003, F-004, F-006 · Supersedes the contact list in D-009 and the "until F-001" clause in D-011
+
+**Context.** The owner answered the open content questions in `docs/FEEDBACK.md`.
+
+**Decision.**
+- Clients are never named. Case studies use generic descriptions ("a regional airline") and invented data only: no logos, no screenshots of real systems (F-001).
+- No custom domain: `https://portfolio-4q6.pages.dev` is the canonical production origin (F-003). The CV keeps the Gmail address.
+- Public contact is the email address (`mailto:`) and the GitHub profile only. No LinkedIn link and no phone number (F-004).
+- No headshot: the About section is typographic (F-006).
+- The owner's full CV lives in the git-ignored `private/` folder (F-007, T-026). How a CV reaches the site is open in F-008.
+
+**Consequences.** Task titles for case studies are generic. T-071 becomes "Canonical production URL". T-024 drops LinkedIn. `REQUIREMENTS.md` still names the clients and LinkedIn; it changes only with the owner's approval.

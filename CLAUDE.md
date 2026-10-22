@@ -69,7 +69,8 @@ docs/                 # REQUIREMENTS, TASKS, DECISIONS, FEEDBACK
 
 - Commit secrets, tokens, `.env` files, or personal phone/address details.
 - Add client-confidential material: real patient, crew, customer or order data, real screenshots, internal URLs. Use invented data or cropped, anonymized visuals.
-- Name a client in content until `docs/FEEDBACK.md` F-001 is resolved.
+- Name a client anywhere in content or docs: generic descriptions and invented data only (D-018).
+- Commit anything from `private/` (git-ignored; holds the owner's full CV).
 - Edit `docs/REQUIREMENTS.md` without asking me first.
 - Install dependencies silently: mention each new one in the PR and, if it is a real choice, in DECISIONS.
 
