@@ -17,7 +17,7 @@ Current phase: **Phase 0: Foundation**
 
 ## Phase 0: Foundation (tag v0.1.0)
 
-- **T-001** · todo · Scaffold the app
+- **T-001** · doing · Scaffold the app
   Official React Router scaffold (TypeScript, Tailwind v4). In `react-router.config.ts` set `ssr: false` and a `prerender` list. TypeScript strict. Add `.nvmrc` (24) and `engines`. If the CLI refuses a non-empty directory, scaffold in a temp folder and move files in, leaving `CLAUDE.md`, `docs/`, `.github/`, `.claude/` untouched.
   Done when: `npm run dev` serves the home route and `npm run build` writes `build/client/index.html`.
 - **T-002** · todo · Tooling and scripts
