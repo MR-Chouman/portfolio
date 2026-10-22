@@ -34,6 +34,7 @@ Current phase: **Phase 0: Foundation**
 - **T-005** · doing · Repo hygiene
   Dependabot (npm and GitHub Actions, weekly), `.editorconfig`, `.gitattributes`, license (see F-005), README stub with run instructions.
   Done when: Dependabot is active and README explains how to run and test the project.
+  Notes: license and Dependabot setup in D-017 (F-005 resolved). Dependabot alerts are on now; scheduled version updates start when `dependabot.yml` reaches `main` at the `v0.1.0` release, the same deferral as T-004.
 
 ## Phase 1: Design foundations (tag v0.2.0)
 
