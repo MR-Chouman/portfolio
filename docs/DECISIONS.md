@@ -209,3 +209,16 @@ Status: Accepted · 2026-10-23 · Refines D-019
 - `/style-tile` is an internal reference page (prerendered, `noindex`) showing colors, the type scale, buttons and a work row side by side in both themes. Its copy lives in `content/style-tile.ts`. `app/lib/seo.ts` builds per-route title, description, canonical and Open Graph tags from the production origin.
 
 **Consequences.** The two preloaded latin fonts weigh about 66 kB (Geist 29 kB, Fraunces 37 kB); Geist Mono (23 kB) loads only where it is used. A new skin adds a file in `skins/` and an entry in the skin test. The style tile stays out of the sitemap; T-013 rebuilds it from the primitives.
+
+## D-021 · Page shell in the root layout; "last updated" from the last commit
+Status: Accepted · 2026-10-23
+
+**Context.** T-012 adds the header, footer, skip link and page container. Error pages render inside the root `Layout`, and the footer needs a "last updated" date that is the same in the prerendered HTML and after hydration.
+
+**Decision.**
+- `root.tsx` `Layout` renders the skip link, `SiteHeader`, one `<main id="main" tabindex="-1">` and `SiteFooter` around every route and the error boundary. Routes render their content without their own `<main>`.
+- The footer date is the last commit's date (`git log -1 --format=%cI`), injected by Vite `define` as `__LAST_UPDATED__`, with the build date as a fallback when Git history is missing. It is shown as the calendar day written in that string (the author's local day), independent of the visitor's time zone.
+- Layout helpers are two Tailwind utilities in `base.css`: `page-container` (centered, max `--width-page`, side gutters) and `page-grid` (4/8/12 columns). Focus rings come from the `focus` token on `:focus-visible`. Under `prefers-reduced-motion: reduce`, transitions, animations, smooth scrolling and view transition animations are switched off globally.
+- The main navigation lists Work, About and Lab (REQUIREMENTS section 5). Until T-022, T-023 and the Lab tasks add those routes, the links lead to the not-found page.
+
+**Consequences.** Docs-only commits also move the "last updated" date. Cloudflare Pages builds from a Git checkout, so the commit date is available there.

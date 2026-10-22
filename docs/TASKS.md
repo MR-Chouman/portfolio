@@ -45,9 +45,10 @@ Current phase: **Phase 1: Design foundations**
 - **T-011** · done · Editorial skin (light and dark)
   `app/styles/skins/editorial.css`; fonts self-hosted via Fontsource with `font-display: swap`; default fonts preloaded.
   Done when: a style-tile route or story shows colors, type scale, buttons and a work row in both themes, with AA contrast.
-- **T-012** · todo · Base layout
+- **T-012** · done · Base layout
   Header with navigation, footer with "last updated", skip link, container and grid, `:focus-visible` styles, reduced-motion handling.
   Done when: layout works at 375 px and 1440 px, keyboard-only navigation works, axe is clean.
+  Notes: D-021. Navigation links to `/work`, `/about` and `/lab` show the not-found page until those routes land (T-022, T-023, Phase 5).
 - **T-013** · todo · UI primitives
   Button, Link, Badge/Tag, Section, Metric, Prose, WorkRow, with unit tests.
   Done when: primitives are documented by usage in the style tile and tested.

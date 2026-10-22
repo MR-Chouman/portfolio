@@ -8,6 +8,9 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { SiteFooter } from "./components/layout/SiteFooter";
+import { SiteHeader } from "./components/layout/SiteHeader";
+import { SkipLink } from "./components/layout/SkipLink";
 import "./styles/base.css";
 import frauncesLatin from "@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url";
 import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
@@ -32,7 +35,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <SkipLink />
+        <SiteHeader />
+        <main id="main" tabIndex={-1} className="flex-1">
+          {children}
+        </main>
+        <SiteFooter />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -61,14 +69,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="container mx-auto p-4 pt-16">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <div className="page-container pt-section">
+      <h1 className="text-4xl">{message}</h1>
+      <p className="mt-3 text-fg-muted">{details}</p>
       {stack && (
-        <pre className="w-full overflow-x-auto p-4">
+        <pre className="mt-6 w-full overflow-x-auto rounded-lg bg-surface-raised p-4 text-sm">
           <code>{stack}</code>
         </pre>
       )}
-    </main>
+    </div>
   );
 }
