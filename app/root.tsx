@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import { SiteFooter } from "./components/layout/SiteFooter";
 import { SiteHeader } from "./components/layout/SiteHeader";
 import { SkipLink } from "./components/layout/SkipLink";
+import { themeScript } from "./lib/theme";
 import "./styles/base.css";
 import frauncesLatin from "@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url";
 import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
@@ -27,10 +28,13 @@ export const links: Route.LinksFunction = () =>
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    // The pre-paint script sets data-theme before React hydrates.
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* Before the stylesheets, so the first paint uses the right theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Meta />
         <Links />
       </head>
