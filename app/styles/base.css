@@ -2,10 +2,44 @@
 @import "./tokens.css";
 @import "./skins/editorial.css";
 
+/*
+ * Layout utilities (T-012)
+ *   page-container  centered column, max width --width-page, side gutters
+ *   page-grid       4 columns, 8 from md (48rem), 12 from lg (64rem); place
+ *                   children with col-span-*
+ */
+@utility page-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: calc(var(--width-page) + 2 * var(--space-gutter));
+  padding-inline: var(--space-gutter);
+}
+
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+
+  @media (width >= 48rem) {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  @media (width >= 64rem) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+  }
+}
+
 @layer base {
   html {
     background-color: var(--surface);
     color: var(--fg);
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
   }
 
   *,
@@ -18,5 +52,39 @@
   h2,
   h3 {
     font-family: var(--font-family-display);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /* Targets of in-page links (skip link) take focus without a ring. */
+  [tabindex="-1"]:focus {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Motion tokens already drop to 0 ms (tokens.css); this also stops motion
+     written without them, including view transitions. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
   }
 }
