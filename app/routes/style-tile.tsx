@@ -1,15 +1,29 @@
-import { styleTile } from "../../content/style-tile";
+import {
+  Button,
+  ButtonLink,
+  Link,
+  Metric,
+  MetricList,
+  Prose,
+  Section,
+  Tag,
+  TagList,
+  WorkRow,
+} from "~/components/ui";
 import { pageMeta } from "~/lib/seo";
+
+import { styleTile } from "../../content/style-tile";
 import type { Route } from "./+types/style-tile";
 
-// Internal reference page for the active skin (T-011). Primitives replace the
-// inline markup once they exist (T-013).
+// Internal reference page for the active skin (T-011): tokens and every UI
+// primitive (T-013), in both themes.
 export function meta(_: Route.MetaArgs) {
   return pageMeta({ ...styleTile.meta, path: "/style-tile", noindex: true });
 }
 
 type Theme = "light" | "dark";
 type ColorToken = keyof typeof styleTile.colors;
+type SectionKey = keyof typeof styleTile.sections;
 
 // Full class names so Tailwind can find them.
 const swatches: Record<ColorToken, string> = {
@@ -35,93 +49,113 @@ const typeSteps = [
   { step: "text-xs", className: "font-mono text-xs", sample: "mono" },
 ] as const;
 
-function ThemePanel({ theme }: { theme: Theme }) {
-  const headingId = `style-tile-${theme}`;
+function Block({
+  name,
+  children,
+}: {
+  name: SectionKey;
+  children: React.ReactNode;
+}) {
+  const { title, components } = styleTile.sections[name];
   return (
-    <section
+    <Section
+      title={title}
+      eyebrow={components}
+      headingLevel={3}
+      className="mt-12"
+    >
+      {children}
+    </Section>
+  );
+}
+
+function ThemePanel({ theme }: { theme: Theme }) {
+  return (
+    <Section
       data-theme={theme}
-      aria-labelledby={headingId}
+      title={styleTile.themes[theme]}
       className="min-w-0 rounded-xl border border-line bg-surface p-6 text-fg"
     >
-      <h2 id={headingId} className="text-2xl">
-        {styleTile.themes[theme]}
-      </h2>
+      <Block name="colors">
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {(Object.keys(swatches) as ColorToken[]).map((token) => (
+            <li key={token}>
+              <div
+                className={`h-12 rounded-md border border-line ${swatches[token]}`}
+              />
+              <p className="mt-2 font-mono text-xs">{token}</p>
+              <p className="text-xs text-fg-muted">{styleTile.colors[token]}</p>
+            </li>
+          ))}
+        </ul>
+      </Block>
 
-      <h3 className="mt-8 text-lg">{styleTile.sections.colors}</h3>
-      <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {(Object.keys(swatches) as ColorToken[]).map((token) => (
-          <li key={token}>
-            <div
-              className={`h-12 rounded-md border border-line ${swatches[token]}`}
-            />
-            <p className="mt-2 font-mono text-xs">{token}</p>
-            <p className="text-xs text-fg-muted">{styleTile.colors[token]}</p>
-          </li>
-        ))}
-      </ul>
+      <Block name="type">
+        <ul className="space-y-4">
+          {typeSteps.map(({ step, className, sample }) => (
+            <li key={step}>
+              <p className="font-mono text-xs text-fg-muted">{step}</p>
+              <p className={className}>{styleTile.type[sample]}</p>
+            </li>
+          ))}
+        </ul>
+      </Block>
 
-      <h3 className="mt-10 text-lg">{styleTile.sections.type}</h3>
-      <ul className="mt-4 space-y-4">
-        {typeSteps.map(({ step, className, sample }) => (
-          <li key={step}>
-            <p className="font-mono text-xs text-fg-muted">{step}</p>
-            <p className={className}>{styleTile.type[sample]}</p>
-          </li>
-        ))}
-      </ul>
+      <Block name="buttons">
+        <div className="flex flex-wrap items-center gap-3">
+          <ButtonLink href="#style-tile">
+            {styleTile.buttons.primary}
+          </ButtonLink>
+          <Button variant="secondary">{styleTile.buttons.secondary}</Button>
+          <Button variant="ghost">{styleTile.buttons.ghost}</Button>
+          <Button size="sm">{styleTile.buttons.small}</Button>
+          <Button variant="secondary" disabled>
+            {styleTile.buttons.disabled}
+          </Button>
+        </div>
+      </Block>
 
-      <h3 className="mt-10 text-lg">{styleTile.sections.buttons}</h3>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg"
-        >
-          {styleTile.buttons.primary}
-        </button>
-        <button
-          type="button"
-          className="rounded-md border border-fg-muted px-4 py-2 text-sm font-medium"
-        >
-          {styleTile.buttons.secondary}
-        </button>
-        <a
-          href="#style-tile"
-          className="rounded-sm text-sm font-medium text-accent underline underline-offset-4"
-        >
-          {styleTile.buttons.ghost}
-        </a>
-      </div>
+      <Block name="links">
+        <p className="flex flex-wrap gap-x-6 gap-y-2">
+          <Link href="#style-tile">{styleTile.links.accent}</Link>
+          <Link href="#style-tile" variant="muted">
+            {styleTile.links.muted}
+          </Link>
+        </p>
+      </Block>
 
-      <h3 className="mt-10 text-lg">{styleTile.sections.work}</h3>
-      <article className="mt-4 grid gap-3 rounded-lg border border-line bg-surface-raised p-5 sm:grid-cols-[1fr_auto]">
-        <div>
-          <p className="font-mono text-xs text-fg-muted">
-            {styleTile.work.sector}
-          </p>
-          <h4 className="mt-1 font-display text-xl">{styleTile.work.title}</h4>
-          <p className="mt-2 text-sm text-fg-muted">{styleTile.work.summary}</p>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {styleTile.work.stack.map((item) => (
-              <li
-                key={item}
-                className="rounded-sm border border-line px-2 py-0.5 font-mono text-xs"
-              >
-                {item}
-              </li>
+      <Block name="tags">
+        <div className="flex flex-wrap items-center gap-3">
+          <Tag>{styleTile.tags.neutral}</Tag>
+          <Tag tone="accent">{styleTile.tags.accent}</Tag>
+        </div>
+        <TagList items={styleTile.tags.list} className="mt-4" />
+      </Block>
+
+      <Block name="metrics">
+        <MetricList>
+          {styleTile.metrics.map((metric) => (
+            <Metric key={metric.label} {...metric} />
+          ))}
+        </MetricList>
+      </Block>
+
+      <Block name="prose">
+        <Prose>
+          <p>{styleTile.prose.paragraph}</p>
+          <ul>
+            {styleTile.prose.list.map((item) => (
+              <li key={item}>{item}</li>
             ))}
           </ul>
-        </div>
-        <div className="flex flex-col justify-between gap-3 sm:items-end">
-          <p className="font-mono text-sm">{styleTile.work.metric}</p>
-          <a
-            href="#style-tile"
-            className="rounded-sm text-sm font-medium text-accent underline underline-offset-4"
-          >
-            {styleTile.work.link}
-          </a>
-        </div>
-      </article>
-    </section>
+          <blockquote>{styleTile.prose.quote}</blockquote>
+        </Prose>
+      </Block>
+
+      <Block name="work">
+        <WorkRow href="#style-tile" headingLevel={4} {...styleTile.work} />
+      </Block>
+    </Section>
   );
 }
 

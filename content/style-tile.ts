@@ -1,23 +1,27 @@
-// Copy for the internal style tile (/style-tile, T-011). Not indexed.
-// The work row uses the public, generic project description (D-018).
+// Copy for the internal style tile (/style-tile, T-011, T-013). Not indexed.
+// Samples use public, generic project facts (REQUIREMENTS section 4, D-018).
 export const styleTile = {
   meta: {
     title: "Style tile · Editorial skin",
     description:
-      "Colors, type scale, buttons and a work row of the Editorial skin, in light and dark.",
+      "Tokens and UI primitives of the Editorial skin, in light and dark.",
   },
   heading: "Style tile",
   intro:
-    "The Editorial skin's tokens and base elements, shown side by side in both themes.",
+    "The Editorial skin's tokens and UI primitives, shown side by side in both themes. Each block names the primitive it uses.",
   themes: {
     light: "Light theme",
     dark: "Dark theme",
   },
   sections: {
-    colors: "Colors",
-    type: "Type scale",
-    buttons: "Buttons",
-    work: "Work row",
+    colors: { title: "Colors", components: "Tokens" },
+    type: { title: "Type scale", components: "Tokens" },
+    buttons: { title: "Buttons", components: "Button · ButtonLink" },
+    links: { title: "Links", components: "Link" },
+    tags: { title: "Tags", components: "Tag · TagList" },
+    metrics: { title: "Metrics", components: "MetricList · Metric" },
+    prose: { title: "Prose", components: "Prose" },
+    work: { title: "Work row", components: "WorkRow" },
   },
   colors: {
     surface: "Page background",
@@ -37,7 +41,33 @@ export const styleTile = {
   buttons: {
     primary: "Download CV",
     secondary: "View work",
-    ghost: "Read the case study",
+    ghost: "Contact",
+    small: "Small",
+    disabled: "Disabled",
+  },
+  links: {
+    accent: "Read the case study",
+    muted: "Source on GitHub",
+  },
+  tags: {
+    neutral: "React",
+    accent: "Lead",
+    list: ["React", "Redux Toolkit", "Tailwind CSS"],
+  },
+  metrics: [
+    { value: "4", label: "Admin platforms" },
+    { value: "260+", label: "Admin screens" },
+    { value: "57", label: "Shared components" },
+  ],
+  prose: {
+    paragraph:
+      "Each platform started from the same foundation: a data table driven by the server, a create and edit drawer, and a small set of form fields.",
+    list: [
+      "Shared CRUD screens instead of one-off pages",
+      "Server-side sorting, filtering and pagination",
+      "Print, barcode and Excel export where operations need them",
+    ],
+    quote: "Reuse first, then speed follows.",
   },
   work: {
     title: "Airline crew management platform",
@@ -46,6 +76,6 @@ export const styleTile = {
       "Rostering, attendance, leave, appraisals, qualifications and training in one admin platform.",
     metric: "25 modules",
     stack: ["Next.js", "TypeScript", "Microsoft SSO"],
-    link: "Read the case study",
+    linkLabel: "Read the case study",
   },
 } as const;

@@ -222,3 +222,18 @@ Status: Accepted · 2026-10-23
 - The main navigation lists Work, About and Lab (REQUIREMENTS section 5). Until T-022, T-023 and the Lab tasks add those routes, the links lead to the not-found page.
 
 **Consequences.** Docs-only commits also move the "last updated" date. Cloudflare Pages builds from a Git checkout, so the commit date is available there.
+
+## D-022 · UI primitives without class-merging dependencies
+Status: Accepted · 2026-10-23
+
+**Context.** T-013 adds the primitives every page is built from: Button, ButtonLink, Link, Tag/TagList, Section, Metric/MetricList, Prose and WorkRow. Libraries such as `clsx`, `tailwind-merge` or `class-variance-authority` are common for this, and `@tailwindcss/typography` for long-form text.
+
+**Decision.**
+- Variants are plain objects of class strings, joined by a five-line `cx()` (`app/lib/cx.ts`). A `className` passed to a primitive is appended, not merged, so primitives avoid conflicting defaults (for example, `Section` sets no outer spacing). No new dependency.
+- `Anchor` decides between client-side navigation and a plain `<a>`: site paths without a file extension use React Router's `Link`; external URLs, `mailto:`, `#hash` links and files such as `/cv.pdf` stay plain anchors. Links open in the same tab.
+- `WorkRow` is one tab stop: the title link is stretched over the card with a pseudo-element, the card draws the focus ring (`has-[a:focus-visible]`), and the "Read the case study" cue is hidden from assistive tech so the link is named by the project title.
+- `Metric` uses a description list with the label first in the DOM and the value shown first on screen.
+- `Prose` styles live in a `.prose-content` class in `base.css` that uses tokens, instead of `@tailwindcss/typography`, so skins can restyle long-form text with CSS only (D-005).
+- The style tile shows every primitive in both themes and names it; it is the usage reference.
+
+**Consequences.** Overriding a primitive's default class requires a variant or a prop, not a conflicting `className`. Revisit `tailwind-merge` only if that becomes a real constraint (it is about 7 kB gzipped).
