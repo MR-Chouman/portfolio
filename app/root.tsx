@@ -9,6 +9,18 @@ import {
 
 import type { Route } from "./+types/root";
 import "./styles/base.css";
+import frauncesLatin from "@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url";
+import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
+
+// Preload the default skin's latin fonts used above the fold (T-011).
+export const links: Route.LinksFunction = () =>
+  [geistLatin, frauncesLatin].map((href) => ({
+    rel: "preload",
+    href,
+    as: "font",
+    type: "font/woff2",
+    crossOrigin: "anonymous",
+  }));
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
