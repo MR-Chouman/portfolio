@@ -4,5 +4,5 @@ import type { Config } from "@react-router/dev/config";
 // to build/client. Case study slugs are derived from content/ in T-020.
 export default {
   ssr: false,
-  prerender: ["/"],
+  prerender: ["/", "/style-tile"],
 } satisfies Config;
