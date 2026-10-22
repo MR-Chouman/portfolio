@@ -12,7 +12,8 @@ Item format: `F-001 · status · date · source (owner | self | review) · block
 
 ## Open
 
-_None._
+- **F-009** · open · 2026-10-23 · self · blocks T-015 (merge)
+  T-015's "Done when" needs two runs of `ci-main.yml`, which only runs on PRs into `main`. A draft "verify, do not merge" PR from the task branch into `main` (as for T-003) was blocked by Claude Code's permission check, so the cache is not verified yet. Owner: either allow that verification PR, or accept verifying it in the Phase 1 release PR by re-running the e2e job before merging it.
 
 ## Triaged
 
