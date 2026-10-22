@@ -1,0 +1,195 @@
+/*
+ * Design token contract (T-010, D-019)
+ * ====================================
+ *
+ * Components style themselves only through the semantic tokens below, via the
+ * Tailwind utilities they generate. Skins (`[data-skin]`, D-005) and themes
+ * (`[data-theme]`) change what the tokens resolve to, never the markup.
+ *
+ * Layers
+ *   1. Raw custom properties (`--surface`, `--radius-card`, ...) on `:root`.
+ *      Skins and themes override these and nothing else.
+ *   2. `@theme inline` maps them to Tailwind namespaces, so utilities emit
+ *      `var(--surface)` and resolve per element at runtime.
+ *   3. Tailwind's default palette, fonts, radii and text sizes are reset, so a
+ *      raw value such as `bg-red-500` or `font-serif` does not exist. Arbitrary
+ *      colors, fonts and radii (`bg-[#fff]`) are rejected by
+ *      `tests/unit/tokens.test.ts`.
+ *
+ * Colors (utilities: bg-*, text-*, border-*, ring-*, outline-*, fill-*, ...)
+ *   surface         page background
+ *   surface-raised  cards, drawers, menus: anything sitting above the page
+ *   fg              body text and headings
+ *   fg-muted        secondary text; >= 4.5:1 on both surfaces
+ *   line            dividers and hairlines; decorative, not for borders that
+ *                   carry meaning (use fg-muted for those, >= 3:1)
+ *   accent          links, primary actions, highlights; >= 4.5:1 as text
+ *   accent-fg       text and icons placed on an accent background
+ *   focus           focus ring; >= 3:1 on both surfaces
+ *   transparent and current stay available (Tailwind built-ins).
+ *
+ * Typography
+ *   font-display  headings (editorial serif; Fraunces from T-011)
+ *   font-body     everything else, also the page default (Geist from T-011)
+ *   font-mono     code, metrics, labels (Geist Mono from T-011)
+ *   text-xs .. text-5xl  type scale; text-2xl and up are fluid between
+ *                        375 px and 1440 px viewports. Each step has a
+ *                        default line height.
+ *   Weights, tracking and leading use Tailwind defaults.
+ *
+ * Radius (rounded-*). Soft by default (F-002).
+ *   rounded-sm    6 px   tags, small controls
+ *   rounded-md   10 px   inputs, buttons
+ *   rounded-lg   14 px   cards, panels
+ *   rounded-xl   20 px   large surfaces, media
+ *   rounded-full         pills, avatars (Tailwind built-in)
+ *
+ * Spacing
+ *   Tailwind's 4 px base step (`p-4` = 16 px) is kept for component spacing.
+ *   Layout spacing is semantic:
+ *     --space-gutter    page side padding (px-gutter, ...)
+ *     --space-section   vertical gap between page sections (py-section, ...)
+ *     --container-page  max content width (max-w-page)
+ *     --container-reading max reading width (max-w-reading)
+ *
+ * Motion (use as `duration-(--duration-base) ease-standard`)
+ *   --duration-fast 120 ms   hover, press
+ *   --duration-base 200 ms   theme cross-fade, small reveals
+ *   --duration-slow 400 ms   skin reveal, drawers
+ *   ease-standard / ease-emphasized
+ *   Durations drop to 0 ms when the visitor prefers reduced motion.
+ *
+ * Contrast (WCAG 2.2, checked when values change; ratios on surface / raised)
+ *   light: fg 16.6 / 17.3, fg-muted 6.3 / 6.5, accent 5.6 / 5.8,
+ *          accent-fg on accent 5.6, focus 6.0 / 6.3
+ *   dark:  fg 16.5 / 15.1, fg-muted 8.3 / 7.6, accent 7.8 / 7.2,
+ *          accent-fg on accent 7.8, focus 9.5 / 8.7
+ */
+
+@theme inline {
+  --color-*: initial;
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-focus: var(--focus);
+
+  --font-*: initial;
+  --font-display: var(--font-family-display);
+  --font-body: var(--font-family-body);
+  --font-mono: var(--font-family-mono);
+  --default-font-family: var(--font-family-body);
+  --default-mono-font-family: var(--font-family-mono);
+
+  --radius-*: initial;
+  --radius-sm: var(--radius-tag);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-card);
+  --radius-xl: var(--radius-surface);
+
+  --spacing-gutter: var(--space-gutter);
+  --spacing-section: var(--space-section);
+  --container-page: var(--width-page);
+  --container-reading: var(--width-reading);
+
+  --ease-*: initial;
+  --ease-standard: var(--easing-standard);
+  --ease-emphasized: var(--easing-emphasized);
+}
+
+@theme {
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.625rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.875rem;
+  --text-2xl: clamp(1.375rem, 1.27rem + 0.45vw, 1.625rem);
+  --text-2xl--line-height: 1.3;
+  --text-3xl: clamp(1.75rem, 1.53rem + 0.94vw, 2.25rem);
+  --text-3xl--line-height: 1.2;
+  --text-4xl: clamp(2.125rem, 1.71rem + 1.76vw, 3.125rem);
+  --text-4xl--line-height: 1.1;
+  --text-5xl: clamp(2.5rem, 1.81rem + 2.93vw, 4.25rem);
+  --text-5xl--line-height: 1.04;
+}
+
+:root {
+  /* Light theme (default). Editorial values; T-011 refines them per skin. */
+  color-scheme: light;
+  --surface: oklch(0.985 0.006 80);
+  --surface-raised: oklch(1 0 0);
+  --fg: oklch(0.22 0.015 260);
+  --fg-muted: oklch(0.48 0.015 260);
+  --line: oklch(0.9 0.008 80);
+  --accent: oklch(0.53 0.19 32);
+  --accent-fg: oklch(0.99 0.004 80);
+  --focus: oklch(0.5 0.2 262);
+
+  --font-family-display:
+    "Fraunces Variable", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-family-body:
+    "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-family-mono:
+    "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-tag: 6px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-surface: 20px;
+
+  --space-gutter: clamp(1rem, 0.6rem + 1.7vw, 2rem);
+  --space-section: clamp(4rem, 3rem + 4.3vw, 7rem);
+  --width-page: 72rem;
+  --width-reading: 42rem;
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 400ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-emphasized: cubic-bezier(0.3, 0, 0, 1.15);
+}
+
+/* Dark theme: explicit choice, or system preference when none is stored. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface: oklch(0.17 0.012 260);
+    --surface-raised: oklch(0.215 0.014 260);
+    --fg: oklch(0.95 0.006 80);
+    --fg-muted: oklch(0.74 0.012 260);
+    --line: oklch(0.32 0.014 260);
+    --accent: oklch(0.74 0.15 38);
+    --accent-fg: oklch(0.17 0.012 260);
+    --focus: oklch(0.78 0.13 250);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: oklch(0.17 0.012 260);
+  --surface-raised: oklch(0.215 0.014 260);
+  --fg: oklch(0.95 0.006 80);
+  --fg-muted: oklch(0.74 0.012 260);
+  --line: oklch(0.32 0.014 260);
+  --accent: oklch(0.74 0.15 38);
+  --accent-fg: oklch(0.17 0.012 260);
+  --focus: oklch(0.78 0.13 250);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
