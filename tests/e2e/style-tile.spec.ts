@@ -39,3 +39,18 @@ test.describe("style tile", () => {
     });
   }
 });
+
+test("work row shows its focus ring on the whole card", async ({ page }) => {
+  await page.goto("/style-tile");
+  const link = page
+    .locator('section[data-theme="light"]')
+    .getByRole("link", { name: "Airline crew management platform" });
+  await link.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  await expect(link).toBeFocused();
+  const outline = await link
+    .locator("xpath=ancestor::article")
+    .evaluate((card) => getComputedStyle(card).outlineStyle);
+  expect(outline).toBe("solid");
+});
