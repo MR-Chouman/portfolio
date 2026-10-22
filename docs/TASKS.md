@@ -27,7 +27,7 @@ Current phase: **Phase 0: Foundation**
   Husky, lint-staged, commitlint (Conventional Commits). Run the steps of `.github/workflows/ci-dev.yml` and `ci-main.yml` locally and fix mismatches (output dir `build/client`, `lighthouserc.json`, script names). Tune Lighthouse CI (URL list, number of runs).
   Done when: a bad commit message is rejected, and both workflows are green on a draft PR into `dev` and a draft PR `dev` -> `main`.
   Notes: hooks and Lighthouse setup in D-016. `ci-main` was verified with a draft PR from the task branch into `main` (closed, not merged), because the changes are not on `dev` yet.
-- **T-004** · review · Cloudflare Pages (Owner action, Claude guides)
+- **T-004** · done · Cloudflare Pages (Owner action, Claude guides)
   Connect the repo; production branch `main`; build command `npm run build`; output directory `build/client`; set `NODE_VERSION=24`; enable preview deployments for `dev`. See D-006.
   Done when: production URL shows the scaffold from `main`, the `dev` preview URL works, and both URLs are recorded in `README.md`.
   Notes: owner decision 2026-10-22: done once the `dev` preview works and production is configured. `main` has no app until the Phase 0 merge, so the production build from `main` is checked at the `v0.1.0` release.
