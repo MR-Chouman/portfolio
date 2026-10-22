@@ -1,6 +1,6 @@
 # REQUIREMENTS
 
-Status: baseline v1 (2026-10-22). Changes need the owner's approval and a note in `DECISIONS.md`.
+Status: baseline v1 (2026-10-22), updated 2026-10-23 with the owner's approval (D-018). Changes need the owner's approval and a note in `DECISIONS.md`.
 
 ## 1. Purpose
 
@@ -21,15 +21,15 @@ Exact wording is finalized in T-035. All numbers must stay consistent with the f
 
 | Project | Sector | Stack highlights | Scale |
 |---|---|---|---|
-| Riyadh Airline Crew Management System | Aviation | Next.js, TypeScript, Microsoft SSO | 25 modules (rostering, attendance, leave, appraisals, qualifications, training) |
-| Axis Pro Solutions | Business services | React, Redux Toolkit, Tailwind | 72 screens (sales to projects, assets, stock, purchasing, staff) |
-| Go Charge | Mobility / EV charging | React, Redux Toolkit, Tailwind | 132 screens, 50-module API layer |
-| BMC (Baalbeck Medical Center) | Healthcare | React, Redux, Tailwind | 33 screens, 57 shared components; built from Aug 2024, led since Jan 2026 |
+| Airline crew management platform | Aviation | Next.js, TypeScript, Microsoft SSO | 25 modules (rostering, attendance, leave, appraisals, qualifications, training) |
+| Business operations platform | Business services | React, Redux Toolkit, Tailwind | 72 screens (sales to projects, assets, stock, purchasing, staff) |
+| EV charging platform | Mobility / EV charging | React, Redux Toolkit, Tailwind | 132 screens, 50-module API layer |
+| Hospital management platform | Healthcare | React, Redux, Tailwind | 33 screens, 57 shared components; built from Aug 2024, led since Jan 2026 |
 
-Headline metrics: 4 platforms, 260+ admin screens (230+ across the three 2026 platforms plus BMC), nearly 3 years of experience.
+Headline metrics: 4 platforms, 260+ admin screens (230+ across the three 2026 platforms plus the hospital platform), nearly 3 years of experience.
 Background story: biology -> bioinformatics (MSc, ML on protein sequences) -> frontend lead. Told briefly on the About page.
 
-Client names stay generic ("a regional airline") until FEEDBACK F-001 is resolved.
+Clients are never named: generic descriptions ("a regional airline") and invented data only, no logos or real screenshots (D-018).
 
 ## 5. Pages and routes
 
@@ -42,7 +42,7 @@ Client names stay generic ("a regional airline") until FEEDBACK F-001 is resolve
 | `/about` | Short first-person story, experience timeline, skills, education |
 | `404` | Helpful not-found page |
 
-Contact is a `mailto:` link plus GitHub and LinkedIn. CV is downloadable as PDF. No contact form in v1 (D-009).
+Contact is a `mailto:` link plus GitHub (D-018). CV is downloadable as PDF. No contact form in v1 (D-009).
 
 ## 6. Features
 
@@ -59,7 +59,7 @@ Contact is a `mailto:` link plus GitHub and LinkedIn. CV is downloadable as PDF.
 - **Accessibility**: WCAG 2.2 AA in every skin and theme; full keyboard use; visible focus; skip link; reduced-motion support; axe checks in Playwright per skin.
 - **Responsive**: designed mobile-first from 375 px; no horizontal scroll.
 - **Browsers**: current and previous major versions of Chrome, Edge, Safari, Firefox. View Transitions are an enhancement, never required.
-- **Privacy**: no cookies, no third-party trackers, no personal phone number or address on the site. Analytics via Cloudflare Web Analytics only (T-072).
+- **Privacy**: no cookies, no third-party trackers, no personal phone number or address on the site's pages (the downloadable CV PDF may include the phone number, D-018). Analytics via Cloudflare Web Analytics only (T-072).
 - **Resilience**: works with JavaScript disabled for reading content (prerendered HTML).
 - **Maintainability**: all copy in `content/`; skins via tokens; tests in CI (D-004).
 

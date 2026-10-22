@@ -67,7 +67,7 @@ docs/                 # REQUIREMENTS, TASKS, DECISIONS, FEEDBACK
 
 ## Never
 
-- Commit secrets, tokens, `.env` files, or personal phone/address details.
+- Commit secrets, tokens, `.env` files, or personal phone/address details. Only exception: the CV PDF the owner adds to `public/` may contain the phone number (D-018); never copy the number into pages or `content/`.
 - Add client-confidential material: real patient, crew, customer or order data, real screenshots, internal URLs. Use invented data or cropped, anonymized visuals.
 - Name a client anywhere in content or docs: generic descriptions and invented data only (D-018).
 - Commit anything from `private/` (git-ignored; holds the owner's full CV).
