@@ -72,8 +72,8 @@ Current phase: **Phase 1: Design foundations**
 - **T-023** · todo · About page
   Story, experience timeline, skills, education.
   Done when: page is complete and content comes only from `content/`.
-- **T-024** · todo · Contact and CV (blocked by F-008)
-  `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number. How the CV PDF is served depends on F-008.
+- **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
+  `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number. The owner adds the CV PDF to `public/` (F-008); the published copy must not contain the phone number.
   Done when: CV downloads from the header and contact block.
 - **T-025** · todo · 404 and headers
   404 page; `public/_headers` with long-cache for hashed assets and sensible security headers.
