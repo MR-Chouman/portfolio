@@ -42,7 +42,7 @@ Current phase: **Phase 1: Design foundations**
   `app/styles/tokens.css` defining semantic tokens: surface, surface-raised, fg, fg-muted, line, accent, accent-fg, focus, radii, font families, type scale, spacing scale, motion durations/easing. Map to the Tailwind theme.
   Done when: the contract is documented in the file header and no component uses raw color/font/radius values.
   Notes: F-002: Claude chooses a modern accent and type pairing; radius is soft (12-16 px).
-- **T-011** · todo · Editorial skin (light and dark)
+- **T-011** · done · Editorial skin (light and dark)
   `app/styles/skins/editorial.css`; fonts self-hosted via Fontsource with `font-display: swap`; default fonts preloaded.
   Done when: a style-tile route or story shows colors, type scale, buttons and a work row in both themes, with AA contrast.
 - **T-012** · todo · Base layout

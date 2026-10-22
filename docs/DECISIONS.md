@@ -196,3 +196,16 @@ Status: Accepted · 2026-10-23 · Resolves the token part of F-002 (fonts are lo
 - Dark mode follows `prefers-color-scheme` unless `data-theme` is set on `<html>`; T-014 sets it before paint.
 
 **Consequences.** Adding a color, font or radius means adding a token here first. The Systems skin (Phase 4) overrides the same properties under `[data-skin="systems"]`. The contrast ratios in the header must be rechecked whenever a color value changes.
+
+## D-020 · Editorial skin: self-hosted variable fonts, skin files and a style tile
+Status: Accepted · 2026-10-23 · Refines D-019
+
+**Context.** T-011 builds the default skin. Fonts must be self-hosted (no third-party requests, D-014) and fast to load, and the skin must be checkable for contrast in both themes.
+
+**Decision.**
+- Fonts come from `@fontsource-variable/fraunces`, `@fontsource-variable/geist` and `@fontsource-variable/geist-mono` (5.3.0, OFL-1.1, pinned). They ship only CSS and `woff2` files, no JavaScript. Only the weight axis is used: Fraunces' latin file is 37 kB, against 67 kB with the optical-size axis. `@font-face` rules use `font-display: swap` and per-subset `unicode-range`, so a visitor downloads only the subsets a page needs. The latin Geist and Fraunces files are preloaded from `root.tsx`; Geist Mono is not.
+- Skin values (colors, fonts, radii) live in `app/styles/skins/<name>.css`; `tokens.css` keeps the skin-neutral contract, spacing and motion. Theme selectors also match nested elements (`[data-theme="dark"]`), so a section can show the other theme.
+- `tests/unit/skins.test.ts` reads each skin file, checks that every color token is set in both themes, that the two dark blocks (system preference and explicit choice) match, and that text pairs meet WCAG AA (focus ring >= 3:1).
+- `/style-tile` is an internal reference page (prerendered, `noindex`) showing colors, the type scale, buttons and a work row side by side in both themes. Its copy lives in `content/style-tile.ts`. `app/lib/seo.ts` builds per-route title, description, canonical and Open Graph tags from the production origin.
+
+**Consequences.** The two preloaded latin fonts weigh about 66 kB (Geist 29 kB, Fraunces 37 kB); Geist Mono (23 kB) loads only where it is used. A new skin adds a file in `skins/` and an entry in the skin test. The style tile stays out of the sitemap; T-013 rebuilds it from the primitives.
