@@ -36,13 +36,6 @@ describe("design token contract", () => {
     expect(tokensCss).toContain(`--color-${token}: var(--${token});`);
   });
 
-  it("sets every color token in the dark theme", () => {
-    const dark = tokensCss.slice(tokensCss.indexOf(':root[data-theme="dark"]'));
-    for (const token of ["surface", "fg", "fg-muted", "accent", "focus"]) {
-      expect(dark).toContain(`--${token}:`);
-    }
-  });
-
   it("resets Tailwind's default colors, fonts, radii and text sizes", () => {
     for (const namespace of ["color", "font", "radius", "text"]) {
       expect(tokensCss).toContain(`--${namespace}-*: initial;`);

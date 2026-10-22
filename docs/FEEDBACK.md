@@ -16,13 +16,13 @@ _None._
 
 ## Triaged
 
-- **F-002** · triaged · 2026-10-22 · owner · -> T-010, T-011
-  Design direction delegated to Claude: a modern, visually appealing accent and type pairing chosen in T-010/T-011 (no style tile round). Radius: soft (12-16 px).
 - **F-007** · triaged · 2026-10-23 · owner · -> T-024, T-026
   The CV goes into a folder whose contents Git ignores (T-026). The published copy goes in `public/` (F-008, T-024).
 
 ## Resolved
 
+- **F-002** · resolved · 2026-10-23 · owner · -> D-019, D-020
+  Design direction delegated to Claude: vermilion accent, Fraunces + Geist + Geist Mono, soft radii (6-20 px), shown on `/style-tile`.
 - **F-008** · resolved · 2026-10-23 · owner · -> T-024
   As originally planned: the owner adds the CV PDF to `public/` when T-024 needs it, so the site serves it. `private/` stays for the owner's own files.
 - **F-001** · resolved · 2026-10-23 · owner · -> D-018
