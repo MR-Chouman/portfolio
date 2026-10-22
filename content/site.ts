@@ -5,6 +5,7 @@ export const site = {
   role: "Frontend lead",
   skipLink: "Skip to content",
   navigationLabel: "Main",
+  themeToggle: "Dark theme",
   navigation: [
     { label: "Work", href: "/work" },
     { label: "About", href: "/about" },

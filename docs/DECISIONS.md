@@ -237,3 +237,17 @@ Status: Accepted · 2026-10-23
 - The style tile shows every primitive in both themes and names it; it is the usage reference.
 
 **Consequences.** Overriding a primitive's default class requires a variant or a prop, not a conflicting `className`. Revisit `tailwind-merge` only if that becomes a real constraint (it is about 7 kB gzipped).
+
+## D-023 · Pre-paint theme script and light/dark toggle
+Status: Accepted · 2026-10-23 · Refines D-005
+
+**Context.** T-014 must avoid a flash of the wrong theme on a static, prerendered site, where the HTML cannot know the visitor's choice, and must keep working when storage is blocked.
+
+**Decision.**
+- A small inline script (`themeScript` in `app/lib/theme.ts`) runs in `<head>` before the stylesheets. It reads `localStorage["theme"]` in a `try/catch`, falls back to `prefers-color-scheme`, and sets `data-theme` on `<html>`. It is a string, not a bundled function, so the bundler cannot rewrite it. `<html>` has `suppressHydrationWarning` because the attribute differs from the prerendered HTML by design. T-041 extends the same script with `data-skin`.
+- Without JavaScript, the skin CSS still follows the system preference (D-020).
+- Only an explicit choice is stored. While nothing is stored, an open page follows changes to the system preference.
+- The toggle is a `<button aria-pressed>` named "Dark theme", in the header after the navigation. Its sun/moon icon follows `data-theme` through CSS, so it is correct before hydration; the button is disabled until hydration (`useSyncExternalStore` with a `null` server snapshot).
+- Switching uses `document.startViewTransition` with a 200 ms cross-fade of the root (`--duration-base`). It is instant when the API is missing or the visitor prefers reduced motion.
+
+**Consequences.** A Content Security Policy (T-025) must allow this inline script by its `sha256` hash, recomputed whenever `themeScript` changes. A visitor whose storage is blocked keeps a choice until the next reload.

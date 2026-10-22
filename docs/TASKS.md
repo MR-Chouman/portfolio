@@ -52,7 +52,7 @@ Current phase: **Phase 1: Design foundations**
 - **T-013** · done · UI primitives
   Button, Link, Badge/Tag, Section, Metric, Prose, WorkRow, with unit tests.
   Done when: primitives are documented by usage in the style tile and tested.
-- **T-014** · todo · Pre-paint script and light/dark toggle
+- **T-014** · done · Pre-paint script and light/dark toggle
   Inline script in `root.tsx` sets `data-theme` (and later `data-skin`) before first paint from storage/system preference (storage in try/catch). Toggle uses a 200 ms View Transitions cross-fade, instant when unsupported or reduced motion.
   Done when: no flash of wrong theme on reload, toggle is keyboard accessible, tested in Playwright.
 - **T-015** · todo · Cache Playwright browsers in CI
