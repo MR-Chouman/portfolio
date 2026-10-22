@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 0: Foundation**
+Current phase: **Phase 1: Design foundations**
 
 ## Rules
 
