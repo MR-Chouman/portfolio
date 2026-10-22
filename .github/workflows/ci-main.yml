@@ -98,4 +98,4 @@ jobs:
         run: npm run build
 
       - name: Run Lighthouse CI
-        run: npx --yes @lhci/cli@0.14.x autorun
+        run: npx --yes @lhci/cli@0.15.x autorun

@@ -23,9 +23,10 @@ Current phase: **Phase 0: Foundation**
 - **T-002** · done · Tooling and scripts
   ESLint (flat config), Prettier, Vitest + React Testing Library + jsdom, Playwright + `@axe-core/playwright`, `sirv-cli`. Scripts: `lint`, `typecheck`, `test`, `test:e2e`, `build`, `preview` (`sirv build/client --single __spa-fallback.html --port 4173`). Playwright config builds and serves on `:4173`.
   Done when: every script passes on the scaffold, with one unit test and one Playwright smoke test (home loads, no axe violations).
-- **T-003** · todo · Git hooks and CI verification
+- **T-003** · done · Git hooks and CI verification
   Husky, lint-staged, commitlint (Conventional Commits). Run the steps of `.github/workflows/ci-dev.yml` and `ci-main.yml` locally and fix mismatches (output dir `build/client`, `lighthouserc.json`, script names). Tune Lighthouse CI (URL list, number of runs).
   Done when: a bad commit message is rejected, and both workflows are green on a draft PR into `dev` and a draft PR `dev` -> `main`.
+  Notes: hooks and Lighthouse setup in D-016. `ci-main` was verified with a draft PR from the task branch into `main` (closed, not merged), because the changes are not on `dev` yet.
 - **T-004** · todo · Cloudflare Pages (Owner action, Claude guides)
   Connect the repo; production branch `main`; build command `npm run build`; output directory `build/client`; set `NODE_VERSION=24`; enable preview deployments for `dev`. See D-006.
   Done when: production URL shows the scaffold from `main`, the `dev` preview URL works, and both URLs are recorded in `README.md`.
