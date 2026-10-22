@@ -31,9 +31,10 @@ Current phase: **Phase 0: Foundation**
   Connect the repo; production branch `main`; build command `npm run build`; output directory `build/client`; set `NODE_VERSION=24`; enable preview deployments for `dev`. See D-006.
   Done when: production URL shows the scaffold from `main`, the `dev` preview URL works, and both URLs are recorded in `README.md`.
   Notes: owner decision 2026-10-22: done once the `dev` preview works and production is configured. `main` has no app until the Phase 0 merge, so the production build from `main` is checked at the `v0.1.0` release.
-- **T-005** · todo · Repo hygiene
+- **T-005** · done · Repo hygiene
   Dependabot (npm and GitHub Actions, weekly), `.editorconfig`, `.gitattributes`, license (see F-005), README stub with run instructions.
   Done when: Dependabot is active and README explains how to run and test the project.
+  Notes: license and Dependabot setup in D-017 (F-005 resolved). Dependabot alerts are on now; scheduled version updates start when `dependabot.yml` reaches `main` at the `v0.1.0` release, the same deferral as T-004.
 
 ## Phase 1: Design foundations (tag v0.2.0)
 

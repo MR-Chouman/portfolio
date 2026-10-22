@@ -20,8 +20,6 @@ Item format: `F-001 · status · date · source (owner | self | review) · block
   Domain name (for example a `.dev` or personal-name domain), and whether to add a matching email address instead of Gmail on the CV.
 - **F-004** · open · 2026-10-22 · owner · blocks T-024, T-070
   Confirm the public contact details: which email address, GitHub and LinkedIn links. The phone number is not published.
-- **F-005** · open · 2026-10-22 · owner · blocks T-005
-  License: for example MIT for code, all rights reserved for written content and images?
 - **F-006** · open · 2026-10-22 · owner · blocks T-021, T-023
   Include a headshot on the site? If yes, provide a photo; if no, use a typographic About section.
 - **F-007** · open · 2026-10-22 · owner · blocks T-024
@@ -33,4 +31,5 @@ _None yet._
 
 ## Resolved
 
-_None yet._
+- **F-005** · resolved · 2026-10-22 · owner · -> T-005, D-017
+  License: MIT for the source code; written content, images and the CV PDF stay all rights reserved.
