@@ -181,3 +181,18 @@ Status: Accepted · 2026-10-23 · Resolves F-001, F-003, F-004, F-006, F-008 · 
 - The owner keeps their own copy of the CV in the git-ignored `private/` folder (F-007, T-026). The downloadable CV is a PDF the owner adds to `public/` for T-024 (F-008). It may include the owner's phone number, by the owner's choice; this is the only place the number appears.
 
 **Consequences.** Task titles for case studies are generic. T-071 becomes "Canonical production URL". T-024 drops LinkedIn. `REQUIREMENTS.md` was updated with the owner's approval to match. Client names remain in earlier Git history.
+
+## D-019 · Design token contract, accent and type pairing
+Status: Accepted · 2026-10-23 · Resolves the token part of F-002 (fonts are loaded in T-011)
+
+**Context.** F-002 delegated the accent and type pairing to Claude, with soft radii (12-16 px). T-010 requires that no component uses raw color, font or radius values, and D-005 requires skins to work through tokens only.
+
+**Decision.**
+- `app/styles/tokens.css` holds the contract (documented in its header). Raw custom properties on `:root` (`--surface`, `--radius-card`, ...) are the only values skins and themes override. `@theme inline` maps them to Tailwind utilities (`bg-surface`, `text-fg-muted`, `rounded-lg`, `px-gutter`, `max-w-page`).
+- Tailwind's default colors, font families, radii, text sizes and easings are reset (`--color-*: initial`, ...), so stock values such as `bg-red-500` do not exist. `tests/unit/tokens.test.ts` fails on hex colors, color functions and arbitrary color/font/radius utilities outside `tokens.css` and `skins/`.
+- Colors are written in OKLCH. Neutrals are a warm off-white paper with cool ink; dark mode is a cool near-black. The accent is a vermilion (`oklch(0.53 0.19 32)` light, `oklch(0.74 0.15 38)` dark), editorial yet modern, and distinct from the blue focus ring. Every text pair meets WCAG AA in both themes; ratios are listed in the file header.
+- Type pairing: Fraunces (variable serif with an optical-size axis) for headings, Geist for body text and UI, Geist Mono for code and metrics. Until T-011 self-hosts them, system fallbacks apply.
+- Radius: tags 6 px, controls 10 px, cards 14 px, large surfaces 20 px. Type sizes from `text-2xl` up are fluid with `clamp()`. Motion durations are tokens that drop to 0 ms under `prefers-reduced-motion`.
+- Dark mode follows `prefers-color-scheme` unless `data-theme` is set on `<html>`; T-014 sets it before paint.
+
+**Consequences.** Adding a color, font or radius means adding a token here first. The Systems skin (Phase 4) overrides the same properties under `[data-skin="systems"]`. The contrast ratios in the header must be rechecked whenever a color value changes.
