@@ -122,3 +122,48 @@ Status: Accepted · 2026-10-22 · Supersedes the squash-merge part of D-003 and 
 **Decision.** Task PRs are merged into `dev` with a regular merge commit (`gh pr merge --merge`), and branches are not deleted after merging (task branches and `chore/advance-to-phase-N` branches stay). Phase PRs into `main` already use merge commits, and `dev` is kept. Every commit on a task branch follows Conventional Commits (enforced locally by commitlint), since each one lands on `dev` individually.
 
 **Consequences.** History on `dev` is more detailed and noisier (several commits plus one merge commit per task). A task is reverted with `git revert -m 1 <merge-commit>`. `git branch --merged` correctly shows finished branches. The branch list grows (about 42 task branches) and can be pruned by hand later; GitHub's "automatically delete head branches" setting must stay off, and rulesets should allow only merge commits on `dev` and `main`.
+
+## D-014 · Scaffold on React Router 8 with a temporary lint script
+Status: Accepted · 2026-10-22 · Refines D-002
+
+**Context.** D-002 was written with React Router 7's static prerendering in mind. On 2026-10-22 the official `create-react-router` template installs React Router 8.5, and its `ssr: false` + `prerender` behaviour is the same. The dev CI (D-004) runs `npm run lint`, but ESLint is only added in T-002.
+
+**Decision.** Use the current template (React Router 8, Vite 8, Tailwind v4) as-is, minus `@react-router/serve` and the template's Google Fonts links (no runtime server, no third-party requests). Until T-002, `lint` runs `react-router typegen && tsc --noEmit` so the dev CI is meaningful rather than missing.
+
+**Consequences.** Docs that mention React Router 7 apply to 8 for our usage. T-002 replaces the placeholder `lint` script with ESLint.
+
+## D-015 · Lint, format and test tooling
+Status: Accepted · 2026-10-22 · Replaces the placeholder lint script from D-014
+
+**Context.** T-002 sets up ESLint, Prettier, Vitest and Playwright. On this date `eslint-plugin-jsx-a11y` (6.10) declares support only up to ESLint 9, while ESLint 10 is current. Running Prettier over the whole repo also reformatted the hand-written docs, including `REQUIREMENTS.md`, which needs owner approval to change.
+
+**Decision.**
+- ESLint 9 (flat config) with `@eslint/js` recommended, `typescript-eslint` strict, `eslint-plugin-react-hooks`, `eslint-plugin-jsx-a11y` (accessibility is a requirement, so static a11y lint is kept rather than dropped for ESLint 10) and `eslint-config-prettier`. No `--legacy-peer-deps`.
+- Prettier with default options, scoped to code and config: `docs/`, `CLAUDE.md`, `.github/` and `.claude/` are in `.prettierignore`.
+- Vitest + React Testing Library + jsdom with its own `vitest.config.ts`, so tests do not load the React Router framework plugin.
+- Playwright (Chromium) + `@axe-core/playwright` run against the prerendered build served by `sirv-cli` on `:4173`, matching what Cloudflare serves.
+
+**Consequences.** Move to ESLint 10 once `jsx-a11y` supports it (Dependabot will surface it, T-005). Docs formatting stays manual.
+
+## D-016 · Git hooks and Lighthouse CI setup
+Status: Accepted · 2026-10-22 · Refines D-004
+
+**Context.** T-003 adds local hooks and checks that the CI workflows match the project. Run locally, Lighthouse CI's `staticDistDir` mode opened `/index.html`, which the client router does not match as a route: the page lost its title and logged an error, failing the accessibility and SEO assertions. It also audited `__spa-fallback.html`.
+
+**Decision.**
+- Husky 9 installs the hooks through the `prepare` script. `pre-commit` runs lint-staged (ESLint with `--max-warnings=0`, then Prettier, on staged files only). `commit-msg` runs commitlint with `@commitlint/config-conventional`. Typecheck and tests stay in CI, so commits remain fast.
+- Lighthouse CI serves the build with `npm run preview` (sirv, as Playwright does) and audits an explicit URL list, 3 runs per URL. Accessibility, best practices and SEO assert at >= 0.95 as errors. Performance is a warning until T-062 enforces the budgets. `@lhci/cli` moves to 0.15.x. New routes are added to the `url` list as they land.
+
+**Consequences.** Hooks can be bypassed with `--no-verify`, so CI remains the real gate. Lighthouse reports are uploaded to temporary public storage, which is acceptable because the site is public.
+
+## D-017 · MIT for code, content all rights reserved; Dependabot targets `dev`
+Status: Accepted · 2026-10-22 · Resolves F-005
+
+**Context.** The repo is public and serves as a showcase, so the code should be reusable. The written content (biography, case studies), images and CV describe the owner's own work and should not be republished by others. Dependabot opens PRs into the default branch (`main`) unless told otherwise, which would bypass the `dev` integration branch (D-003). GitHub reads `dependabot.yml` from the default branch only.
+
+**Decision.**
+- `LICENSE` is the standard MIT text, so GitHub detects it. The README states that `content/`, images and the CV PDF are all rights reserved and not covered by it.
+- Dependabot version updates for npm and GitHub Actions run weekly with `target-branch: dev`. Minor and patch npm updates are grouped into one PR. Actions updates are grouped together.
+- Dependabot alerts are on. Dependabot security-update PRs stay off, because they always target the default branch. Alerts are handled through a normal task branch into `dev`.
+
+**Consequences.** Scheduled updates start once this config reaches `main` (Phase 0 release, `v0.1.0`). Dependabot PRs go through the light `dev` CI and are merged by hand, not by `/finish-task`. Dependabot commit messages use `chore(deps)` and `ci` prefixes to fit Conventional Commits.

@@ -17,21 +17,24 @@ Current phase: **Phase 0: Foundation**
 
 ## Phase 0: Foundation (tag v0.1.0)
 
-- **T-001** · todo · Scaffold the app
+- **T-001** · done · Scaffold the app
   Official React Router scaffold (TypeScript, Tailwind v4). In `react-router.config.ts` set `ssr: false` and a `prerender` list. TypeScript strict. Add `.nvmrc` (24) and `engines`. If the CLI refuses a non-empty directory, scaffold in a temp folder and move files in, leaving `CLAUDE.md`, `docs/`, `.github/`, `.claude/` untouched.
   Done when: `npm run dev` serves the home route and `npm run build` writes `build/client/index.html`.
-- **T-002** · todo · Tooling and scripts
+- **T-002** · done · Tooling and scripts
   ESLint (flat config), Prettier, Vitest + React Testing Library + jsdom, Playwright + `@axe-core/playwright`, `sirv-cli`. Scripts: `lint`, `typecheck`, `test`, `test:e2e`, `build`, `preview` (`sirv build/client --single __spa-fallback.html --port 4173`). Playwright config builds and serves on `:4173`.
   Done when: every script passes on the scaffold, with one unit test and one Playwright smoke test (home loads, no axe violations).
-- **T-003** · todo · Git hooks and CI verification
+- **T-003** · done · Git hooks and CI verification
   Husky, lint-staged, commitlint (Conventional Commits). Run the steps of `.github/workflows/ci-dev.yml` and `ci-main.yml` locally and fix mismatches (output dir `build/client`, `lighthouserc.json`, script names). Tune Lighthouse CI (URL list, number of runs).
   Done when: a bad commit message is rejected, and both workflows are green on a draft PR into `dev` and a draft PR `dev` -> `main`.
-- **T-004** · todo · Cloudflare Pages (Owner action, Claude guides)
+  Notes: hooks and Lighthouse setup in D-016. `ci-main` was verified with a draft PR from the task branch into `main` (closed, not merged), because the changes are not on `dev` yet.
+- **T-004** · done · Cloudflare Pages (Owner action, Claude guides)
   Connect the repo; production branch `main`; build command `npm run build`; output directory `build/client`; set `NODE_VERSION=24`; enable preview deployments for `dev`. See D-006.
   Done when: production URL shows the scaffold from `main`, the `dev` preview URL works, and both URLs are recorded in `README.md`.
-- **T-005** · todo · Repo hygiene
+  Notes: owner decision 2026-10-22: done once the `dev` preview works and production is configured. `main` has no app until the Phase 0 merge, so the production build from `main` is checked at the `v0.1.0` release.
+- **T-005** · done · Repo hygiene
   Dependabot (npm and GitHub Actions, weekly), `.editorconfig`, `.gitattributes`, license (see F-005), README stub with run instructions.
   Done when: Dependabot is active and README explains how to run and test the project.
+  Notes: license and Dependabot setup in D-017 (F-005 resolved). Dependabot alerts are on now; scheduled version updates start when `dependabot.yml` reaches `main` at the `v0.1.0` release, the same deferral as T-004.
 
 ## Phase 1: Design foundations (tag v0.2.0)
 
