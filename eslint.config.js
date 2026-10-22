@@ -14,6 +14,7 @@ export default tseslint.config(
       "test-results/",
       "coverage/",
       ".lighthouseci/",
+      "private/",
     ],
   },
   js.configs.recommended,
