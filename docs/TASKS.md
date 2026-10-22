@@ -23,7 +23,7 @@ Current phase: **Phase 0: Foundation**
 - **T-002** · done · Tooling and scripts
   ESLint (flat config), Prettier, Vitest + React Testing Library + jsdom, Playwright + `@axe-core/playwright`, `sirv-cli`. Scripts: `lint`, `typecheck`, `test`, `test:e2e`, `build`, `preview` (`sirv build/client --single __spa-fallback.html --port 4173`). Playwright config builds and serves on `:4173`.
   Done when: every script passes on the scaffold, with one unit test and one Playwright smoke test (home loads, no axe violations).
-- **T-003** · todo · Git hooks and CI verification
+- **T-003** · doing · Git hooks and CI verification
   Husky, lint-staged, commitlint (Conventional Commits). Run the steps of `.github/workflows/ci-dev.yml` and `ci-main.yml` locally and fix mismatches (output dir `build/client`, `lighthouserc.json`, script names). Tune Lighthouse CI (URL list, number of runs).
   Done when: a bad commit message is rejected, and both workflows are green on a draft PR into `dev` and a draft PR `dev` -> `main`.
 - **T-004** · todo · Cloudflare Pages (Owner action, Claude guides)
