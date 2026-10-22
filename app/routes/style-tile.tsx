@@ -35,9 +35,6 @@ const typeSteps = [
   { step: "text-xs", className: "font-mono text-xs", sample: "mono" },
 ] as const;
 
-const focusRing =
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
-
 function ThemePanel({ theme }: { theme: Theme }) {
   const headingId = `style-tile-${theme}`;
   return (
@@ -77,19 +74,19 @@ function ThemePanel({ theme }: { theme: Theme }) {
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          className={`rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg ${focusRing}`}
+          className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg"
         >
           {styleTile.buttons.primary}
         </button>
         <button
           type="button"
-          className={`rounded-md border border-fg-muted px-4 py-2 text-sm font-medium ${focusRing}`}
+          className="rounded-md border border-fg-muted px-4 py-2 text-sm font-medium"
         >
           {styleTile.buttons.secondary}
         </button>
         <a
           href="#style-tile"
-          className={`rounded-sm text-sm font-medium text-accent underline underline-offset-4 ${focusRing}`}
+          className="rounded-sm text-sm font-medium text-accent underline underline-offset-4"
         >
           {styleTile.buttons.ghost}
         </a>
@@ -118,7 +115,7 @@ function ThemePanel({ theme }: { theme: Theme }) {
           <p className="font-mono text-sm">{styleTile.work.metric}</p>
           <a
             href="#style-tile"
-            className={`rounded-sm text-sm font-medium text-accent underline underline-offset-4 ${focusRing}`}
+            className="rounded-sm text-sm font-medium text-accent underline underline-offset-4"
           >
             {styleTile.work.link}
           </a>
@@ -130,13 +127,13 @@ function ThemePanel({ theme }: { theme: Theme }) {
 
 export default function StyleTile() {
   return (
-    <main id="style-tile" className="mx-auto max-w-page px-gutter py-section">
+    <div id="style-tile" className="page-container pt-section">
       <h1 className="text-4xl">{styleTile.heading}</h1>
       <p className="mt-3 max-w-reading text-fg-muted">{styleTile.intro}</p>
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <ThemePanel theme="light" />
         <ThemePanel theme="dark" />
       </div>
-    </main>
+    </div>
   );
 }
