@@ -55,9 +55,10 @@ Current phase: **Phase 1: Design foundations**
 - **T-014** · done · Pre-paint script and light/dark toggle
   Inline script in `root.tsx` sets `data-theme` (and later `data-skin`) before first paint from storage/system preference (storage in try/catch). Toggle uses a 200 ms View Transitions cross-fade, instant when unsupported or reduced motion.
   Done when: no flash of wrong theme on reload, toggle is keyboard accessible, tested in Playwright.
-- **T-015** · review · Cache Playwright browsers in CI
+- **T-015** · done · Cache Playwright browsers in CI
   In `ci-main.yml`, cache `~/.cache/ms-playwright` keyed on the installed `@playwright/test` version. On a cache hit, install only the system dependencies (`npx playwright install-deps chromium`). In the Phase 0 release, the browser install took 7m22s while the tests took 7 s.
   Done when: a second run on a PR into `main` restores the cache, and the Playwright job is clearly faster than the first run.
+  Notes: verified on draft PR #24 (closed, F-009): attempt 1 missed and saved `playwright-Linux-1.64.1` (browser install 24 s, cache save 19 s, job 68 s); attempt 2 restored it (install skipped, system deps 17 s, job 41 s).
 
 ## Phase 2: Content and pages (tag v0.3.0)
 
