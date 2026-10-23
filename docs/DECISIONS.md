@@ -167,3 +167,87 @@ Status: Accepted · 2026-10-22 · Resolves F-005
 - Dependabot alerts are on. Dependabot security-update PRs stay off, because they always target the default branch. Alerts are handled through a normal task branch into `dev`.
 
 **Consequences.** Scheduled updates start once this config reaches `main` (Phase 0 release, `v0.1.0`). Dependabot PRs go through the light `dev` CI and are merged by hand, not by `/finish-task`. Dependabot commit messages use `chore(deps)` and `ci` prefixes to fit Conventional Commits.
+
+## D-018 · Content and contact policy from the owner's answers
+Status: Accepted · 2026-10-23 · Resolves F-001, F-003, F-004, F-006, F-008 · Supersedes the contact list and the "phone never published" line in D-009, and the "until F-001" clause in D-011
+
+**Context.** The owner answered the open content questions in `docs/FEEDBACK.md`.
+
+**Decision.**
+- Clients are never named. Case studies use generic descriptions ("a regional airline") and invented data only: no logos, no screenshots of real systems (F-001).
+- No custom domain: `https://portfolio-4q6.pages.dev` is the canonical production origin (F-003). The CV keeps the Gmail address.
+- Public contact on the site's pages is the email address (`mailto:`) and the GitHub profile only. No LinkedIn link and no phone number on the pages (F-004).
+- No headshot: the About section is typographic (F-006).
+- The owner keeps their own copy of the CV in the git-ignored `private/` folder (F-007, T-026). The downloadable CV is a PDF the owner adds to `public/` for T-024 (F-008). It may include the owner's phone number, by the owner's choice; this is the only place the number appears.
+
+**Consequences.** Task titles for case studies are generic. T-071 becomes "Canonical production URL". T-024 drops LinkedIn. `REQUIREMENTS.md` was updated with the owner's approval to match. Client names remain in earlier Git history.
+
+## D-019 · Design token contract, accent and type pairing
+Status: Accepted · 2026-10-23 · Resolves the token part of F-002 (fonts are loaded in T-011)
+
+**Context.** F-002 delegated the accent and type pairing to Claude, with soft radii (12-16 px). T-010 requires that no component uses raw color, font or radius values, and D-005 requires skins to work through tokens only.
+
+**Decision.**
+- `app/styles/tokens.css` holds the contract (documented in its header). Raw custom properties on `:root` (`--surface`, `--radius-card`, ...) are the only values skins and themes override. `@theme inline` maps them to Tailwind utilities (`bg-surface`, `text-fg-muted`, `rounded-lg`, `px-gutter`, `max-w-page`).
+- Tailwind's default colors, font families, radii, text sizes and easings are reset (`--color-*: initial`, ...), so stock values such as `bg-red-500` do not exist. `tests/unit/tokens.test.ts` fails on hex colors, color functions and arbitrary color/font/radius utilities outside `tokens.css` and `skins/`.
+- Colors are written in OKLCH. Neutrals are a warm off-white paper with cool ink; dark mode is a cool near-black. The accent is a vermilion (`oklch(0.53 0.19 32)` light, `oklch(0.74 0.15 38)` dark), editorial yet modern, and distinct from the blue focus ring. Every text pair meets WCAG AA in both themes; ratios are listed in the file header.
+- Type pairing: Fraunces (variable serif with an optical-size axis) for headings, Geist for body text and UI, Geist Mono for code and metrics. Until T-011 self-hosts them, system fallbacks apply.
+- Radius: tags 6 px, controls 10 px, cards 14 px, large surfaces 20 px. Type sizes from `text-2xl` up are fluid with `clamp()`. Motion durations are tokens that drop to 0 ms under `prefers-reduced-motion`.
+- Dark mode follows `prefers-color-scheme` unless `data-theme` is set on `<html>`; T-014 sets it before paint.
+
+**Consequences.** Adding a color, font or radius means adding a token here first. The Systems skin (Phase 4) overrides the same properties under `[data-skin="systems"]`. The contrast ratios in the header must be rechecked whenever a color value changes.
+
+## D-020 · Editorial skin: self-hosted variable fonts, skin files and a style tile
+Status: Accepted · 2026-10-23 · Refines D-019
+
+**Context.** T-011 builds the default skin. Fonts must be self-hosted (no third-party requests, D-014) and fast to load, and the skin must be checkable for contrast in both themes.
+
+**Decision.**
+- Fonts come from `@fontsource-variable/fraunces`, `@fontsource-variable/geist` and `@fontsource-variable/geist-mono` (5.3.0, OFL-1.1, pinned). They ship only CSS and `woff2` files, no JavaScript. Only the weight axis is used: Fraunces' latin file is 37 kB, against 67 kB with the optical-size axis. `@font-face` rules use `font-display: swap` and per-subset `unicode-range`, so a visitor downloads only the subsets a page needs. The latin Geist and Fraunces files are preloaded from `root.tsx`; Geist Mono is not.
+- Skin values (colors, fonts, radii) live in `app/styles/skins/<name>.css`; `tokens.css` keeps the skin-neutral contract, spacing and motion. Theme selectors also match nested elements (`[data-theme="dark"]`), so a section can show the other theme.
+- `tests/unit/skins.test.ts` reads each skin file, checks that every color token is set in both themes, that the two dark blocks (system preference and explicit choice) match, and that text pairs meet WCAG AA (focus ring >= 3:1).
+- `/style-tile` is an internal reference page (prerendered, `noindex`) showing colors, the type scale, buttons and a work row side by side in both themes. Its copy lives in `content/style-tile.ts`. `app/lib/seo.ts` builds per-route title, description, canonical and Open Graph tags from the production origin.
+
+**Consequences.** The two preloaded latin fonts weigh about 66 kB (Geist 29 kB, Fraunces 37 kB); Geist Mono (23 kB) loads only where it is used. A new skin adds a file in `skins/` and an entry in the skin test. The style tile stays out of the sitemap; T-013 rebuilds it from the primitives.
+
+## D-021 · Page shell in the root layout; "last updated" from the last commit
+Status: Accepted · 2026-10-23
+
+**Context.** T-012 adds the header, footer, skip link and page container. Error pages render inside the root `Layout`, and the footer needs a "last updated" date that is the same in the prerendered HTML and after hydration.
+
+**Decision.**
+- `root.tsx` `Layout` renders the skip link, `SiteHeader`, one `<main id="main" tabindex="-1">` and `SiteFooter` around every route and the error boundary. Routes render their content without their own `<main>`.
+- The footer date is the last commit's date (`git log -1 --format=%cI`), injected by Vite `define` as `__LAST_UPDATED__`, with the build date as a fallback when Git history is missing. It is shown as the calendar day written in that string (the author's local day), independent of the visitor's time zone.
+- Layout helpers are two Tailwind utilities in `base.css`: `page-container` (centered, max `--width-page`, side gutters) and `page-grid` (4/8/12 columns). Focus rings come from the `focus` token on `:focus-visible`. Under `prefers-reduced-motion: reduce`, transitions, animations, smooth scrolling and view transition animations are switched off globally.
+- The main navigation lists Work, About and Lab (REQUIREMENTS section 5). Until T-022, T-023 and the Lab tasks add those routes, the links lead to the not-found page.
+
+**Consequences.** Docs-only commits also move the "last updated" date. Cloudflare Pages builds from a Git checkout, so the commit date is available there.
+
+## D-022 · UI primitives without class-merging dependencies
+Status: Accepted · 2026-10-23
+
+**Context.** T-013 adds the primitives every page is built from: Button, ButtonLink, Link, Tag/TagList, Section, Metric/MetricList, Prose and WorkRow. Libraries such as `clsx`, `tailwind-merge` or `class-variance-authority` are common for this, and `@tailwindcss/typography` for long-form text.
+
+**Decision.**
+- Variants are plain objects of class strings, joined by a five-line `cx()` (`app/lib/cx.ts`). A `className` passed to a primitive is appended, not merged, so primitives avoid conflicting defaults (for example, `Section` sets no outer spacing). No new dependency.
+- `Anchor` decides between client-side navigation and a plain `<a>`: site paths without a file extension use React Router's `Link`; external URLs, `mailto:`, `#hash` links and files such as `/cv.pdf` stay plain anchors. Links open in the same tab.
+- `WorkRow` is one tab stop: the title link is stretched over the card with a pseudo-element, the card draws the focus ring (`has-[a:focus-visible]`), and the "Read the case study" cue is hidden from assistive tech so the link is named by the project title.
+- `Metric` uses a description list with the label first in the DOM and the value shown first on screen.
+- `Prose` styles live in a `.prose-content` class in `base.css` that uses tokens, instead of `@tailwindcss/typography`, so skins can restyle long-form text with CSS only (D-005).
+- The style tile shows every primitive in both themes and names it; it is the usage reference.
+
+**Consequences.** Overriding a primitive's default class requires a variant or a prop, not a conflicting `className`. Revisit `tailwind-merge` only if that becomes a real constraint (it is about 7 kB gzipped).
+
+## D-023 · Pre-paint theme script and light/dark toggle
+Status: Accepted · 2026-10-23 · Refines D-005
+
+**Context.** T-014 must avoid a flash of the wrong theme on a static, prerendered site, where the HTML cannot know the visitor's choice, and must keep working when storage is blocked.
+
+**Decision.**
+- A small inline script (`themeScript` in `app/lib/theme.ts`) runs in `<head>` before the stylesheets. It reads `localStorage["theme"]` in a `try/catch`, falls back to `prefers-color-scheme`, and sets `data-theme` on `<html>`. It is a string, not a bundled function, so the bundler cannot rewrite it. `<html>` has `suppressHydrationWarning` because the attribute differs from the prerendered HTML by design. T-041 extends the same script with `data-skin`.
+- Without JavaScript, the skin CSS still follows the system preference (D-020).
+- Only an explicit choice is stored. While nothing is stored, an open page follows changes to the system preference.
+- The toggle is a `<button aria-pressed>` named "Dark theme", in the header after the navigation. Its sun/moon icon follows `data-theme` through CSS, so it is correct before hydration; the button is disabled until hydration (`useSyncExternalStore` with a `null` server snapshot).
+- Switching uses `document.startViewTransition` with a 200 ms cross-fade of the root (`--duration-base`). It is instant when the API is missing or the visitor prefers reduced motion.
+
+**Consequences.** A Content Security Policy (T-025) must allow this inline script by its `sha256` hash, recomputed whenever `themeScript` changes. A visitor whose storage is blocked keeps a choice until the next reload.

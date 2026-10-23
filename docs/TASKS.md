@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 0: Foundation**
+Current phase: **Phase 1: Design foundations**
 
 ## Rules
 
@@ -38,21 +38,27 @@ Current phase: **Phase 0: Foundation**
 
 ## Phase 1: Design foundations (tag v0.2.0)
 
-- **T-010** · todo · Design token contract (blocked by F-002)
+- **T-010** · done · Design token contract
   `app/styles/tokens.css` defining semantic tokens: surface, surface-raised, fg, fg-muted, line, accent, accent-fg, focus, radii, font families, type scale, spacing scale, motion durations/easing. Map to the Tailwind theme.
   Done when: the contract is documented in the file header and no component uses raw color/font/radius values.
-- **T-011** · todo · Editorial skin (light and dark)
+  Notes: F-002: Claude chooses a modern accent and type pairing; radius is soft (12-16 px).
+- **T-011** · done · Editorial skin (light and dark)
   `app/styles/skins/editorial.css`; fonts self-hosted via Fontsource with `font-display: swap`; default fonts preloaded.
   Done when: a style-tile route or story shows colors, type scale, buttons and a work row in both themes, with AA contrast.
-- **T-012** · todo · Base layout
+- **T-012** · done · Base layout
   Header with navigation, footer with "last updated", skip link, container and grid, `:focus-visible` styles, reduced-motion handling.
   Done when: layout works at 375 px and 1440 px, keyboard-only navigation works, axe is clean.
-- **T-013** · todo · UI primitives
+  Notes: D-021. Navigation links to `/work`, `/about` and `/lab` show the not-found page until those routes land (T-022, T-023, Phase 5).
+- **T-013** · done · UI primitives
   Button, Link, Badge/Tag, Section, Metric, Prose, WorkRow, with unit tests.
   Done when: primitives are documented by usage in the style tile and tested.
-- **T-014** · todo · Pre-paint script and light/dark toggle
+- **T-014** · done · Pre-paint script and light/dark toggle
   Inline script in `root.tsx` sets `data-theme` (and later `data-skin`) before first paint from storage/system preference (storage in try/catch). Toggle uses a 200 ms View Transitions cross-fade, instant when unsupported or reduced motion.
   Done when: no flash of wrong theme on reload, toggle is keyboard accessible, tested in Playwright.
+- **T-015** · done · Cache Playwright browsers in CI
+  In `ci-main.yml`, cache `~/.cache/ms-playwright` keyed on the installed `@playwright/test` version. On a cache hit, install only the system dependencies (`npx playwright install-deps chromium`). In the Phase 0 release, the browser install took 7m22s while the tests took 7 s.
+  Done when: a second run on a PR into `main` restores the cache, and the Playwright job is clearly faster than the first run.
+  Notes: verified on draft PR #24 (closed, F-009): attempt 1 missed and saved `playwright-Linux-1.64.1` (browser install 24 s, cache save 19 s, job 68 s); attempt 2 restored it (install skipped, system deps 17 s, job 41 s).
 
 ## Phase 2: Content and pages (tag v0.3.0)
 
@@ -68,22 +74,25 @@ Current phase: **Phase 0: Foundation**
 - **T-023** · todo · About page
   Story, experience timeline, skills, education.
   Done when: page is complete and content comes only from `content/`.
-- **T-024** · todo · Contact and CV (Owner: final CV PDF, see F-007)
-  `mailto:` link, GitHub/LinkedIn, CV PDF in `public/`. No phone number.
+- **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
+  `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number on the pages. The owner adds the CV PDF to `public/` (F-008); it may include the phone number (D-018).
   Done when: CV downloads from the header and contact block.
 - **T-025** · todo · 404 and headers
   404 page; `public/_headers` with long-cache for hashed assets and sensible security headers.
   Done when: an unknown URL returns the 404 page with a 404 status on the Cloudflare preview.
+- **T-026** · todo · Private CV folder (Owner action)
+  `private/` exists and Git ignores everything in it except its `.gitkeep` (created with F-007's triage). The owner adds the current CV PDF there (the version with the Gmail address).
+  Done when: the CV is in `private/` and `git status` does not show it.
 
 ## Phase 3: Case studies and imagery (tag v0.4.0)
 
-- **T-030** · todo · Case study: Riyadh Airline Crew Management System (Owner review, F-001)
+- **T-030** · todo · Case study: airline crew management platform (Owner review, D-018)
   Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome, and 2-4 captioned images.
-- **T-031** · todo · Case study: Axis Pro Solutions (Owner review, F-001)
+- **T-031** · todo · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
-- **T-032** · todo · Case study: Go Charge (Owner review, F-001)
+- **T-032** · todo · Case study: EV charging platform (Owner review, D-018)
   Done when: same structure; highlights the 132 screens and 50-module API layer.
-- **T-033** · todo · Case study: BMC Baalbeck Medical Center (Owner review, F-001)
+- **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
 - **T-034** · todo · Image pipeline (Owner review: anonymized crops)
   Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
@@ -148,9 +157,9 @@ Current phase: **Phase 0: Foundation**
 - **T-070** · todo · README
   Screenshot, stack, architecture notes, how to run, Lighthouse scores, links to DECISIONS.
   Done when: a stranger can run the project and understand the choices in 5 minutes.
-- **T-071** · todo · Custom domain (Owner action, F-003)
-  DNS on Cloudflare, HTTPS, canonical domain, redirects from `pages.dev`, optional matching email address.
-  Done when: production serves on the custom domain only.
+- **T-071** · todo · Canonical production URL
+  No custom domain (F-003, D-018): `https://portfolio-4q6.pages.dev` is the canonical origin. Canonical tags, sitemap, Open Graph URLs and JSON-LD use it from one config value, so a domain can be added later in one place.
+  Done when: every absolute URL on the site comes from that value and points at the `pages.dev` origin.
 - **T-072** · todo · Analytics
   Cloudflare Web Analytics, cookieless.
   Done when: page views are visible and no consent banner is needed.

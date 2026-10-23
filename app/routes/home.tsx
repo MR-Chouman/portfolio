@@ -14,9 +14,9 @@ export function meta(_: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <h1 className="text-3xl font-semibold">Mohamad Rida Chouman</h1>
-      <p className="mt-2">Portfolio in progress.</p>
-    </main>
+    <div className="page-container pt-section">
+      <h1 className="max-w-reading text-4xl">Mohamad Rida Chouman</h1>
+      <p className="mt-2 text-fg-muted">Portfolio in progress.</p>
+    </div>
   );
 }

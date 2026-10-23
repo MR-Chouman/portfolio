@@ -13,3 +13,7 @@
 
 # Lighthouse CI
 /.lighthouseci/
+
+# Owner-only files (full CV); never committed (D-018, T-026)
+/private/*
+!/private/.gitkeep
