@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 1: Design foundations**
+Current phase: **Phase 2: Content and pages**
 
 ## Rules
 
