@@ -21,6 +21,8 @@ _None._
 
 ## Resolved
 
+- **F-009** · resolved · 2026-10-23 · owner · -> T-015
+  The owner allowed a draft verification PR into `main` (#24, closed unmerged); the second e2e run restored the cache.
 - **F-002** · resolved · 2026-10-23 · owner · -> D-019, D-020
   Design direction delegated to Claude: vermilion accent, Fraunces + Geist + Geist Mono, soft radii (6-20 px), shown on `/style-tile`.
 - **F-008** · resolved · 2026-10-23 · owner · -> T-024
