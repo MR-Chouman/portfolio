@@ -79,7 +79,7 @@ Current phase: **Phase 2: Content and pages**
   Story, experience timeline, skills, education.
   Done when: page is complete and content comes only from `content/`.
   Notes: `/about` is prerendered with its own `meta`. Page titles and labels live in `content/about.ts` (validated by `aboutSchema`); the story, skills and education come from `profile.ts` and the timeline from `experience.ts`, rendered as an ordered list with `<time>` dates. Typographic, no headshot (D-018). The story, timeline entry, university and page intro are marked placeholders for T-035 (F-015); skills and education restate REQUIREMENTS facts only. The header "About" link and the home "More about me" link now reach the page. Playwright checks the prerendered meta, both links, and every section, horizontal scroll and axe in both themes at 375, 768 and 1440 px.
-- **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
+- **T-024** · doing · Contact and CV (Owner: CV PDF in `public/`)
   `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number on the pages. The owner adds the CV PDF to `public/` (F-008); it may include the phone number (D-018).
   Done when: CV downloads from the header and contact block.
 - **T-025** · todo · 404 and headers

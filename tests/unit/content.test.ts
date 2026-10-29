@@ -4,6 +4,7 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
+import { contact } from "../../content/contact";
 import { experience } from "../../content/experience";
 import {
   ContentError,
@@ -14,6 +15,7 @@ import {
 } from "../../content/load";
 import { profile } from "../../content/profile";
 import {
+  contactSchema,
   experienceSchema,
   profileSchema,
   projectFrontmatterSchema,
@@ -153,6 +155,48 @@ describe("profile and experience validation", () => {
     const [entry] = experience;
     expect(
       experienceSchema.safeParse([{ ...entry, start: "2024-13" }]).success,
+    ).toBe(false);
+  });
+});
+
+describe("contact content", () => {
+  it("is valid", () => {
+    expect(contactSchema.safeParse(contact).success).toBe(true);
+  });
+
+  it("rejects an invalid email address", () => {
+    const result = contactSchema.safeParse({
+      ...contact,
+      email: { ...contact.email, address: "not-an-email" },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a CV that is not a PDF path on the site", () => {
+    for (const href of ["/cv.docx", "https://example.com/cv.pdf", "cv.pdf"]) {
+      const result = contactSchema.safeParse({
+        ...contact,
+        cv: { ...contact.cv, href },
+      });
+      expect(result.success, href).toBe(false);
+    }
+  });
+
+  it("rejects a non-https GitHub link", () => {
+    const result = contactSchema.safeParse({
+      ...contact,
+      github: { ...contact.github, href: "http://github.com/MR-Chouman" },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("has no extra contact channels (D-018)", () => {
+    expect(Object.keys(contact).sort()).toEqual(["cv", "email", "github"]);
+    expect(
+      contactSchema.safeParse({
+        ...contact,
+        linkedin: { label: "LinkedIn", href: "https://linkedin.com" },
+      }).success,
     ).toBe(false);
   });
 });
