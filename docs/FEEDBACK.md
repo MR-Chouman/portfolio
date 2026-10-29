@@ -8,7 +8,7 @@ Questions, review notes and requested changes. Keep it short and actionable. Thi
 2. **triaged**: turned into a task (`-> T-xxx`) or a decision (`-> D-xxx`), or explicitly rejected with a reason.
 3. **resolved**: the task/decision is done. Move the item to "Resolved" with the link and date.
 
-Item format: `F-001 · status · date · source (owner | self | review) · blocks T-xxx`, then one or two lines.
+Item format: `F-001 · status · date · source (owner | self | review | auto (recommended)) · blocks T-xxx`, then one or two lines.
 
 ## Open
 

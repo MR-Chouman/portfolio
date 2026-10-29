@@ -31,3 +31,12 @@ Finish the current task ($ARGUMENTS if given, otherwise infer the ID from the br
 8. If all conditions hold: `gh pr merge --merge --subject "<PR title>"` (a merge commit, never squash or rebase, and do **not** delete the branch). Then `git switch dev && git pull --ff-only` and confirm the task shows `done`.
 9. If any condition fails: do not merge. Leave the PR open, change the task to `review` in the branch (commit and push), and tell me exactly what stopped the merge and what I need to do.
 10. Reply with the PR URL, whether it merged, a 3-line summary of the change, and the ID of the next eligible task. Do not start it.
+
+## Auto mode (`--auto`)
+
+When $ARGUMENTS contains `--auto`, the task runs under `/run-phase` (D-024). The steps above apply with these changes:
+
+- **Step 2:** if a check still fails after two honest fix attempts, leave the PR open (or the branch pushed), and report `failed`.
+- **Step 6:** auto-answers logged under the Auto-answer rule of `.claude/commands/start-task.md` do not block the merge.
+- **Step 9:** for an `Owner review` task, leave the PR open with the task in `review` and report `parked-review`. For any other failed condition, do the same and report `failed`, with the reason in NOTE.
+- **Step 10:** end with the RESULT block from `.claude/commands/run-phase.md` (`merged` when step 8 succeeded).
