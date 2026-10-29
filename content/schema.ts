@@ -88,7 +88,64 @@ export const projectFrontmatterSchema = z.strictObject({
   order: z.int().positive(),
 });
 
+// A site path ("/work"), an in-page anchor ("#contact") or an https URL.
+export const linkSchema = z.strictObject({
+  label: text,
+  href: z
+    .string()
+    .regex(
+      /^(\/(?!\/)\S*|#[\w-]+|https:\/\/\S+)$/,
+      "Use a site path (/work), an anchor (#contact) or an https:// URL",
+    ),
+});
+
+const sectionCopy = {
+  eyebrow: text,
+  title: text,
+};
+
+// Copy for the home page (content/home.ts, T-021). The headline and metrics
+// live in profile.ts and the selected work in the project files.
+export const homeSchema = z.strictObject({
+  meta: z.strictObject({
+    title: text,
+    description: text.max(200),
+  }),
+  hero: z.strictObject({
+    actions: z.array(linkSchema).min(1).max(2),
+  }),
+  metrics: z.strictObject({
+    title: text,
+  }),
+  work: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+    linkLabel: text,
+    more: linkSchema,
+  }),
+  approach: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+    items: z
+      .array(z.strictObject({ title: text, body: text }))
+      .min(1)
+      .max(4),
+  }),
+  about: z.strictObject({
+    ...sectionCopy,
+    body: text,
+    link: linkSchema,
+  }),
+  contact: z.strictObject({
+    ...sectionCopy,
+    body: text,
+    links: z.array(linkSchema).min(1),
+  }),
+});
+
 export type Metric = z.infer<typeof metricSchema>;
+export type Link = z.infer<typeof linkSchema>;
+export type Home = z.infer<typeof homeSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
 export type Experience = z.infer<typeof experienceSchema>;

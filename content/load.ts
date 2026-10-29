@@ -9,13 +9,16 @@ import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 
 import { experience } from "./experience";
+import { home } from "./home";
 import { profile } from "./profile";
 import {
   experienceSchema,
+  homeSchema,
   profileSchema,
   projectFrontmatterSchema,
   slugSchema,
   type Experience,
+  type Home,
   type Profile,
   type ProjectSummary,
 } from "./schema";
@@ -98,6 +101,7 @@ export function loadProjects(dir: string = PROJECTS_DIR): ProjectSummary[] {
 export interface Content {
   profile: Profile;
   experience: Experience;
+  home: Home;
   projects: ProjectSummary[];
 }
 
@@ -105,6 +109,7 @@ export function loadContent(dir: string = PROJECTS_DIR): Content {
   return {
     profile: check(profileSchema, profile, "content/profile.ts"),
     experience: check(experienceSchema, experience, "content/experience.ts"),
+    home: check(homeSchema, home, "content/home.ts"),
     projects: loadProjects(dir),
   };
 }
