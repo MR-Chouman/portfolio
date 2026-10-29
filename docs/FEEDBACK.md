@@ -21,6 +21,9 @@ _None._
 
 ## Resolved
 
+- **F-015** · resolved · 2026-10-30 · auto (recommended) · -> T-023, T-035
+  What copy should the About page use before the owner writes it? Chosen: section titles and labels in `content/about.ts`; the story as three paragraphs following the REQUIREMENTS arc (biology, bioinformatics MSc with machine learning on protein sequences, frontend lead), each marked "Placeholder"; the single timeline entry, the university and the page intro stay placeholders, now pointing at T-035 (the Owner review task for About copy); skills and education restate REQUIREMENTS facts only. Alternatives: draft the full story and timeline now; hide unfinished sections until T-035. Reason: the page is complete in structure without inventing claims, dates or employers.
+
 - **F-014** · resolved · 2026-10-30 · auto (recommended) · -> T-022, D-026
   How should the case study template define its sections and images before the case studies are written (T-030 to T-034)? Chosen: sections are `##` headings in each MDX body, and every project body now has the four REQUIREMENTS sections ("The problem", "What I owned", "Key decisions", "Outcome") with text marked "Placeholder"; images use a `<Figure>` component (required width, height, alt and caption) that MDX files use without importing, and no image ships until real anonymized crops exist. Alternatives: section text as structured frontmatter fields rendered by the route; an invented sample image now. Reason: MDX keeps case studies free to vary their headings and embed figures where they belong, and no claim or visual is invented.
 
