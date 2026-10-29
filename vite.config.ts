@@ -4,6 +4,8 @@ import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
+import { mdxPlugin } from "./mdx.config.ts";
+
 // "Last updated" in the footer is the last commit date; builds without Git
 // history fall back to the build date.
 function lastUpdated(): string {
@@ -15,7 +17,7 @@ function lastUpdated(): string {
 }
 
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter()],
+  plugins: [mdxPlugin(), tailwindcss(), reactRouter()],
   define: {
     __LAST_UPDATED__: JSON.stringify(lastUpdated()),
   },

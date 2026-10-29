@@ -63,7 +63,7 @@ Current phase: **Phase 2: Content and pages**
 
 ## Phase 2: Content and pages (tag v0.3.0)
 
-- **T-020** · todo · Content layer
+- **T-020** · doing · Content layer
   Zod schemas in `content/schema.ts`; `profile.ts`, `experience.ts`; projects as MDX with validated frontmatter (verify the MDX Vite plugin works with React Router framework mode, record in DECISIONS). Derive the `prerender` path list from content.
   Done when: invalid content fails `npm run build`, and every project slug is prerendered.
 - **T-021** · todo · Home page
