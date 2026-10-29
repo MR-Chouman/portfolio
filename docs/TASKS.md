@@ -67,9 +67,10 @@ Current phase: **Phase 2: Content and pages**
   Zod schemas in `content/schema.ts`; `profile.ts`, `experience.ts`; projects as MDX with validated frontmatter (verify the MDX Vite plugin works with React Router framework mode, record in DECISIONS). Derive the `prerender` path list from content.
   Done when: invalid content fails `npm run build`, and every project slug is prerendered.
   Notes: D-025. MDX works in framework mode via `@mdx-js/rollup`. Content is validated in Node when `react-router.config.ts` builds the prerender list (checked by breaking a project's `order`: the build stops naming the file and field). A minimal `/work/:slug` route ships here and T-022 extends it (F-011); project, profile and experience copy is placeholder or REQUIREMENTS facts only (F-010). Unknown `/work/*` slugs show the generic error page until T-025.
-- **T-021** · todo · Home page
+- **T-021** · done · Home page
   Hero, metrics strip, selected work, "How I build" teaser, About teaser, contact block. Placeholder content allowed until Phase 3.
   Done when: home is complete at all breakpoints with per-route `meta`.
+  Notes: copy lives in `content/home.ts`, validated by `homeSchema` at build time (links must be site paths, `#anchors` or `https://` URLs); the headline and metrics come from `profile.ts` and the work list from the project files. Approach, About and contact text are marked placeholders for T-035 (F-012). The contact block links the GitHub profile only; T-024 adds the email and CV (F-013). "All case studies" and "More about me" lead to the not-found page until T-022 and T-023. Playwright checks 375/768/1440 px, both themes with axe, and the prerendered meta.
 - **T-022** · todo · Work index and case study template
   `/work` and `/work/:slug`: summary header, sections, captioned images, next-project link, per-route `meta`.
   Done when: each slug has its own prerendered HTML with its own title and Open Graph tags.

@@ -21,6 +21,11 @@ _None._
 
 ## Resolved
 
+- **F-012** · resolved · 2026-10-30 · auto (recommended) · -> T-021
+  What copy should the home page's "How I build", About teaser and contact block use before T-035? Chosen: section titles that restate REQUIREMENTS facts only ("One foundation, many platforms", "A shared data layer", "A component library", "From biology to frontend lead"), with every body sentence marked "Placeholder" and pointing at T-035. Alternatives: draft full copy now; hide the sections until T-035. Reason: the page is complete in structure without inventing claims about the owner's work.
+- **F-013** · resolved · 2026-10-30 · auto (recommended) · -> T-021, T-024
+  Should the home contact block show the email address and CV link now? Chosen: the GitHub profile link only, with T-024 adding the `mailto:` link and the CV (D-018). Alternatives: add the email in T-021; leave the block empty. Reason: T-024 owns contact and CV, and the CV PDF is not in `public/` yet.
+
 - **F-010** · resolved · 2026-10-30 · auto (recommended) · -> T-020
   What content should the content layer ship with before the case studies (Phase 3) and final copy (T-023, T-035)? Chosen: four project files whose frontmatter uses only the facts in REQUIREMENTS section 4, with the role and body marked "Placeholder"; profile and experience use the same facts and mark everything else (summary, story, university, employer description, dates) as placeholders. Alternatives: one invented sample project; empty files. Reason: real slugs let T-021/T-022 build on the final URLs without inventing any claim.
 - **F-011** · resolved · 2026-10-30 · auto (recommended) · -> T-020, D-025
