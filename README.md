@@ -10,7 +10,7 @@ Requirements: Node 24 (pinned in `.nvmrc`; run `nvm use`) and npm.
 npm ci            # install dependencies and the Git hooks
 npm run dev       # dev server at http://localhost:5173
 npm run build     # prerendered static output in build/client
-npm run preview   # serve build/client at http://localhost:4173
+npm run preview   # serve build/client at http://localhost:4173 (unknown URLs get 404.html)
 ```
 
 ## Test and check

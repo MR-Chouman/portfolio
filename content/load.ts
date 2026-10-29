@@ -11,12 +11,14 @@ import { z } from "zod";
 import { about } from "./about";
 import { experience } from "./experience";
 import { home } from "./home";
+import { notFound } from "./not-found";
 import { profile } from "./profile";
 import { work } from "./work";
 import {
   aboutSchema,
   experienceSchema,
   homeSchema,
+  notFoundSchema,
   profileSchema,
   projectFrontmatterSchema,
   slugSchema,
@@ -24,6 +26,7 @@ import {
   type About,
   type Experience,
   type Home,
+  type NotFound,
   type Profile,
   type ProjectSummary,
   type Work,
@@ -110,6 +113,7 @@ export interface Content {
   home: Home;
   work: Work;
   about: About;
+  notFound: NotFound;
   projects: ProjectSummary[];
 }
 
@@ -120,12 +124,24 @@ export function loadContent(dir: string = PROJECTS_DIR): Content {
     home: check(homeSchema, home, "content/home.ts"),
     work: check(workSchema, work, "content/work.ts"),
     about: check(aboutSchema, about, "content/about.ts"),
+    notFound: check(notFoundSchema, notFound, "content/not-found.ts"),
     projects: loadProjects(dir),
   };
 }
 
-// Static pages plus one case study page per project (D-002).
-export const STATIC_PATHS = ["/", "/work", "/about", "/style-tile"] as const;
+// Prerendered by the catch-all route and moved to build/client/404.html after
+// the build (scripts/finalize-build.ts), which Cloudflare Pages serves with a
+// 404 status for every unknown URL (T-025).
+export const NOT_FOUND_PATH = "/404";
+
+// Static pages, the 404 page and one case study page per project (D-002).
+export const STATIC_PATHS = [
+  "/",
+  "/work",
+  "/about",
+  "/style-tile",
+  NOT_FOUND_PATH,
+] as const;
 
 export function prerenderPaths(dir: string = PROJECTS_DIR): string[] {
   const { projects } = loadContent(dir);

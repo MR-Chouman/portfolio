@@ -54,13 +54,20 @@ describe("content in the repository", () => {
     expect(() => loadContent()).not.toThrow();
   });
 
-  it("prerenders every project slug and the static pages", () => {
+  it("prerenders every project slug, the static pages and the 404 page", () => {
     const slugs = readdirSync(PROJECTS_DIR)
       .filter((name) => name.endsWith(".mdx"))
       .map((name) => `/work/${name.replace(/\.mdx$/, "")}`);
     expect(slugs.length).toBeGreaterThan(0);
     expect(prerenderPaths()).toEqual(
-      expect.arrayContaining(["/", "/work", "/about", "/style-tile", ...slugs]),
+      expect.arrayContaining([
+        "/",
+        "/work",
+        "/about",
+        "/style-tile",
+        "/404",
+        ...slugs,
+      ]),
     );
   });
 

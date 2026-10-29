@@ -82,9 +82,10 @@ Current phase: **Phase 2: Content and pages**
 - **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
   `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number on the pages. The owner adds the CV PDF to `public/` (F-008); it may include the phone number (D-018).
   Done when: CV downloads from the header and contact block.
-- **T-025** · todo · 404 and headers
+- **T-025** · done · 404 and headers
   404 page; `public/_headers` with long-cache for hashed assets and sensible security headers.
   Done when: an unknown URL returns the 404 page with a 404 status on the Cloudflare preview.
+  Notes: D-027. A catch-all route renders the 404 page (copy in `content/not-found.ts`); it is prerendered at `/404` and moved to `build/client/404.html` after the build, which Pages serves with a 404 status. Unknown case study slugs and client-side navigation to missing routes (`/lab` until Phase 5) show the same page. `_headers` long-caches `/assets/*` and sets a CSP whose inline script hashes are filled in at build time, plus HSTS, nosniff, frame, referrer, permissions and opener policies. Playwright checks the 404 page (three URL shapes, axe in both themes at 375 and 1440 px), the built `_headers`, and replays the CSP on every page type. Only `dev` is built by Cloudflare, so the 404 status on the preview is checked right after the merge (F-016); before it, the `dev` preview answered unknown URLs with a 200.
 - **T-026** · todo · Private CV folder (Owner action)
   `private/` exists and Git ignores everything in it except its `.gitkeep` (created with F-007's triage). The owner adds the current CV PDF there (the version with the Gmail address).
   Done when: the CV is in `private/` and `git status` does not show it.
