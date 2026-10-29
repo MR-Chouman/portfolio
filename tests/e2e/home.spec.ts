@@ -76,3 +76,32 @@ test("a selected work card opens its case study", async ({ page }) => {
   await expect(page).toHaveURL(/\/work\/[a-z0-9-]+$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(name ?? "");
 });
+
+test("the header and the contact block link the CV download and the email", async ({
+  request,
+}) => {
+  // Checked in the prerendered HTML, so the links work before JavaScript.
+  const html = await (await request.get("/")).text();
+  const cvLinks = html.match(/<a [^>]*href="\/cv\.pdf"[^>]*>/g) ?? [];
+  expect(cvLinks).toHaveLength(2);
+  for (const link of cvLinks) {
+    expect(link).toMatch(/download="[\w-]+\.pdf"/);
+  }
+  expect(html).toMatch(/<a [^>]*href="mailto:[^"]+@[^"]+"/);
+  // D-018: no LinkedIn and no phone number on the pages.
+  expect(html).not.toMatch(/linkedin\.com|href="tel:/i);
+});
+
+test("the header CV link is on every page and reachable by keyboard", async ({
+  page,
+}) => {
+  for (const path of ["/", "/work", "/about"]) {
+    await page.goto(path);
+    const cv = page
+      .getByRole("banner")
+      .getByRole("link", { name: "Download CV (PDF)" });
+    await expect(cv, path).toHaveAttribute("href", "/cv.pdf");
+    await cv.focus();
+    await expect(cv, path).toBeFocused();
+  }
+});

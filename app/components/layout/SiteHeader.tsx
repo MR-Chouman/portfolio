@@ -1,5 +1,8 @@
 import { Link, NavLink } from "react-router";
 
+import { ButtonLink } from "~/components/ui";
+
+import { contact } from "../../../content/contact";
 import { site } from "../../../content/site";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -30,7 +33,21 @@ export function SiteHeader() {
               ))}
             </ul>
           </nav>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            {/* Visible text is the short label; the accessible name starts
+                with it (WCAG 2.5.3) and says what the link does. */}
+            <ButtonLink
+              href={contact.cv.href}
+              download={contact.cv.fileName}
+              type="application/pdf"
+              aria-label={`${contact.cv.label} (${contact.cv.format})`}
+              variant="secondary"
+              size="sm"
+            >
+              {contact.cv.shortLabel}
+            </ButtonLink>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>
