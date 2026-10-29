@@ -279,3 +279,17 @@ Status: Accepted · 2026-10-30 · Records the MDX check asked for in D-007
 - New dev dependencies (build time only, nothing shipped to the browser): `zod`, `yaml`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `@types/mdx`. `tsconfig.json` allows `.ts` extensions in imports so `vite.config.ts` can import `mdx.config.ts` in the form Vite's future native config loader requires.
 
 **Consequences.** Adding a case study means adding one MDX file; its page is prerendered automatically. All case study bodies are in the `/work/:slug` route chunk, which is fine for four projects; T-062 can split them with a lazy glob if they grow. Unknown `/work/*` slugs render the generic error page until T-025 adds the 404 page. When a client-side feature needs Zod at runtime (the CRUD drawer, T-052), it moves to `dependencies`.
+
+## D-026 · Work index and case study template
+Status: Accepted · 2026-10-30 · Refines D-025
+
+**Context.** T-022 extends the minimal `/work/:slug` route of T-020 into the full case study template and adds the `/work` index. REQUIREMENTS section 5 lists a summary header, problem, what I owned, key decisions, outcome, captioned images and a next-project link. The case study texts and images are written later (T-030 to T-034).
+
+**Decision.**
+- Page titles and labels for both routes live in `content/work.ts`, validated by `workSchema` with the other content at build time. Project facts stay in the MDX frontmatter. `/work` is a static prerender path.
+- Sections are the `##` headings of each MDX body, not frontmatter fields, so each case study can phrase and order them and place figures inside them. The project files carry the four REQUIREMENTS sections as placeholders (F-014).
+- Captioned images use `Figure` (`<figure>`, `<img>` with required `width`, `height` and `alt`, and `<figcaption>`), lazy-loaded unless `priority` is set. The route passes it to the MDX content through `components`, so MDX files use `<Figure ... />` without importing it. Styles live in `.prose-content` so skins can restyle them (D-005).
+- "Next project" follows display order and wraps from the last project to the first, so every case study ends with a next step. It sits in a `nav` landmark, and its link is named "Next project: <title>".
+- Case studies set `og:type` to `article` (`pageMeta` takes an optional `type`); other pages stay `website`.
+
+**Consequences.** Adding a component for case studies means adding it to the route's MDX `components` map. Figures need the AVIF/WebP files from the image pipeline (T-034) before any case study uses them.
