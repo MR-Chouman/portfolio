@@ -1,4 +1,5 @@
 export { Button, ButtonLink, buttonStyles } from "./Button";
+export { Figure } from "./Figure";
 export { Anchor, Link, isInternalHref } from "./Link";
 export { Metric, MetricList } from "./Metric";
 export { Prose } from "./Prose";

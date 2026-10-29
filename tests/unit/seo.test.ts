@@ -17,6 +17,13 @@ describe("pageMeta", () => {
     ]);
   });
 
+  it("sets the Open Graph type when asked", () => {
+    expect(pageMeta({ ...base, type: "article" })).toContainEqual({
+      property: "og:type",
+      content: "article",
+    });
+  });
+
   it("adds a noindex robots tag only when asked", () => {
     expect(pageMeta(base)).not.toContainEqual(
       expect.objectContaining({ name: "robots" }),

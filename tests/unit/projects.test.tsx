@@ -1,10 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
-import { getProject, projects } from "~/lib/projects";
-import CaseStudy from "~/routes/work.$slug";
+import { getNextProject, getProject, projects } from "~/lib/projects";
+import CaseStudy, { meta } from "~/routes/work.$slug";
 
 import { loadProjects } from "../../content/load";
+import { work } from "../../content/work";
 import type { Route } from "../../app/routes/+types/work.$slug";
 
 describe("project loader", () => {
@@ -24,22 +26,112 @@ describe("project loader", () => {
   it("returns undefined for an unknown slug", () => {
     expect(getProject("not-a-project")).toBeUndefined();
   });
+
+  it("finds the next project in display order, wrapping to the first", () => {
+    expect(projects.length).toBeGreaterThan(1);
+    for (const [index, project] of projects.entries()) {
+      expect(getNextProject(project.slug)).toBe(
+        projects[(index + 1) % projects.length],
+      );
+    }
+    expect(getNextProject("not-a-project")).toBeUndefined();
+  });
 });
 
 describe("case study route", () => {
   const props = (slug: string) =>
     ({ params: { slug } }) as unknown as Route.ComponentProps;
 
-  it("renders the project header and its MDX body", () => {
+  function renderCaseStudy(slug: string) {
+    return render(
+      <MemoryRouter>
+        <CaseStudy {...props(slug)} />
+      </MemoryRouter>,
+    );
+  }
+
+  it("renders the summary header with role, stack and metrics", () => {
     const [first] = projects;
-    const { container } = render(<CaseStudy {...props(first.slug)} />);
+    renderCaseStudy(first.slug);
     expect(
-      screen.getByRole("heading", { level: 1, name: first.title }),
-    ).toBeInTheDocument();
-    expect(container.querySelector(".prose-content")?.textContent).not.toBe("");
+      screen.getAllByRole("heading", { level: 1 }).map((h) => h.textContent),
+    ).toEqual([first.title]);
+    expect(screen.getByText(first.summary)).toBeInTheDocument();
+    expect(screen.getByText(first.role)).toBeInTheDocument();
+    for (const item of first.stack) {
+      expect(screen.getByText(item)).toBeInTheDocument();
+    }
+    const metrics = screen.getByRole("region", {
+      name: work.caseStudy.metrics,
+    });
+    for (const metric of first.metrics) {
+      expect(within(metrics).getByText(metric.value)).toBeInTheDocument();
+    }
+  });
+
+  it("renders the MDX body sections", () => {
+    const [first] = projects;
+    const { container } = renderCaseStudy(first.slug);
+    const body = container.querySelector(".prose-content");
+    expect(body?.querySelectorAll("h2").length).toBeGreaterThan(0);
+  });
+
+  it("links back to the index and on to the next project", () => {
+    for (const project of projects) {
+      const next = getNextProject(project.slug);
+      const { unmount } = renderCaseStudy(project.slug);
+      const nav = screen.getByRole("navigation", {
+        name: work.caseStudy.navigationLabel,
+      });
+      expect(
+        within(nav).getByRole("link", {
+          name: `${work.caseStudy.next}: ${next?.title}`,
+        }),
+      ).toHaveAttribute("href", `/work/${next?.slug}`);
+      for (const link of screen.getAllByRole("link", {
+        name: new RegExp(work.caseStudy.back.label),
+      })) {
+        expect(link).toHaveAttribute("href", work.caseStudy.back.href);
+      }
+      unmount();
+    }
   });
 
   it("throws a 404 for an unknown slug", () => {
-    expect(() => render(<CaseStudy {...props("not-a-project")} />)).toThrow();
+    expect(() => renderCaseStudy("not-a-project")).toThrow();
+  });
+});
+
+describe("case study meta", () => {
+  it("gives each project its own title, canonical URL and article type", () => {
+    const titles = new Set<string>();
+    for (const project of projects) {
+      const tags = meta({
+        params: { slug: project.slug },
+      } as unknown as Route.MetaArgs);
+      const title = tags
+        .map((tag) => ("title" in tag ? String(tag.title) : undefined))
+        .find(Boolean);
+      expect(title).toContain(project.title);
+      titles.add(title ?? "");
+      expect(tags).toContainEqual({
+        property: "og:description",
+        content: project.summary,
+      });
+      expect(tags).toContainEqual({ property: "og:type", content: "article" });
+      expect(tags).toContainEqual(
+        expect.objectContaining({
+          rel: "canonical",
+          href: expect.stringMatching(new RegExp(`/work/${project.slug}$`)),
+        }),
+      );
+    }
+    expect(titles.size).toBe(projects.length);
+  });
+
+  it("returns no tags for an unknown slug", () => {
+    expect(
+      meta({ params: { slug: "nope" } } as unknown as Route.MetaArgs),
+    ).toEqual([]);
   });
 });

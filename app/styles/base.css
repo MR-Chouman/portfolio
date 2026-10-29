@@ -175,6 +175,14 @@
       border-radius: var(--radius-card);
     }
 
+    /* Captioned images (Figure, T-022) take the full text column and keep
+       their aspect ratio from the width/height attributes. */
+    & figure img {
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+    }
+
     & figcaption {
       margin-top: 0.75em;
       color: var(--fg-muted);
