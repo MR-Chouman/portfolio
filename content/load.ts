@@ -8,17 +8,20 @@ import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 
+import { about } from "./about";
 import { experience } from "./experience";
 import { home } from "./home";
 import { profile } from "./profile";
 import { work } from "./work";
 import {
+  aboutSchema,
   experienceSchema,
   homeSchema,
   profileSchema,
   projectFrontmatterSchema,
   slugSchema,
   workSchema,
+  type About,
   type Experience,
   type Home,
   type Profile,
@@ -106,6 +109,7 @@ export interface Content {
   experience: Experience;
   home: Home;
   work: Work;
+  about: About;
   projects: ProjectSummary[];
 }
 
@@ -115,12 +119,13 @@ export function loadContent(dir: string = PROJECTS_DIR): Content {
     experience: check(experienceSchema, experience, "content/experience.ts"),
     home: check(homeSchema, home, "content/home.ts"),
     work: check(workSchema, work, "content/work.ts"),
+    about: check(aboutSchema, about, "content/about.ts"),
     projects: loadProjects(dir),
   };
 }
 
 // Static pages plus one case study page per project (D-002).
-export const STATIC_PATHS = ["/", "/work", "/style-tile"] as const;
+export const STATIC_PATHS = ["/", "/work", "/about", "/style-tile"] as const;
 
 export function prerenderPaths(dir: string = PROJECTS_DIR): string[] {
   const { projects } = loadContent(dir);
