@@ -21,6 +21,9 @@ _None._
 
 ## Resolved
 
+- **F-014** · resolved · 2026-10-30 · auto (recommended) · -> T-022, D-026
+  How should the case study template define its sections and images before the case studies are written (T-030 to T-034)? Chosen: sections are `##` headings in each MDX body, and every project body now has the four REQUIREMENTS sections ("The problem", "What I owned", "Key decisions", "Outcome") with text marked "Placeholder"; images use a `<Figure>` component (required width, height, alt and caption) that MDX files use without importing, and no image ships until real anonymized crops exist. Alternatives: section text as structured frontmatter fields rendered by the route; an invented sample image now. Reason: MDX keeps case studies free to vary their headings and embed figures where they belong, and no claim or visual is invented.
+
 - **F-012** · resolved · 2026-10-30 · auto (recommended) · -> T-021
   What copy should the home page's "How I build", About teaser and contact block use before T-035? Chosen: section titles that restate REQUIREMENTS facts only ("One foundation, many platforms", "A shared data layer", "A component library", "From biology to frontend lead"), with every body sentence marked "Placeholder" and pointing at T-035. Alternatives: draft full copy now; hide the sections until T-035. Reason: the page is complete in structure without inventing claims about the owner's work.
 - **F-013** · resolved · 2026-10-30 · auto (recommended) · -> T-021, T-024

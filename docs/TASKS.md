@@ -71,9 +71,10 @@ Current phase: **Phase 2: Content and pages**
   Hero, metrics strip, selected work, "How I build" teaser, About teaser, contact block. Placeholder content allowed until Phase 3.
   Done when: home is complete at all breakpoints with per-route `meta`.
   Notes: copy lives in `content/home.ts`, validated by `homeSchema` at build time (links must be site paths, `#anchors` or `https://` URLs); the headline and metrics come from `profile.ts` and the work list from the project files. Approach, About and contact text are marked placeholders for T-035 (F-012). The contact block links the GitHub profile only; T-024 adds the email and CV (F-013). "All case studies" and "More about me" lead to the not-found page until T-022 and T-023. Playwright checks 375/768/1440 px, both themes with axe, and the prerendered meta.
-- **T-022** · todo · Work index and case study template
+- **T-022** · done · Work index and case study template
   `/work` and `/work/:slug`: summary header, sections, captioned images, next-project link, per-route `meta`.
   Done when: each slug has its own prerendered HTML with its own title and Open Graph tags.
+  Notes: D-026. `/work` lists every project (copy in `content/work.ts`, validated by `workSchema`). The case study template has a back link, a summary header (sector, title, summary, role, stack, metrics), the MDX body whose `##` headings are the sections, and a "Next project" link that wraps from the last project to the first. Captioned images use `<Figure>`, available in MDX without an import; no images ship until T-030 to T-034. Each project body now has the four REQUIREMENTS sections with placeholder text (F-014). Case studies use `og:type` `article`. Playwright checks the prerendered title and Open Graph tags of `/work` and every slug, the next-project chain, and axe in both themes at 375 and 1440 px.
 - **T-023** · todo · About page
   Story, experience timeline, skills, education.
   Done when: page is complete and content comes only from `content/`.

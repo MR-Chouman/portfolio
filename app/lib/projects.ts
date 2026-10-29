@@ -37,3 +37,11 @@ export function getProject(slug: string): Project | undefined {
   const entry = entries.find(({ summary }) => summary.slug === slug);
   return entry && { ...entry.summary, Content: entry.Content };
 }
+
+// The project after `slug` in display order, wrapping from the last to the
+// first, for the "Next project" link of a case study (T-022).
+export function getNextProject(slug: string): ProjectSummary | undefined {
+  const index = projects.findIndex((project) => project.slug === slug);
+  if (index === -1 || projects.length < 2) return undefined;
+  return projects[(index + 1) % projects.length];
+}
