@@ -35,7 +35,7 @@ Node version is pinned in `.nvmrc`. Before opening any PR: `lint`, `typecheck`, 
 - Commits and PR titles use Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`). Because task branches are merged with all their commits (D-013), every commit must follow this and describe a real step: no `wip` or bare `fix` commits.
 - PR bodies follow `.github/pull_request_template.md` (task) or `.github/PULL_REQUEST_TEMPLATE/phase.md` (phase).
 - Update `docs/TASKS.md` (and DECISIONS/FEEDBACK when relevant) **in the same PR** as the work.
-- Slash commands: `/start-task` (picks the next eligible task from `docs/TASKS.md`; an ID such as `T-012` overrides the choice), `/finish-task` (verify, PR, wait for CI, merge into `dev`), `/finish-phase` (full checks, PR, merge into `main`, tag).
+- Slash commands: `/start-task` (picks the next eligible task from `docs/TASKS.md`; an ID such as `T-012` overrides the choice), `/finish-task` (verify, PR, wait for CI, merge into `dev`), `/finish-phase` (full checks, PR, merge into `main`, tag), `/run-phase` (runs every task of the current phase, one fresh subagent per task, auto-answering questions, then `/finish-phase` if all is clean; D-024).
 - Tasks marked **Owner review** in `docs/TASKS.md` are never auto-merged: open the PR, wait for CI, then stop for my review.
 
 ## Structure
@@ -77,3 +77,4 @@ docs/                 # REQUIREMENTS, TASKS, DECISIONS, FEEDBACK
 ## When unsure
 
 If a task is ambiguous or blocked by an open FEEDBACK item, add a note to `docs/FEEDBACK.md` and ask me. Do not guess on design direction, copy claims, or anything affecting what is published about my work.
+Exception: under `/run-phase` (the `--auto` mode of `/start-task` and `/finish-task`), choose the recommended option and log it as an `auto (recommended)` FEEDBACK item instead of asking; claims about my work stay placeholders, and the hard stops in `.claude/commands/start-task.md` still apply (D-024).

@@ -251,3 +251,17 @@ Status: Accepted · 2026-10-23 · Refines D-005
 - Switching uses `document.startViewTransition` with a 200 ms cross-fade of the root (`--duration-base`). It is instant when the API is missing or the visitor prefers reduced motion.
 
 **Consequences.** A Content Security Policy (T-025) must allow this inline script by its `sha256` hash, recomputed whenever `themeScript` changes. A visitor whose storage is blocked keeps a choice until the next reload.
+
+## D-024 · Autonomous phase runs with `/run-phase`
+Status: Accepted · 2026-10-29 · Refines D-012
+
+**Context.** Running a phase took one `/start-task`, `/finish-task` and `/clear` per task, plus the owner answering every question. The owner wants a phase to run unattended, with a clean context per task.
+
+**Decision.**
+- `/run-phase` is a thin orchestrator. It picks each eligible task and runs it in a fresh general-purpose subagent, which follows `/start-task` and `/finish-task` with `--auto`. A command cannot clear its own chat, so a new subagent per task is how each task gets a clean context; the orchestrator keeps only each task's RESULT block.
+- In `--auto` mode, questions are answered with the recommended option and logged as `auto (recommended)` FEEDBACK items and in the PR notes. Claims about the owner's work stay placeholders. Hard stops (client names, confidential or personal data, secrets, `docs/REQUIREMENTS.md`, contradicting a decision) block the task instead.
+- Draft verification PRs from the task branch into `dev` or `main` are pre-authorized and closed unmerged (as in F-009).
+- Owner review tasks are parked in `review` and Owner action tasks are parked as `blocked`; later tasks that depend on a parked task are skipped. A failed task stops the run, with no automatic retry.
+- `/finish-phase` runs automatically only when every task of the phase is `done` and nothing was parked or failed; its own merge conditions still apply.
+
+**Consequences.** Auto-answered choices land without the owner seeing them first, so the owner reviews `auto (recommended)` FEEDBACK items after a run. A phase release can deploy to production without an owner in the loop when every check is green.
