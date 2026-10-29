@@ -60,7 +60,7 @@ describe("content in the repository", () => {
       .map((name) => `/work/${name.replace(/\.mdx$/, "")}`);
     expect(slugs.length).toBeGreaterThan(0);
     expect(prerenderPaths()).toEqual(
-      expect.arrayContaining(["/", "/style-tile", ...slugs]),
+      expect.arrayContaining(["/", "/work", "/style-tile", ...slugs]),
     );
   });
 

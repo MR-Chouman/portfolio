@@ -143,9 +143,34 @@ export const homeSchema = z.strictObject({
   }),
 });
 
+// Copy for the work index (/work) and the case study template
+// (/work/:slug), in content/work.ts (T-022). Project facts come from the
+// project files; this holds only page titles and labels.
+export const workSchema = z.strictObject({
+  meta: z.strictObject({
+    title: text,
+    description: text.max(200),
+  }),
+  index: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+    linkLabel: text,
+  }),
+  caseStudy: z.strictObject({
+    back: linkSchema,
+    role: text,
+    stack: text,
+    metrics: text,
+    next: text,
+    // The navigation landmark around the next-project link.
+    navigationLabel: text,
+  }),
+});
+
 export type Metric = z.infer<typeof metricSchema>;
 export type Link = z.infer<typeof linkSchema>;
 export type Home = z.infer<typeof homeSchema>;
+export type Work = z.infer<typeof workSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
 export type Experience = z.infer<typeof experienceSchema>;
