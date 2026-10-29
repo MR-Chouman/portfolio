@@ -16,10 +16,16 @@ _None._
 
 ## Triaged
 
+- **F-017** · triaged · 2026-10-30 · self · -> T-060
+  Cloudflare Pages redirects `/about` to `/about/` (308), because prerendered pages are `<path>/index.html`, while canonical and Open Graph URLs omit the trailing slash. T-060 should make canonical URLs match the served URL (or the reverse) so they do not point at a redirect.
+
 - **F-007** · triaged · 2026-10-23 · owner · -> T-024, T-026
   The CV goes into a folder whose contents Git ignores (T-026). The published copy goes in `public/` (F-008, T-024).
 
 ## Resolved
+
+- **F-016** · resolved · 2026-10-30 · auto (recommended) · -> T-025, D-027
+  "Done when" asks for a 404 status on the Cloudflare preview, but Cloudflare builds only `dev` (README), so a task branch cannot be checked there before it merges. Chosen: prove it locally (the build writes a top-level `404.html`, which Pages serves with a 404 status; Playwright checks the page, `_headers` and the CSP), merge, then check `https://dev.portfolio-4q6.pages.dev/<unknown>` right after the merge and report the result. Alternatives: park the task in `review` for the owner; temporarily enable preview builds for task branches in Cloudflare. Reason: the check is only possible after the merge into `dev`, which is staging, and `/finish-phase` re-checks before production.
 
 - **F-015** · resolved · 2026-10-30 · auto (recommended) · -> T-023, T-035
   What copy should the About page use before the owner writes it? Chosen: section titles and labels in `content/about.ts`; the story as three paragraphs following the REQUIREMENTS arc (biology, bioinformatics MSc with machine learning on protein sequences, frontend lead), each marked "Placeholder"; the single timeline entry, the university and the page intro stay placeholders, now pointing at T-035 (the Owner review task for About copy); skills and education restate REQUIREMENTS facts only. Alternatives: draft the full story and timeline now; hide unfinished sections until T-035. Reason: the page is complete in structure without inventing claims, dates or employers.
