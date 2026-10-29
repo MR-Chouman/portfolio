@@ -167,10 +167,33 @@ export const workSchema = z.strictObject({
   }),
 });
 
+// Copy for the About page (content/about.ts, T-023). The story, skills and
+// education live in profile.ts and the timeline in experience.ts.
+export const aboutSchema = z.strictObject({
+  meta: z.strictObject({
+    title: text,
+    description: text.max(200),
+  }),
+  header: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+  }),
+  story: z.strictObject({ title: text }),
+  experience: z.strictObject({
+    title: text,
+    // Shown as the end of the current role.
+    present: text,
+  }),
+  skills: z.strictObject({ title: text }),
+  education: z.strictObject({ title: text }),
+  links: z.array(linkSchema).min(1).max(2),
+});
+
 export type Metric = z.infer<typeof metricSchema>;
 export type Link = z.infer<typeof linkSchema>;
 export type Home = z.infer<typeof homeSchema>;
 export type Work = z.infer<typeof workSchema>;
+export type About = z.infer<typeof aboutSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
 export type Experience = z.infer<typeof experienceSchema>;

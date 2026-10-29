@@ -2,7 +2,8 @@
 // Validated by experienceSchema at build time (content/load.ts).
 //
 // Organizations are generic descriptions, never names (D-018). Entries marked
-// "Placeholder" (and their dates) are replaced with the owner's approved timeline in T-023.
+// "Placeholder" (and their dates) are replaced with the owner's approved
+// timeline in T-035 (F-015).
 import type { Experience } from "./schema";
 
 export const experience = [
@@ -12,7 +13,7 @@ export const experience = [
     start: "2024-08",
     end: null,
     summary:
-      "Placeholder: one sentence on the scope of the role, written in T-023.",
+      "Placeholder: one sentence on the scope of the role, written in T-035.",
     highlights: [],
   },
 ] satisfies Experience;

@@ -75,9 +75,10 @@ Current phase: **Phase 2: Content and pages**
   `/work` and `/work/:slug`: summary header, sections, captioned images, next-project link, per-route `meta`.
   Done when: each slug has its own prerendered HTML with its own title and Open Graph tags.
   Notes: D-026. `/work` lists every project (copy in `content/work.ts`, validated by `workSchema`). The case study template has a back link, a summary header (sector, title, summary, role, stack, metrics), the MDX body whose `##` headings are the sections, and a "Next project" link that wraps from the last project to the first. Captioned images use `<Figure>`, available in MDX without an import; no images ship until T-030 to T-034. Each project body now has the four REQUIREMENTS sections with placeholder text (F-014). Case studies use `og:type` `article`. Playwright checks the prerendered title and Open Graph tags of `/work` and every slug, the next-project chain, and axe in both themes at 375 and 1440 px.
-- **T-023** · todo · About page
+- **T-023** · done · About page
   Story, experience timeline, skills, education.
   Done when: page is complete and content comes only from `content/`.
+  Notes: `/about` is prerendered with its own `meta`. Page titles and labels live in `content/about.ts` (validated by `aboutSchema`); the story, skills and education come from `profile.ts` and the timeline from `experience.ts`, rendered as an ordered list with `<time>` dates. Typographic, no headshot (D-018). The story, timeline entry, university and page intro are marked placeholders for T-035 (F-015); skills and education restate REQUIREMENTS facts only. The header "About" link and the home "More about me" link now reach the page. Playwright checks the prerendered meta, both links, and every section, horizontal scroll and axe in both themes at 375, 768 and 1440 px.
 - **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
   `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number on the pages. The owner adds the CV PDF to `public/` (F-008); it may include the phone number (D-018).
   Done when: CV downloads from the header and contact block.

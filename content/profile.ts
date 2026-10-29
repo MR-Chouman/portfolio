@@ -2,7 +2,8 @@
 // Validated by profileSchema at build time (content/load.ts).
 //
 // Facts and numbers come from REQUIREMENTS section 4. Text marked
-// "Placeholder" is replaced with the owner's approved copy in T-023 and T-035.
+// "Placeholder" is replaced with the owner's approved copy in T-035 (F-010,
+// F-015).
 import type { Profile } from "./schema";
 
 export const profile = {
@@ -18,8 +19,12 @@ export const profile = {
     { value: "260+", label: "Admin screens" },
     { value: "~3 yrs", label: "Experience" },
   ],
+  // The About story, one string per paragraph, following the arc in
+  // REQUIREMENTS section 4.
   story: [
-    "Placeholder: the short first-person story (biology, then bioinformatics, then frontend lead), written and approved in T-023.",
+    "Placeholder: how the path started in biology, written and approved in T-035.",
+    "Placeholder: the move to bioinformatics (an MSc with machine learning on protein sequences), written and approved in T-035.",
+    "Placeholder: the step into frontend work and to leading enterprise admin platforms, written and approved in T-035.",
   ],
   skills: [
     {
@@ -39,7 +44,7 @@ export const profile = {
     {
       degree: "MSc",
       field: "Bioinformatics",
-      institution: "Placeholder: university, confirmed in T-023",
+      institution: "Placeholder: university, confirmed in T-035",
       note: "Machine learning on protein sequences.",
     },
   ],

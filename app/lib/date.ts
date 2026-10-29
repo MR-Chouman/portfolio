@@ -9,3 +9,13 @@ export function formatDate(iso: string): string {
     timeZone: "UTC",
   }).format(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
 }
+
+// Formats a "YYYY-MM" month, e.g. "2024-08" -> "Aug 2024". Time zone
+// independent, like formatDate.
+export function formatYearMonth(yearMonth: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${yearMonth}-01T00:00:00Z`));
+}
