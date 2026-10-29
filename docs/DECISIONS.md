@@ -265,3 +265,17 @@ Status: Accepted · 2026-10-29 · Refines D-012
 - `/finish-phase` runs automatically only when every task of the phase is `done` and nothing was parked or failed; its own merge conditions still apply.
 
 **Consequences.** Auto-answered choices land without the owner seeing them first, so the owner reviews `auto (recommended)` FEEDBACK items after a run. A phase release can deploy to production without an owner in the loop when every check is green.
+
+## D-025 · Content layer: build-time Zod validation, MDX through `@mdx-js/rollup`
+Status: Accepted · 2026-10-30 · Records the MDX check asked for in D-007
+
+**Context.** T-020 needs typed, validated content that fails the build when it is wrong, case studies written in MDX with frontmatter, and a prerender list derived from content. D-007 asked to verify that an MDX plugin works with React Router framework mode (React Router 8.5, Vite 8 with Rolldown).
+
+**Decision.**
+- `content/schema.ts` holds Zod 4 schemas for the profile, the experience timeline and the project frontmatter. Objects are strict (unknown keys fail, which catches typos), with no transforms or defaults, so the data the app renders is exactly the data that was validated. Slugs are the MDX file names and must be lowercase kebab-case; project `order` values must be unique.
+- Validation runs at build time only. `react-router.config.ts` sets `prerender` to a function that calls `content/load.ts`: it validates `profile.ts` and `experience.ts`, reads each `content/projects/*.mdx` file's YAML frontmatter with `yaml`, validates it, and returns the static paths plus `/work/<slug>` for every project. Any error stops `npm run build` with the file and field named. The app imports only the inferred types (`import type`), so Zod is not in the client bundle; `profile.ts` and `experience.ts` use `satisfies` for compile-time checks.
+- MDX: `@mdx-js/rollup` 3.1 with `remark-frontmatter` and `remark-mdx-frontmatter` (YAML exported as `frontmatter`), added before the React Router plugin with `enforce: "pre"` in a shared `mdx.config.ts` used by Vite and Vitest. **Verified:** it works in framework mode with `ssr: false` and prerendering; each case study page is prerendered with its MDX body, title and Open Graph tags. The compiled MDX imports only `react/jsx-runtime`, so it adds no client dependency. A unit test checks that the MDX pipeline and `content/load.ts` read the same frontmatter.
+- `app/lib/projects.ts` loads the MDX modules with `import.meta.glob` (eager), so case study pages need no `loader` and client-side navigation makes no data request. A minimal `/work/:slug` route ships with T-020 because prerendering a path that matches no route fails the build; T-022 builds the full template on it.
+- New dev dependencies (build time only, nothing shipped to the browser): `zod`, `yaml`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `@types/mdx`. `tsconfig.json` allows `.ts` extensions in imports so `vite.config.ts` can import `mdx.config.ts` in the form Vite's future native config loader requires.
+
+**Consequences.** Adding a case study means adding one MDX file; its page is prerendered automatically. All case study bodies are in the `/work/:slug` route chunk, which is fine for four projects; T-062 can split them with a lazy glob if they grow. Unknown `/work/*` slugs render the generic error page until T-025 adds the 404 page. When a client-side feature needs Zod at runtime (the CRUD drawer, T-052), it moves to `dependencies`.

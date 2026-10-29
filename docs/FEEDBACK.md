@@ -21,6 +21,10 @@ _None._
 
 ## Resolved
 
+- **F-010** · resolved · 2026-10-30 · auto (recommended) · -> T-020
+  What content should the content layer ship with before the case studies (Phase 3) and final copy (T-023, T-035)? Chosen: four project files whose frontmatter uses only the facts in REQUIREMENTS section 4, with the role and body marked "Placeholder"; profile and experience use the same facts and mark everything else (summary, story, university, employer description, dates) as placeholders. Alternatives: one invented sample project; empty files. Reason: real slugs let T-021/T-022 build on the final URLs without inventing any claim.
+- **F-011** · resolved · 2026-10-30 · auto (recommended) · -> T-020, D-025
+  Prerendering `/work/<slug>` fails the build when no route matches, so how does T-020 prove every slug is prerendered before T-022? Chosen: a minimal `/work/:slug` route (header, metrics, MDX body, per-route meta) that T-022 extends into the full template. Alternatives: leave slugs out of the prerender list until T-022 (fails "Done when"); a placeholder route with no content. Reason: it also verifies the MDX pipeline end to end, as D-007 asks.
 - **F-009** · resolved · 2026-10-23 · owner · -> T-015
   The owner allowed a draft verification PR into `main` (#24, closed unmerged); the second e2e run restored the cache.
 - **F-002** · resolved · 2026-10-23 · owner · -> D-019, D-020
