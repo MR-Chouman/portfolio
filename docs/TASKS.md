@@ -63,9 +63,10 @@ Current phase: **Phase 2: Content and pages**
 
 ## Phase 2: Content and pages (tag v0.3.0)
 
-- **T-020** · todo · Content layer
+- **T-020** · done · Content layer
   Zod schemas in `content/schema.ts`; `profile.ts`, `experience.ts`; projects as MDX with validated frontmatter (verify the MDX Vite plugin works with React Router framework mode, record in DECISIONS). Derive the `prerender` path list from content.
   Done when: invalid content fails `npm run build`, and every project slug is prerendered.
+  Notes: D-025. MDX works in framework mode via `@mdx-js/rollup`. Content is validated in Node when `react-router.config.ts` builds the prerender list (checked by breaking a project's `order`: the build stops naming the file and field). A minimal `/work/:slug` route ships here and T-022 extends it (F-011); project, profile and experience copy is placeholder or REQUIREMENTS facts only (F-010). Unknown `/work/*` slugs show the generic error page until T-025.
 - **T-021** · todo · Home page
   Hero, metrics strip, selected work, "How I build" teaser, About teaser, contact block. Placeholder content allowed until Phase 3.
   Done when: home is complete at all breakpoints with per-route `meta`.
