@@ -3,7 +3,10 @@
     "collect": {
       "startServerCommand": "npm run preview",
       "startServerReadyPattern": "Local:",
-      "url": ["http://localhost:4173/"],
+      "url": [
+        "http://localhost:4173/",
+        "http://localhost:4173/work/airline-crew-management"
+      ],
       "numberOfRuns": 3
     },
     "assert": {
