@@ -12,7 +12,8 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Open
 
-_None._
+- **F-019** · open · 2026-10-30 · self · blocks T-026
+  Owner action: copy the current CV PDF (the version with the Gmail address) into `private/`, for example `private/cv.pdf`. Then run `git status` and confirm it lists nothing under `private/` (`git check-ignore -v private/cv.pdf` should print the `/private/*` rule). Never `git add -f` it. Then set T-026 to `done` (or tell Claude to finish it).
 
 ## Triaged
 
