@@ -11,8 +11,12 @@ import type { Route } from "./+types/root";
 import { SiteFooter } from "./components/layout/SiteFooter";
 import { SiteHeader } from "./components/layout/SiteHeader";
 import { SkipLink } from "./components/layout/SkipLink";
+import { NotFound, notFoundMeta } from "./components/sections/NotFound";
+import { Link } from "./components/ui";
 import { themeScript } from "./lib/theme";
 import "./styles/base.css";
+import { notFound } from "../content/not-found";
+import { site } from "../content/site";
 import frauncesLatin from "@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url";
 import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 
@@ -56,26 +60,35 @@ export default function App() {
   return <Outlet />;
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
+function isNotFound(error: unknown): boolean {
+  return isRouteErrorResponse(error) && error.status === 404;
+}
 
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
+// Only used when a route throws: the 404 page's tags for a 404 response
+// (an unknown case study slug), otherwise the error page's title.
+export const meta: Route.MetaFunction = ({ error }) => {
+  if (!error) return [];
+  if (isNotFound(error)) return notFoundMeta();
+  return [
+    { title: `${notFound.error.title} · ${site.name}` },
+    { name: "robots", content: "noindex" },
+  ];
+};
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  if (isNotFound(error)) return <NotFound />;
+
+  const { title, body, link } = notFound.error;
+  const stack =
+    import.meta.env.DEV && error instanceof Error ? error.stack : undefined;
 
   return (
     <div className="page-container pt-section">
-      <h1 className="text-4xl">{message}</h1>
-      <p className="mt-3 text-fg-muted">{details}</p>
+      <h1 className="text-4xl sm:text-5xl">{title}</h1>
+      <p className="mt-4 max-w-reading text-lg text-fg-muted">{body}</p>
+      <p className="mt-8">
+        <Link href={link.href}>{link.label}</Link>
+      </p>
       {stack && (
         <pre className="mt-6 w-full overflow-x-auto rounded-lg bg-surface-raised p-4 text-sm">
           <code>{stack}</code>

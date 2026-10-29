@@ -82,7 +82,7 @@ Current phase: **Phase 2: Content and pages**
 - **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
   `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number on the pages. The owner adds the CV PDF to `public/` (F-008); it may include the phone number (D-018).
   Done when: CV downloads from the header and contact block.
-- **T-025** · todo · 404 and headers
+- **T-025** · doing · 404 and headers
   404 page; `public/_headers` with long-cache for hashed assets and sensible security headers.
   Done when: an unknown URL returns the 404 page with a 404 status on the Cloudflare preview.
 - **T-026** · todo · Private CV folder (Owner action)

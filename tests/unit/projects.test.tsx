@@ -2,10 +2,12 @@ import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
+import { notFoundMeta } from "~/components/sections/NotFound";
 import { getNextProject, getProject, projects } from "~/lib/projects";
 import CaseStudy, { meta } from "~/routes/work.$slug";
 
 import { loadProjects } from "../../content/load";
+import { notFound } from "../../content/not-found";
 import { work } from "../../content/work";
 import type { Route } from "../../app/routes/+types/work.$slug";
 
@@ -97,8 +99,11 @@ describe("case study route", () => {
     }
   });
 
-  it("throws a 404 for an unknown slug", () => {
-    expect(() => renderCaseStudy("not-a-project")).toThrow();
+  it("renders the 404 page for an unknown slug", () => {
+    renderCaseStudy("not-a-project");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      notFound.title,
+    );
   });
 });
 
@@ -129,9 +134,9 @@ describe("case study meta", () => {
     expect(titles.size).toBe(projects.length);
   });
 
-  it("returns no tags for an unknown slug", () => {
+  it("returns the 404 page's tags for an unknown slug", () => {
     expect(
       meta({ params: { slug: "nope" } } as unknown as Route.MetaArgs),
-    ).toEqual([]);
+    ).toEqual(notFoundMeta());
   });
 });
