@@ -35,7 +35,7 @@ Node version is pinned in `.nvmrc`. Before opening any PR: `lint`, `typecheck`, 
 - Commits and PR titles use Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`). Because task branches are merged with all their commits (D-013), every commit must follow this and describe a real step: no `wip` or bare `fix` commits.
 - PR bodies follow `.github/pull_request_template.md` (task) or `.github/PULL_REQUEST_TEMPLATE/phase.md` (phase).
 - Update `docs/TASKS.md` (and DECISIONS/FEEDBACK when relevant) **in the same PR** as the work.
-- Slash commands: `/start-task` (picks the next eligible task from `docs/TASKS.md`; an ID such as `T-012` overrides the choice), `/finish-task` (verify, PR, wait for CI, merge into `dev`), `/finish-phase` (full checks, PR, merge into `main`, tag), `/run-phase` (runs every task of the current phase, one fresh subagent per task, auto-answering questions, then `/finish-phase` if all is clean; D-024).
+- Slash commands: `/start-task` (picks the next eligible task from `docs/TASKS.md`; an ID such as `T-012` overrides the choice), `/finish-task` (verify, PR, wait for CI, merge into `dev`), `/finish-phase` (full checks, PR, merge into `main`, tag), `/run-phase` (runs every task of a phase, by default the current one, one fresh subagent per task, auto-answering questions, then `/finish-phase` if all is clean; D-024).
 - Tasks marked **Owner review** in `docs/TASKS.md` are never auto-merged: open the PR, wait for CI, then stop for my review.
 
 ## Structure

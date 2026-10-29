@@ -1,16 +1,22 @@
 ---
-description: Run every task of the current phase autonomously (one fresh subagent per task), then finish the phase if everything is clean
-argument-hint: [max-tasks] (optional, default 15)
+description: Run every task of a phase (default: the latest unfinished one) autonomously, one fresh subagent per task, then finish the phase if everything is clean
+argument-hint: [phase, e.g. 2 or "Phase 2"] [max-tasks, e.g. max=5] (both optional)
 ---
 
-Run the current phase without stopping for questions (D-024). $ARGUMENTS may give the maximum number of tasks to run; default 15.
+Run a phase without stopping for questions (D-024). $ARGUMENTS may contain:
+
+- **A phase** (`2`, `P2`, `Phase 2`). If none is given, run the **latest phase**: the "Current phase" line in `docs/TASKS.md`, which `/finish-phase` advances. If that line says `Complete`, tell me there is nothing left to run and stop.
+- **A maximum number of tasks** (`max=5`). Default 15.
+
+The phase chosen here is "the phase" in every step below.
 
 This chat is only the orchestrator. Each task runs in its own fresh subagent, so every task starts with a clean context. Keep this context small: never read source files or run checks here, and keep only each subagent's RESULT block.
 
 ## Preconditions
 
 1. The working tree is clean (`git status --porcelain` is empty). Otherwise stop and tell me.
-2. `git switch dev && git pull --ff-only`. Read "Current phase" in `docs/TASKS.md`.
+2. `git switch dev && git pull --ff-only`. Resolve the phase as described above and say which one you are running. If a phase was given and it is not the "Current phase", say so: the run works its tasks but skips step 5 (`/finish-phase` only releases the current phase).
+3. If the phase has no `todo` or `doing` task left, go straight to step 5.
 
 ## Loop
 
@@ -38,7 +44,7 @@ Repeat until no eligible task is left, a task fails, or the maximum is reached:
 
 ## Finish the phase
 
-5. If every task of the current phase is `done` in `docs/TASKS.md`, nothing was parked or failed, and `gh pr list --state open --base dev` shows no task PR, follow `.claude/commands/finish-phase.md`. It re-checks everything and refuses to merge on any failure. Otherwise do not run it.
+5. If the phase is the "Current phase", every task of it is `done` in `docs/TASKS.md`, nothing was parked or failed, and `gh pr list --state open --base dev` shows no task PR, follow `.claude/commands/finish-phase.md`. It re-checks everything and refuses to merge on any failure. Otherwise do not run it.
 
 ## Reply
 

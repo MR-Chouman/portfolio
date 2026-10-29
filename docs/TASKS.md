@@ -11,7 +11,7 @@ Current phase: **Phase 2: Content and pages**
 - Tasks marked **Owner** need input or an action from the owner; if it is missing, mark `blocked` and add a FEEDBACK item.
 - Tasks marked **Owner review** are never auto-merged: `/finish-task` opens the PR, waits for CI, then stops for the owner's review.
 - `/start-task` picks the first eligible `todo` task of the current phase in ID order (it skips `blocked` tasks and tasks listed under an open FEEDBACK item's "blocks").
-- `/run-phase` runs the current phase's tasks one after another, each in a fresh subagent with `--auto`: questions get the recommended answer (logged in FEEDBACK as `auto (recommended)`), Owner review and Owner action tasks are parked, and `/finish-phase` runs only when every task is `done` (D-024).
+- `/run-phase [phase] [max=N]` runs a phase's tasks (default: the current phase) one after another, each in a fresh subagent with `--auto`: questions get the recommended answer (logged in FEEDBACK as `auto (recommended)`), Owner review and Owner action tasks are parked, and `/finish-phase` runs only when every task is `done` (D-024).
 - Phase end: `/finish-phase` opens `dev` -> `main`, merges it with a merge commit when everything is clean, tags `v0.N.0` (Phase 0 -> `v0.1.0`, ..., Phase 6 -> `v0.7.0`, Phase 7 -> `v1.0.0`) and advances "Current phase".
 
 ---
