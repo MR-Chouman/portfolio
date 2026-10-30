@@ -3,12 +3,13 @@
  * ====================================
  *
  * Components style themselves only through the semantic tokens below, via the
- * Tailwind utilities they generate. Skins (`[data-skin]`, D-005) and themes
- * (`[data-theme]`) change what the tokens resolve to, never the markup.
+ * Tailwind utilities they generate. Themes (`[data-theme]`) change what the
+ * tokens resolve to, never the markup. The site has one design (D-038).
  *
  * Layers
- *   1. Raw custom properties (`--surface`, `--radius-card`, ...) on `:root`.
- *      Skins and themes override these and nothing else.
+ *   1. Raw custom properties (`--surface`, `--radius-card`, ...) on `:root`,
+ *      set at the end of this file. Themes override the colors and nothing
+ *      else.
  *   2. `@theme inline` maps them to Tailwind namespaces, so utilities emit
  *      `var(--surface)` and resolve per element at runtime.
  *   3. Tailwind's default palette, fonts, radii and text sizes are reset, so a
@@ -37,11 +38,11 @@
  *                        default line height.
  *   Weights, tracking and leading use Tailwind defaults.
  *
- * Radius (rounded-*). Values below are the Editorial skin's (F-002).
- *   rounded-sm    6 px   tags, small controls
- *   rounded-md   10 px   inputs, buttons
- *   rounded-lg   14 px   cards, panels
- *   rounded-xl   20 px   large surfaces, media
+ * Radius (rounded-*)
+ *   rounded-sm    3 px   tags, small controls
+ *   rounded-md    4 px   inputs, buttons
+ *   rounded-lg    6 px   cards, panels
+ *   rounded-xl    8 px   large surfaces, media
  *   rounded-full         pills, avatars (Tailwind built-in)
  *
  * Spacing
@@ -55,15 +56,14 @@
  * Motion (use as `duration-(--duration-base) ease-standard`)
  *   --duration-fast 120 ms   hover, press
  *   --duration-base 200 ms   theme cross-fade, small reveals
- *   --duration-slow 400 ms   skin reveal, drawers
+ *   --duration-slow 400 ms   drawers, larger reveals
  *   ease-standard / ease-emphasized
  *   Durations drop to 0 ms when the visitor prefers reduced motion.
  *
- * Skins and themes
- *   A skin file sets the color, font and radius values (`--surface`,
- *   `--font-family-body`, `--radius-card`, ...) for light and dark, and
- *   records its contrast ratios. `tests/unit/skins.test.ts` checks them.
- *   Theme selectors work on any element (`[data-theme="dark"]`), so a
+ * Themes
+ *   The end of this file sets the color values for light and dark and
+ *   records their contrast ratios; `tests/unit/theme-tokens.test.ts` checks
+ *   them. Theme selectors work on any element (`[data-theme="dark"]`), so a
  *   section can show a theme other than the page's (style tile).
  */
 
@@ -124,8 +124,6 @@
 }
 
 :root {
-  /* Skin-independent values. Colors, fonts and radii come from the skin
-     (app/styles/skins/), which must set every token listed above. */
   --space-gutter: clamp(1rem, 0.6rem + 1.7vw, 2rem);
   --space-section: clamp(4rem, 3rem + 4.3vw, 7rem);
   --width-page: 72rem;
@@ -136,6 +134,23 @@
   --duration-slow: 400ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --easing-emphasized: cubic-bezier(0.3, 0, 0, 1.15);
+
+  /* Geist for headings and text, Geist Mono for labels and figures
+     (D-020, D-033). Self-hosted through Fontsource, imported in base.css;
+     the latin Geist file is preloaded in root.tsx. */
+  --font-family-display:
+    "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-family-body:
+    "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-family-mono:
+    "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --radius-tag: 3px;
+  --radius-control: 4px;
+  --radius-card: 6px;
+  --radius-surface: 8px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -144,4 +159,61 @@
     --duration-base: 0ms;
     --duration-slow: 0ms;
   }
+}
+
+/*
+ * Colors (T-040, T-045, D-033, D-038): the look of a well-made admin
+ * console. Cool neutral greys, a teal-green accent and a blue focus ring.
+ *
+ * Every color token is set in both themes. The dark block appears twice
+ * (system preference and explicit choice) and both copies must match;
+ * `tests/unit/theme-tokens.test.ts` checks that and the contrast ratios.
+ *
+ * Contrast (WCAG 2.2; on surface / surface-raised)
+ *   light: fg 16.8 / 18.1, fg-muted 6.6 / 7.1, accent 5.0 / 5.4,
+ *          accent-fg on accent 5.2, focus 5.4 / 5.8
+ *   dark:  fg 16.8 / 15.5, fg-muted 8.1 / 7.5, accent 11.7 / 10.8,
+ *          accent-fg on accent 11.7, focus 10.3 / 9.5
+ */
+
+/* theme: light */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --surface: oklch(0.975 0.004 250);
+  --surface-raised: oklch(1 0 0);
+  --fg: oklch(0.2 0.012 255);
+  --fg-muted: oklch(0.46 0.016 255);
+  --line: oklch(0.89 0.006 250);
+  --accent: oklch(0.51 0.1 185);
+  --accent-fg: oklch(0.99 0.003 250);
+  --focus: oklch(0.52 0.2 265);
+}
+
+/* theme: dark (system preference) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface: oklch(0.16 0.008 255);
+    --surface-raised: oklch(0.205 0.01 255);
+    --fg: oklch(0.95 0.004 250);
+    --fg-muted: oklch(0.73 0.012 250);
+    --line: oklch(0.31 0.01 255);
+    --accent: oklch(0.82 0.12 180);
+    --accent-fg: oklch(0.16 0.008 255);
+    --focus: oklch(0.8 0.12 255);
+  }
+}
+
+/* theme: dark (explicit) */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: oklch(0.16 0.008 255);
+  --surface-raised: oklch(0.205 0.01 255);
+  --fg: oklch(0.95 0.004 250);
+  --fg-muted: oklch(0.73 0.012 250);
+  --line: oklch(0.31 0.01 255);
+  --accent: oklch(0.82 0.12 180);
+  --accent-fg: oklch(0.16 0.008 255);
+  --focus: oklch(0.8 0.12 255);
 }

@@ -15,7 +15,7 @@ import { pageMeta } from "~/lib/seo";
 import { styleTile } from "../../content/style-tile";
 import type { Route } from "./+types/style-tile";
 
-// Internal reference page for the active skin (T-011): tokens and every UI
+// Internal reference page for the design (T-011): tokens and every UI
 // primitive (T-013), in both themes.
 export function meta(_: Route.MetaArgs) {
   return pageMeta({ ...styleTile.meta, path: "/style-tile", noindex: true });

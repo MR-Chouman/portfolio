@@ -62,7 +62,6 @@ beforeEach(() => {
   );
   Element.prototype.scrollIntoView = () => {};
   html.dataset.theme = "light";
-  html.dataset.skin = "editorial";
   localStorage.clear();
 });
 
@@ -155,7 +154,6 @@ describe("CommandMenu", () => {
     for (const project of projects) {
       expect(option(new RegExp(project.title))).toBeInTheDocument();
     }
-    expect(option("Switch to Systems design")).toBeInTheDocument();
     expect(option(copy.theme.dark)).toBeInTheDocument();
     expect(option(new RegExp(contact.cv.label))).toBeInTheDocument();
   });
@@ -200,16 +198,6 @@ describe("CommandMenu", () => {
     expect(html.dataset.theme).toBe("dark");
     expect(localStorage.getItem("theme")).toBe("dark");
     expect(screen.getByRole("status")).toHaveTextContent(copy.themeOn.dark);
-  });
-
-  it("switches the design and announces it", async () => {
-    renderMenu();
-    await openWithShortcut();
-    fireEvent.click(option("Switch to Systems design"));
-    await waitFor(() => expect(html.dataset.skin).toBe("systems"));
-    await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent("Systems design on"),
-    );
   });
 
   it("downloads the CV", async () => {

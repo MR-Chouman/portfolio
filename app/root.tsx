@@ -13,15 +13,13 @@ import { SiteHeader } from "./components/layout/SiteHeader";
 import { SkipLink } from "./components/layout/SkipLink";
 import { NotFound, notFoundMeta } from "./components/sections/NotFound";
 import { Link } from "./components/ui";
-import { prePaintScript } from "./lib/skin";
+import { themeScript } from "./lib/theme";
 import "./styles/base.css";
 import { notFound } from "../content/not-found";
 import { site } from "../content/site";
 import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 
-// Preload the latin Geist file every skin uses above the fold (T-011). Fonts
-// only one skin uses (Fraunces) are preloaded by the pre-paint script, for
-// that skin only (T-042).
+// Preload the latin Geist file used above the fold on every page (T-011).
 export const links: Route.LinksFunction = () =>
   [geistLatin].map((href) => ({
     rel: "preload",
@@ -33,13 +31,13 @@ export const links: Route.LinksFunction = () =>
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    // The pre-paint script sets data-theme and data-skin before React hydrates.
+    // The pre-paint script sets data-theme before React hydrates.
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Before the stylesheets, so the first paint uses the right theme and skin. */}
-        <script dangerouslySetInnerHTML={{ __html: prePaintScript }} />
+        {/* Before the stylesheets, so the first paint uses the right theme. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Meta />
         <Links />
       </head>

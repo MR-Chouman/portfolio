@@ -3,9 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { projects } from "~/lib/projects";
-import { nextSkin, switchSkin } from "~/lib/skin";
 import { setTheme } from "~/lib/theme";
-import { useSkin } from "~/lib/useSkin";
 import { useTheme } from "~/lib/useTheme";
 
 import { contact } from "../../../content/contact";
@@ -38,8 +36,8 @@ const itemClass =
 const groupClass =
   "px-1 py-2 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-fg-muted";
 
-// The command palette (T-043): go to a page or case study, switch the design
-// or the theme, download the CV. A native modal <dialog> keeps focus inside
+// The command palette (T-043): go to a page or case study, switch the theme,
+// download the CV. A native modal <dialog> keeps focus inside
 // and makes the page behind it inert; cmdk provides the combobox and the
 // filtered list (D-036). Loaded lazily by CommandMenu.
 export default function CommandPalette({
@@ -50,7 +48,6 @@ export default function CommandPalette({
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const skin = useSkin();
   const theme = useTheme();
   const [search, setSearch] = useState("");
 
@@ -74,7 +71,6 @@ export default function CommandPalette({
   }
 
   const pages = [{ label: copy.home, href: "/" }, ...site.navigation];
-  const otherSkin = skin === null ? null : nextSkin(skin);
   const otherTheme = theme === "dark" ? "light" : "dark";
 
   return (
@@ -142,32 +138,6 @@ export default function CommandPalette({
             heading={copy.groups.preferences}
             className={groupClass}
           >
-            {otherSkin && (
-              <Command.Item
-                value={copy.switchDesign.replace(
-                  "{design}",
-                  site.skinSwitcher.names[otherSkin],
-                )}
-                onSelect={() =>
-                  run(() => {
-                    void switchSkin(otherSkin).then(() =>
-                      onAnnounce(
-                        site.skinSwitcher.switched.replace(
-                          "{design}",
-                          site.skinSwitcher.names[otherSkin],
-                        ),
-                      ),
-                    );
-                  })
-                }
-                className={itemClass}
-              >
-                {copy.switchDesign.replace(
-                  "{design}",
-                  site.skinSwitcher.names[otherSkin],
-                )}
-              </Command.Item>
-            )}
             {theme !== null && (
               <Command.Item
                 value={copy.theme[otherTheme]}

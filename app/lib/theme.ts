@@ -1,6 +1,6 @@
 // Light/dark theme (T-014). The pre-paint script sets `data-theme` on <html>
 // before the first paint; the toggle changes it and stores an explicit
-// choice. Without JavaScript, the skin CSS follows the system preference.
+// choice. Without JavaScript, the tokens follow the system preference.
 
 export type Theme = "light" | "dark";
 
