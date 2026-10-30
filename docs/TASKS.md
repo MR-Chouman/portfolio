@@ -136,9 +136,10 @@ Current phase: **Phase 5: Lab demo**
 
 ## Phase 5: Lab demo (tag v0.6.0)
 
-- **T-045** · todo · Single design: Systems only
+- **T-045** · done · Single design: Systems only
   Make Systems the only design (D-038): move its styles out of `[data-skin="systems"]` into the base tokens and styles; remove the Editorial skin, its fonts, the skin switcher and circular reveal, `?skin=`, the skin commands of the command palette and the skin layer of the pre-paint script; turn the per-skin tests into per-theme tests.
   Done when: every page looks as it did in Systems, in both themes; no Editorial code, font or `skin` reference is left; checks pass.
+  Notes: D-039, F-033 (auto), F-034 (open, `CLAUDE.md` for the owner). Systems colors, fonts and radii now live in `tokens.css` and its element styles unscoped in `base.css`; `app/styles/skins/`, `skin.ts`, `useSkin`, `SkinSwitcher`, the reveal CSS, the palette's design command, its copy and `@fontsource-variable/fraunces` are removed, and the pre-paint script is the theme script. `skins.test.ts` became `theme-tokens.test.ts`, `per-skin.spec.ts` became `per-theme.spec.ts` (plus a check that the build has no `data-skin` or Fraunces), and the skin unit and e2e specs are deleted; Playwright runs in Chromium only. Screenshot comparison against `dev` with `?skin=systems` (6 pages, both themes, 375 and 1440 px): identical apart from the removed header button and the style tile's intro copy. Skin mentions remain only in docs history and in `CLAUDE.md` (F-034).
 - **T-046** · todo · Accent mechanism and tokens
   Six accents (green default, purple, gold, red, blue, orange) as accent tokens per theme, AA in light and dark; `app/lib/accent.ts`: get/set, `localStorage` (try/catch), `?accent=` param (stored), `data-accent` set by the pre-paint script; one command per accent in the command palette; accent names in `content/`.
   Done when: no flash on reload; param works; contrast is unit tested for every accent and theme.

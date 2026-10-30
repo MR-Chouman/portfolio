@@ -12,7 +12,8 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Open
 
-None.
+- **F-034** · open · 2026-10-30 · self · blocks none
+  `CLAUDE.md` still describes skins (structure lines for `root.tsx`, `lib/` and `styles/`, the "Skins are CSS-only over one DOM (D-005)" convention, and "contrast in every skin and theme"), which D-038 and T-045 removed. T-045 leaves `CLAUDE.md` to the owner. Suggested: `root.tsx  # html shell, pre-paint theme script`, `lib/  # theme.ts, content loaders, seo helpers`, `styles/  # tokens.css, base.css`; the convention becomes "One design over one DOM (D-038): never render different markup per theme or accent; use tokens, `[data-theme]`/`[data-accent]` selectors, CSS grid and container queries"; and "WCAG 2.2 AA contrast in both themes and every accent".
 
 ## Triaged
 
@@ -20,6 +21,9 @@ None.
   Cloudflare Pages redirects `/about` to `/about/` (308), because prerendered pages are `<path>/index.html`, while canonical and Open Graph URLs omit the trailing slash. T-060 should make canonical URLs match the served URL (or the reverse) so they do not point at a redirect.
 
 ## Resolved
+
+- **F-033** · resolved · 2026-10-30 · auto (recommended) · -> T-045, D-039
+  The Firefox and WebKit Playwright projects ran only the skin switcher spec, which T-045 deletes. What happens to them? Chosen: remove both projects and install only Chromium in `ci-main`. Alternatives: point them at the theme spec (cross-engine coverage of the cross-fade, but slower CI and WebKit checks only on a PR into `main`); keep them with no spec (installs browsers for nothing). Reason: no remaining feature needs another engine; the theme cross-fade has an instant fallback and is unit tested.
 
 - **F-032** · resolved · 2026-10-30 · auto (recommended) · -> T-044, D-037
   How should the "visual check at 375/768/1440" be done? Chosen: automated layout checks at the three widths in every skin and theme (no sideways scroll, header and h1 inside the viewport), plus a one-off review by eye of full-page screenshots, with no committed screenshot baselines. Alternatives: Playwright `toHaveScreenshot` baselines for every page (font rendering differs between machines and CI, and every copy change would need new baselines); a manual check only (no regression guard). Reason: catches the layout breaks that matter without brittle pixel diffs.
