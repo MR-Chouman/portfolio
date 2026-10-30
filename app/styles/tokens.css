@@ -56,6 +56,14 @@
  *     --container-reading max reading width (max-w-reading)
  *     --space-rail      left room kept for the floating accent palette;
  *                       page-container never starts its content inside it
+ *     --space-header-gap  gap between the floating header and the top of
+ *                       the window; also kept below it when the page scrolls
+ *                       to an anchor or a focused element
+ *
+ * Elevation (shadow-*)
+ *   shadow-raised  the floating header and other surfaces that sit above
+ *                  the page while it scrolls; set per theme (a deeper, darker
+ *                  shadow in dark, where a light one would not show)
  *
  * Motion (use as `duration-(--duration-base) ease-standard`)
  *   --duration-fast 120 ms   hover, press
@@ -100,6 +108,9 @@
   --container-page: var(--width-page);
   --container-reading: var(--width-reading);
 
+  --shadow-*: initial;
+  --shadow-raised: var(--elevation-raised);
+
   --ease-*: initial;
   --ease-standard: var(--easing-standard);
   --ease-emphasized: var(--easing-emphasized);
@@ -135,6 +146,8 @@
   /* Room kept free on the left for the floating accent palette (T-047):
      the phone tab, then the tablet and desktop rail, plus a gap. */
   --space-rail: 2rem;
+  /* Floating header (T-048). */
+  --space-header-gap: 0.75rem;
 
   --duration-fast: 120ms;
   --duration-base: 200ms;
@@ -251,6 +264,9 @@
   --accent: var(--accent-light);
   --accent-fg: oklch(0.99 0.003 250);
   --focus: oklch(0.52 0.2 265);
+  --elevation-raised:
+    0 1px 2px oklch(0.2 0.012 255 / 0.06),
+    0 6px 20px -4px oklch(0.2 0.012 255 / 0.12);
 }
 
 /* theme: dark (system preference) */
@@ -265,6 +281,8 @@
     --accent: var(--accent-dark);
     --accent-fg: oklch(0.16 0.008 255);
     --focus: oklch(0.8 0.12 255);
+    --elevation-raised:
+      0 1px 2px oklch(0 0 0 / 0.4), 0 8px 24px -4px oklch(0 0 0 / 0.5);
   }
 }
 
@@ -279,4 +297,6 @@
   --accent: var(--accent-dark);
   --accent-fg: oklch(0.16 0.008 255);
   --focus: oklch(0.8 0.12 255);
+  --elevation-raised:
+    0 1px 2px oklch(0 0 0 / 0.4), 0 8px 24px -4px oklch(0 0 0 / 0.5);
 }

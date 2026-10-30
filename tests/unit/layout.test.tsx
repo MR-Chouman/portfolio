@@ -87,3 +87,19 @@ describe("formatDate", () => {
     expect(formatDate("2026-10-23T23:30:00-05:00")).toBe("23 October 2026");
   });
 });
+
+describe("SiteHeader floating bar", () => {
+  it("publishes the bar height for scroll-padding-top and clears it on unmount", () => {
+    const { unmount } = render(
+      <MemoryRouter>
+        <SiteHeader />
+      </MemoryRouter>,
+    );
+    const root = document.documentElement;
+    // jsdom has no layout, so the measured height is 0 px.
+    expect(root.style.getPropertyValue("--header-height")).toBe("0px");
+    expect(screen.getByRole("banner")).toHaveClass("site-header");
+    unmount();
+    expect(root.style.getPropertyValue("--header-height")).toBe("");
+  });
+});

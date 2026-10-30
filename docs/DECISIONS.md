@@ -503,3 +503,16 @@ Status: Accepted · 2026-10-30 · Implements D-038
 - `tests/unit/accent-palette.test.tsx` covers the group, choice, storage, announcement, tab and closing rules; `tests/e2e/accent-palette.spec.ts` checks every page at 375, 768 and 1440 px (palette right edge never past the content's left edge, no sideways scroll), the centred fixed position, the phone flow, keyboard and focus ring, swatch colors per theme and axe.
 
 **Consequences.** Content on phones is 16 px narrower and on tablets about 29 px narrower. A layout that does not use `page-container` must keep its own content clear of `--space-rail`. The open phone rail sits over the page until closed, like a menu.
+
+## D-042 · Floating header: a sticky bar and a measured scroll padding
+Status: Accepted · 2026-10-30 · Implements D-038
+
+**Context.** T-048 turns the header into a detached, rounded bar inset from the edges with a gap at the top, on the raised surface with a subtle shadow from tokens, always in view while scrolling. Anchor and focus targets must never end up under it, the skip link and keyboard order must keep working, and nothing may shift. At 375 px the bar wraps to two rows (about 120 px), from about 640 px it is one row (about 72 px). The positioning and the way the offset is known were chosen under `/run-phase` (F-039).
+
+**Decision.**
+- The `<header>` is `position: sticky` (`.site-header` in `base.css`) with `top` and `margin-top` set to `--space-header-gap` (0.75rem), z-index 30 (below the accent palette at 40 and the skip link at 50). Sticky keeps it in the flow, so the page starts below it as before and hydration moves nothing. Its box is transparent and `pointer-events: none`; the bar inside `page-container` is `pointer-events-auto`, `rounded-xl`, `border-line`, `bg-surface-raised` and `shadow-raised`.
+- `shadow-raised` is a new token: `@theme inline` resets the `shadow-*` namespace and maps `--shadow-raised` to `--elevation-raised`, set in each theme block (a deeper, darker shadow in dark).
+- `useHeaderOffset` measures the bar with a `ResizeObserver` and writes `--header-height` on `<html>`; `html { scroll-padding-top: calc(var(--header-height) + 2 * var(--space-header-gap)) }`. A CSS fallback (7.5rem, 4.5rem from 40rem) covers the page before hydration. Writing a custom property never changes layout.
+- `tests/e2e/floating-header.spec.ts` checks every page at 375, 768 and 1440 px in both themes (rounded, shadowed, inset, same place after scrolling to the end, controls usable), anchor and focus targets landing below the bar, the published height, layout shift and the skip link above the bar.
+
+**Consequences.** Content scrolls behind the bar and shows in the gap above it, as with any floating bar. A hard-coded offset would break on zoom or wrapped labels; the measured one follows them. Other surfaces that float over the page can reuse `shadow-raised`.

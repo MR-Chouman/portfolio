@@ -101,10 +101,26 @@
     color: var(--accent-fg);
   }
 
-  /* The header and footer sit on solid surfaces above the grid. */
-  body > header,
+  /* The footer sits on a solid surface above the grid; the header is a
+     floating bar (.site-header). */
   body > footer {
     background-color: var(--surface);
+  }
+
+  /* Anchor targets and focused elements scroll clear of the floating header
+     (T-048): its bar height, published by useHeaderOffset, plus the gap above
+     and below it. The fallback covers the page before hydration. */
+  html {
+    --header-height: 7.5rem;
+    scroll-padding-top: calc(
+      var(--header-height) + 2 * var(--space-header-gap)
+    );
+  }
+
+  @media (width >= 40rem) {
+    html {
+      --header-height: 4.5rem;
+    }
   }
 
   :focus-visible {
@@ -261,6 +277,23 @@
 ::view-transition-new(root) {
   animation-duration: var(--duration-base);
   animation-timing-function: var(--easing-standard);
+}
+
+/*
+ * Floating header (T-048, D-042). Sticky rather than fixed, so it keeps its
+ * place in the flow: the page starts below it and nothing shifts when it
+ * hydrates. The header box spans the page width but is transparent and lets
+ * pointer events through; only its bar (pointer-events-auto) catches them.
+ * It stacks below the skip link (z-50) and the accent palette (z-40).
+ */
+@layer components {
+  .site-header {
+    position: sticky;
+    top: var(--space-header-gap);
+    z-index: 30;
+    margin-top: var(--space-header-gap);
+    pointer-events: none;
+  }
 }
 
 /*

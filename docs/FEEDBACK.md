@@ -22,6 +22,8 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-039** · resolved · 2026-10-30 · auto (recommended) · -> T-048, D-042
+  How does the floating header stay in view and how do anchor and focus targets learn its height? Chosen: a sticky header (in the flow, with a top gap) whose bar height is measured by a `ResizeObserver` into `--header-height`, used by `scroll-padding-top`, with a CSS fallback before hydration. Alternatives: a fixed header with a matching top padding on the body (the padding must track the height, so a wrap or zoom shifts content); a hard-coded scroll padding per breakpoint (breaks when the bar wraps or text is zoomed). Reason: sticky cannot cause layout shift, and the measured height stays right at every width and zoom level.
 - **F-038** · resolved · 2026-10-30 · auto (recommended) · -> T-047, D-041
   What does the phone swatch look like and when does it close? Chosen: a 24 x 48 px tab flush with the left edge, filled with the current accent with a chevron, opening the six-swatch rail beside it; Escape (focus back to the tab), a press outside or focus moving away closes it, choosing a color does not. Alternatives: a round floating swatch like the rail (wider, so more content room lost); closing on each choice (arrow keys would close it after one step). Reason: the smallest target that still meets the 24 px minimum, and arrow keys keep working.
 - **F-037** · resolved · 2026-10-30 · auto (recommended) · -> T-047, D-041
