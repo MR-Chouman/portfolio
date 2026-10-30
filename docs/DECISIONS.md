@@ -320,3 +320,16 @@ Status: Accepted · 2026-10-30
 - typescript-eslint is the only dependency that imports the compiler API. Vite, Vitest, React Router typegen and MDX do not, so nothing else changes. The tsconfig already uses only options TS 7 accepts (`moduleResolution: bundler`, no `baseUrl`, `esModuleInterop` on, explicit `types`), and the code type-checks cleanly with no changes.
 
 **Consequences.** CI type checking runs on TS 7. Lint type information comes from TS 6, which shares TS 7's type checker logic. Editors that read `node_modules/typescript` find the compatibility package rather than a full TS install, so use the editor's bundled TypeScript (or the TS 7 extension). Once typescript-eslint supports TS 7 (expected after TS 7.1 ships an API), drop both aliases for a plain `"typescript": "^7"` and restore `tsc` in the typecheck script. Dependabot may propose bumping the aliased packages oddly; check what it targets before accepting.
+
+## D-029 · New Cloudflare Pages project `mr-chouman-portfolio`
+
+Status: Accepted · 2026-10-30 · Refines D-006 · Supersedes the origin in D-018
+
+**Context.** The first Pages project was created with an auto-assigned name, so the site lived at `portfolio-4q6.pages.dev`. The owner created a new Pages project by hand to choose the name, and it replaces the old one.
+
+**Decision.**
+- The site is hosted by the Pages project `mr-chouman-portfolio`, connected to this repository with the D-006 settings: production branch `main`, `dev` as the staging preview, build command `npm run build`, output `build/client`, `NODE_VERSION=24`.
+- The canonical production origin is `https://mr-chouman-portfolio.pages.dev` (`SITE_ORIGIN` in `app/lib/seo.ts`). Staging is `https://dev.mr-chouman-portfolio.pages.dev`. Still no custom domain (F-003).
+- The old `portfolio-4q6` project stops building and is retired by the owner once the new one serves production.
+
+**Consequences.** Canonical and Open Graph URLs point at the new origin once this reaches `main` at the next phase release; until then production pages carry the old origin. Earlier mentions of `portfolio-4q6` in DECISIONS and FEEDBACK stay as history. T-071 uses the new origin.

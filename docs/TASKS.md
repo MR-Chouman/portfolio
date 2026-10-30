@@ -166,7 +166,7 @@ Current phase: **Phase 3: Case studies and imagery**
   Screenshot, stack, architecture notes, how to run, Lighthouse scores, links to DECISIONS.
   Done when: a stranger can run the project and understand the choices in 5 minutes.
 - **T-071** · todo · Canonical production URL
-  No custom domain (F-003, D-018): `https://portfolio-4q6.pages.dev` is the canonical origin. Canonical tags, sitemap, Open Graph URLs and JSON-LD use it from one config value, so a domain can be added later in one place.
+  No custom domain (F-003, D-018, D-029): `https://mr-chouman-portfolio.pages.dev` is the canonical origin. Canonical tags, sitemap, Open Graph URLs and JSON-LD use it from one config value, so a domain can be added later in one place.
   Done when: every absolute URL on the site comes from that value and points at the `pages.dev` origin.
 - **T-072** · todo · Analytics
   Cloudflare Web Analytics, cookieless.
