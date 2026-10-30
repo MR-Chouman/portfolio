@@ -90,6 +90,14 @@ describe("Home route", () => {
     ).toHaveAttribute("href", contact.github.href);
     expect(within(region).getAllByRole("link")).toHaveLength(3);
   });
+
+  it("fills the contact card like the About card", () => {
+    renderHome();
+    const card = screen.getByRole("region", { name: home.contact.title });
+    const about = screen.getByRole("region", { name: home.about.title });
+    expect(card).toHaveClass("bg-surface-raised", "border-line");
+    expect(about).toHaveClass("bg-surface-raised", "border-line");
+  });
 });
 
 describe("Home meta", () => {

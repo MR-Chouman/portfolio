@@ -172,6 +172,13 @@ Current phase: **Phase 5: Lab demo**
   Done when: every component shows variants and states in both themes and with every accent.
 - **T-054** · todo · Lab page copy and source links
   Done when: `/lab` explains the patterns and links to the source on GitHub.
+- **T-055** · done · Filled contact card
+  Owner request: the contact card uses the same filled background as the other cards instead of a transparent one, from tokens, in both themes and every accent.
+  Done when: the contact card matches the other cards' surface in both themes; contrast stays AA; checks pass.
+  Notes: the home contact card (`#contact`) gets `bg-surface-raised`, the token the About card, the work cards and the next-project card already use; no new token or style. Text on it (`fg`, `fg-muted`, the primary and secondary buttons) was already AA on `surface-raised` in every accent and theme (`theme-tokens.test.ts`, `per-accent.spec.ts`). The secondary buttons' hover fill is the same token, so on this card their hover shows through the border turning `fg`, as on the About card's link. Tests: a unit test in `home.test.tsx` (both cards carry the token class) and `tests/e2e/home.spec.ts` (in both themes and all six accents, the card's computed background is not transparent and equals `--surface-raised`, the About card and a work card; axe on the card).
+- **T-056** · todo · CV preview modal
+  Owner request: the CV link opens a modal that previews the PDF and offers a download. Native `<dialog>` (or the existing dialog primitive), focus trapped, Escape and a close button, focus returns to the trigger; copy in `content/`; no new dependency over ~10 kB. Inline PDF preview where the browser supports it; on phones that cannot show a PDF inline (Android Chrome, iOS Safari), the modal shows a short note with "Open" and "Download" instead of a broken preview. Never copy the phone number into pages or `content/` (D-018).
+  Done when: keyboard and screen-reader usable, preview works on desktop, phone fallback shown at 375 px, download works; unit and e2e tested.
 
 ## Phase 6: Quality and SEO (tag v0.7.0)
 

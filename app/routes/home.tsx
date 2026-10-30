@@ -132,7 +132,7 @@ export default function Home() {
           id="contact"
           eyebrow={contact.eyebrow}
           title={contact.title}
-          className={`rounded-xl border border-line p-6 sm:p-8 ${anchorTarget}`}
+          className={`rounded-xl border border-line bg-surface-raised p-6 sm:p-8 ${anchorTarget}`}
         >
           <p className="max-w-reading text-fg-muted">{contact.body}</p>
           <ul className="mt-6 flex flex-wrap gap-3">
