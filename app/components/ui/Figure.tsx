@@ -1,5 +1,8 @@
 export interface FigureProps {
+  // The WebP file, also the fallback for browsers without AVIF support.
   src: string;
+  // An optional AVIF version of the same image, preferred when supported.
+  avif?: string;
   alt: string;
   caption: string;
   // Intrinsic size, required so the image reserves its space (no layout shift).
@@ -12,25 +15,38 @@ export interface FigureProps {
 // A captioned image for case studies (T-022). MDX files use it as
 // <Figure src="..." alt="..." caption="..." width={..} height={..} /> without
 // importing it: the case study route passes it in `components`. Styles come
-// from `.prose-content` (base.css), so skins can restyle it.
+// from `.prose-content` (base.css), so skins can restyle it. With `avif`, the
+// image sits in a <picture> so browsers that support AVIF load the smaller
+// file (T-030); content/load.ts checks both files at build time.
 export function Figure({
   src,
+  avif,
   alt,
   caption,
   width,
   height,
   priority = false,
 }: FigureProps) {
+  const image = (
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={priority ? "eager" : "lazy"}
+      decoding="async"
+    />
+  );
   return (
     <figure>
-      <img
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-      />
+      {avif ? (
+        <picture>
+          <source srcSet={avif} type="image/avif" />
+          {image}
+        </picture>
+      ) : (
+        image
+      )}
       <figcaption>{caption}</figcaption>
     </figure>
   );
