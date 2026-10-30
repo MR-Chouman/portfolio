@@ -1,6 +1,12 @@
 import type { MetaDescriptor } from "react-router";
 
 import { site } from "../../content/site";
+import {
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_TYPE,
+  OG_IMAGE_WIDTH,
+  ogImagePath,
+} from "./og-image";
 
 // Canonical production origin (D-018, D-029).
 export const SITE_ORIGIN = "https://mr-chouman-portfolio.pages.dev";
@@ -17,6 +23,18 @@ export function canonicalUrl(path: string): string {
   return new URL(pathname, SITE_ORIGIN).href;
 }
 
+// The image link previews show (T-061, D-051): a site path to a generated
+// card and its alt text.
+export interface PageImage {
+  path: string;
+  alt: string;
+}
+
+export const SITE_IMAGE: PageImage = {
+  path: ogImagePath(),
+  alt: site.openGraph.site.alt,
+};
+
 interface PageMeta {
   title: string;
   description: string;
@@ -24,6 +42,8 @@ interface PageMeta {
   noindex?: boolean;
   // Open Graph object type: case studies are articles, other pages websites.
   type?: "website" | "article";
+  // Defaults to the site card.
+  image?: PageImage;
 }
 
 export function pageMeta({
@@ -32,8 +52,11 @@ export function pageMeta({
   path,
   noindex = false,
   type = "website",
+  image = SITE_IMAGE,
 }: PageMeta): MetaDescriptor[] {
   const url = canonicalUrl(path);
+  // Scrapers need an absolute URL; the file is served as is, not as a page.
+  const imageUrl = new URL(image.path, SITE_ORIGIN).href;
   return [
     { title },
     { name: "description", content: description },
@@ -44,10 +67,16 @@ export function pageMeta({
     { property: "og:title", content: title },
     { property: "og:description", content: description },
     { property: "og:url", content: url },
-    // T-061 adds per-page images and moves this to summary_large_image.
-    { name: "twitter:card", content: "summary" },
+    { property: "og:image", content: imageUrl },
+    { property: "og:image:type", content: OG_IMAGE_TYPE },
+    { property: "og:image:width", content: String(OG_IMAGE_WIDTH) },
+    { property: "og:image:height", content: String(OG_IMAGE_HEIGHT) },
+    { property: "og:image:alt", content: image.alt },
+    { name: "twitter:card", content: "summary_large_image" },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image:alt", content: image.alt },
     ...(noindex ? [{ name: "robots", content: "noindex" }] : []),
   ];
 }

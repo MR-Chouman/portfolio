@@ -8,10 +8,12 @@ import {
   TagList,
 } from "~/components/ui";
 import { NotFound, notFoundMeta } from "~/components/sections/NotFound";
+import { ogImagePath } from "~/lib/og-image";
 import { getNextProject, getProject } from "~/lib/projects";
 import { pageMeta } from "~/lib/seo";
 
 import { profile } from "../../content/profile";
+import { site } from "../../content/site";
 import { work } from "../../content/work";
 import type { Route } from "./+types/work.$slug";
 
@@ -34,6 +36,10 @@ export function meta({ params }: Route.MetaArgs) {
     description: project.summary,
     path: `/work/${project.slug}`,
     type: "article",
+    image: {
+      path: ogImagePath(project.slug),
+      alt: `${site.openGraph.caseStudy.alt}: ${project.title}`,
+    },
   });
 }
 
