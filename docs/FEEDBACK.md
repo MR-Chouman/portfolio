@@ -21,6 +21,9 @@ None.
 
 ## Resolved
 
+- **F-023** · resolved · 2026-10-30 · auto (recommended) · -> T-035
+  Where does the final hero and About copy come from, when the owner is not in the chat and claims about his work must not be invented? Chosen: draft every sentence from REQUIREMENTS section 4 and the owner's published CV (`public/cv.pdf`) only, keep the REQUIREMENTS headline and metrics, describe employers generically ("a software company building client platforms", "a restaurant group"), and name only the universities and the bootcamp (public institutions, not clients); the PR stays open for the owner's approval (Owner review). Alternatives: keep every text a placeholder until the owner writes it (nothing to approve); write freer marketing copy (would add unsourced claims). Reason: the task asks the owner to approve copy, and each sentence can be checked against his own CV. Owner to check: the tone of the first-person story, naming the universities and bootcamp, listing the application analyst role, and the contact line about remote work and the Middle East (from REQUIREMENTS section 2).
+
 - **F-019** · resolved · 2026-10-30 · self · -> T-026
   Owner action: copy the current CV PDF (the version with the Gmail address) into `private/` and confirm Git ignores it. Done 2026-10-30: the owner saved it as `private/cv.pdf`; `git check-ignore -v private/cv.pdf` prints the `/private/*` rule, `git status` lists nothing under `private/`, and `git ls-files private` lists only `private/.gitkeep`.
 - **F-007** · resolved · 2026-10-30 · owner · -> T-024, T-026
