@@ -102,9 +102,10 @@ Current phase: **Phase 3: Case studies and imagery**
   Done when: same structure; highlights the 132 screens and 50-module API layer.
 - **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
-- **T-034** · todo · Image pipeline (Owner review: anonymized crops)
-  Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
-  Done when: all case study images go through the script and none contain real client data.
+- **T-034** · review · 3D project objects (Owner review)
+  One rotatable low-poly Three.js object per case study, in place of images (D-031, D-032): airplane, crates on a pallet, EV charger, hospital bed.
+  Done when: each case study header shows its object, rotatable by drag and arrow keys, with reduced-motion and no-WebGL handling; Three.js loads only on `/work/:slug`; home's initial JS is unchanged.
+  Notes: D-032. Owner decision 2026-10-30 replaced the image pipeline with this task. Models are built in code from simple shapes and colored from `--fg`, `--accent` and `--fg-muted`; colors follow theme and skin changes. `scene.ts` (Three.js, ~135 kB gzipped) is imported when the object scrolls into view. Unit tests cover rotation, colors, models (all slots used, centered, within their sphere), the component and the schema; Playwright checks every case study draws and turns its object, the idle spin and reduced motion, and that home, `/work` and `/about` never request the chunk.
 - **T-035** · todo · Final hero and About copy (Owner review)
   Done when: owner approves the copy and numbers match REQUIREMENTS section 4.
 
