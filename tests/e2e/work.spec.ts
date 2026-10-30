@@ -107,6 +107,33 @@ test.describe("case study pages", () => {
   });
 });
 
+test("case study figures load their images with captions (T-030)", async ({
+  page,
+}) => {
+  await page.goto("/work/airline-crew-management");
+  const figures = page.locator(".prose-content figure");
+  const count = await figures.count();
+  expect(count).toBeGreaterThanOrEqual(2);
+  expect(count).toBeLessThanOrEqual(4);
+  for (const figure of await figures.all()) {
+    await figure.scrollIntoViewIfNeeded();
+    await expect(figure.locator("figcaption")).not.toBeEmpty();
+    const image = figure.getByRole("img");
+    await expect(image).toHaveAttribute("alt", /\S/);
+    // Chromium supports AVIF, so the <picture> source is the file it loads.
+    await expect
+      .poll(() =>
+        image.evaluate((img: HTMLImageElement) =>
+          img.complete ? img.currentSrc : "",
+        ),
+      )
+      .toMatch(/\.avif$/);
+    expect(
+      await image.evaluate((img: HTMLImageElement) => img.naturalWidth),
+    ).toBeGreaterThan(0);
+  }
+});
+
 for (const width of [375, 1440]) {
   test.describe(`work pages at ${width} px`, () => {
     test.use({ viewport: { width, height: 900 } });
