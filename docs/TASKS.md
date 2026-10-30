@@ -95,17 +95,18 @@ Current phase: **Phase 3: Case studies and imagery**
 ## Phase 3: Case studies and imagery (tag v0.4.0)
 
 - **T-030** · review · Case study: airline crew management platform (Owner review, D-018)
-  Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome, and 2-4 captioned images.
-  Notes: D-030. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; it states only REQUIREMENTS facts and leaves the role and the narrative as marked placeholders for the owner (F-024). Three captioned figures (weekly roster, leave approvals, qualifications) are illustrations with invented data, not screenshots (F-023): SVG sources in `content/projects/figures/airline-crew-management/`, WebP and AVIF in `public/images/work/airline-crew-management/` (1440x900, 36-52 kB each), encoded once with ffmpeg until T-034's script. `Figure` serves AVIF through `<picture>` with the WebP fallback. The build now validates every `<Figure />` in project MDX (path, both files present, alt, caption, and width/height against the file headers). Playwright checks that the figures load AVIF with captions; axe stays clean in both themes at 375 and 1440 px.
+  Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome. No images (D-031).
+  Notes: D-030, superseded by D-031. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; it states only REQUIREMENTS facts and leaves the role and the narrative as marked placeholders for the owner (F-024). The three invented-data figures first added (F-023) and the figure tooling around them were removed on the owner's decision to show no screenshots for now (D-031).
 - **T-031** · todo · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
 - **T-032** · todo · Case study: EV charging platform (Owner review, D-018)
   Done when: same structure; highlights the 132 screens and 50-module API layer.
 - **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
-- **T-034** · todo · Image pipeline (Owner review: anonymized crops)
+- **T-034** · blocked · Image pipeline (Owner review: anonymized crops)
   Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
   Done when: all case study images go through the script and none contain real client data.
+  Notes: blocked by D-031 (owner decision 2026-10-30: no screenshots in the portfolio for now).
 - **T-035** · todo · Final hero and About copy (Owner review)
   Done when: owner approves the copy and numbers match REQUIREMENTS section 4.
 

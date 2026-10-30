@@ -9,7 +9,6 @@ import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 
 import { about } from "./about";
-import { checkFigures } from "./figures";
 import { contact } from "./contact";
 import { experience } from "./experience";
 import { home } from "./home";
@@ -39,14 +38,6 @@ import {
 export const PROJECTS_DIR = join(
   dirname(fileURLToPath(import.meta.url)),
   "projects",
-);
-
-// Static files served at the site root; case study images live in
-// public/images/work/<slug>/ (T-030).
-export const PUBLIC_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "public",
 );
 
 export class ContentError extends Error {
@@ -82,10 +73,7 @@ export function readFrontmatter(source: string, file: string): unknown {
   }
 }
 
-export function loadProjects(
-  dir: string = PROJECTS_DIR,
-  publicDir: string = PUBLIC_DIR,
-): ProjectSummary[] {
+export function loadProjects(dir: string = PROJECTS_DIR): ProjectSummary[] {
   const files = readdirSync(dir)
     .filter((name) => name.endsWith(".mdx"))
     .sort();
@@ -100,18 +88,11 @@ export function loadProjects(
       basename(name, ".mdx"),
       `${file} (file name)`,
     );
-    const source = readFileSync(file, "utf8");
     const frontmatter = check(
       projectFrontmatterSchema,
-      readFrontmatter(source, file),
+      readFrontmatter(readFileSync(file, "utf8"), file),
       file,
     );
-    const { errors } = checkFigures(source, slug, publicDir);
-    if (errors.length > 0) {
-      throw new ContentError(
-        `Invalid figures in ${file}:\n${errors.join("\n")}`,
-      );
-    }
     return { slug, ...frontmatter };
   });
 
@@ -140,10 +121,7 @@ export interface Content {
   projects: ProjectSummary[];
 }
 
-export function loadContent(
-  dir: string = PROJECTS_DIR,
-  publicDir: string = PUBLIC_DIR,
-): Content {
+export function loadContent(dir: string = PROJECTS_DIR): Content {
   return {
     profile: check(profileSchema, profile, "content/profile.ts"),
     experience: check(experienceSchema, experience, "content/experience.ts"),
@@ -152,7 +130,7 @@ export function loadContent(
     about: check(aboutSchema, about, "content/about.ts"),
     contact: check(contactSchema, contact, "content/contact.ts"),
     notFound: check(notFoundSchema, notFound, "content/not-found.ts"),
-    projects: loadProjects(dir, publicDir),
+    projects: loadProjects(dir),
   };
 }
 
@@ -170,10 +148,7 @@ export const STATIC_PATHS = [
   NOT_FOUND_PATH,
 ] as const;
 
-export function prerenderPaths(
-  dir: string = PROJECTS_DIR,
-  publicDir: string = PUBLIC_DIR,
-): string[] {
-  const { projects } = loadContent(dir, publicDir);
+export function prerenderPaths(dir: string = PROJECTS_DIR): string[] {
+  const { projects } = loadContent(dir);
   return [...STATIC_PATHS, ...projects.map(({ slug }) => `/work/${slug}`)];
 }

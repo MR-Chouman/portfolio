@@ -336,7 +336,7 @@ Status: Accepted · 2026-10-30 · Refines D-006 · Supersedes the origin in D-01
 
 ## D-030 · Case study figures: invented-data illustrations, AVIF with WebP fallback, checked at build time
 
-Status: Accepted · 2026-10-30 · Refines D-018, D-026 · Resolves F-023
+Status: Superseded by D-031 · 2026-10-30 · Refines D-018, D-026 · Resolves F-023
 
 **Context.** T-030 needs 2-4 captioned images in the airline case study, but D-018 rules out screenshots of client systems and the image pipeline (T-034) does not exist yet. CLAUDE.md asks for AVIF/WebP images with explicit dimensions.
 
@@ -347,3 +347,17 @@ Status: Accepted · 2026-10-30 · Refines D-018, D-026 · Resolves F-023
 - `content/figures.ts` checks every `<Figure />` in project MDX at build time (through `content/load.ts`): files under `/images/work/<slug>/`, WebP required and AVIF optional, both present in `public/`, non-empty alt and caption, and `width`/`height` equal to the size read from each file's header.
 
 **Consequences.** A wrong path, a missing file or a stale size fails `npm run build`. No new dependency. Figures must be self-closing JSX with string and integer props so the build-time reader can parse them.
+
+## D-031 · No screenshots or screen illustrations in case studies for now
+
+Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030 · Defers T-034
+
+**Context.** T-030 added three illustrations of typical screens drawn with invented data (D-030). The owner decided not to include screenshots in the portfolio for the time being, and illustrations of app screens count as screenshots for this purpose.
+
+**Decision.**
+- Case studies ship as text only: no screenshots, cropped or anonymized captures, or illustrations of app screens.
+- The T-030 figures, their SVG sources, the AVIF support in `Figure` and the build-time figure check (`content/figures.ts`) are removed. They remain in the history of `task/T-030-airline-crew-case-study` if images come back.
+- `Figure` (D-026) stays as it was, unused, so a later decision can add images without changing the template.
+- T-034 (image pipeline) is `blocked` until the owner reverses this decision.
+
+**Consequences.** T-030 to T-033 no longer require captioned images. REQUIREMENTS section 5 still lists "captioned images" for `/work/:slug`, and it is not changed without the owner's approval. Open Graph images (T-061) are generated cards, not screenshots, so they are not affected.

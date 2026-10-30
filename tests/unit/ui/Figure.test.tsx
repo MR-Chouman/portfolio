@@ -28,20 +28,4 @@ describe("Figure", () => {
     rerender(<Figure {...props} priority />);
     expect(screen.getByRole("img")).toHaveAttribute("loading", "eager");
   });
-
-  it("offers an AVIF source before the WebP image when given one", () => {
-    render(<Figure {...props} avif="/images/sample.avif" />);
-    const image = screen.getByRole("img", { name: props.alt });
-    const picture = image.parentElement;
-    expect(picture?.tagName).toBe("PICTURE");
-    const source = picture?.querySelector("source");
-    expect(source).toHaveAttribute("type", "image/avif");
-    expect(source).toHaveAttribute("srcset", "/images/sample.avif");
-    expect(image).toHaveAttribute("src", props.src);
-  });
-
-  it("renders a plain image without an AVIF source", () => {
-    render(<Figure {...props} />);
-    expect(screen.getByRole("img").parentElement?.tagName).toBe("FIGURE");
-  });
 });
