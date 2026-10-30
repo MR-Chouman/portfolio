@@ -3,13 +3,14 @@
  * ====================================
  *
  * Components style themselves only through the semantic tokens below, via the
- * Tailwind utilities they generate. Themes (`[data-theme]`) change what the
- * tokens resolve to, never the markup. The site has one design (D-038).
+ * Tailwind utilities they generate. Themes (`[data-theme]`) and accents
+ * (`[data-accent]`) change what the tokens resolve to, never the markup. The
+ * site has one design (D-038).
  *
  * Layers
  *   1. Raw custom properties (`--surface`, `--radius-card`, ...) on `:root`,
- *      set at the end of this file. Themes override the colors and nothing
- *      else.
+ *      set at the end of this file. Themes and accents override the colors
+ *      and nothing else.
  *   2. `@theme inline` maps them to Tailwind namespaces, so utilities emit
  *      `var(--surface)` and resolve per element at runtime.
  *   3. Tailwind's default palette, fonts, radii and text sizes are reset, so a
@@ -24,7 +25,8 @@
  *   fg-muted        secondary text; >= 4.5:1 on both surfaces
  *   line            dividers and hairlines; decorative, not for borders that
  *                   carry meaning (use fg-muted for those, >= 3:1)
- *   accent          links, primary actions, highlights; >= 4.5:1 as text
+ *   accent          links, primary actions, highlights; >= 4.5:1 as text;
+ *                   one of six hues, chosen by the visitor (T-046)
  *   accent-fg       text and icons placed on an accent background
  *   focus           focus ring; >= 3:1 on both surfaces
  *   transparent and current stay available (Tailwind built-ins).
@@ -162,19 +164,69 @@
 }
 
 /*
- * Colors (T-040, T-045, D-033, D-038): the look of a well-made admin
- * console. Cool neutral greys, a teal-green accent and a blue focus ring.
+ * Colors (T-040, T-045, T-046, D-033, D-038, D-040): the look of a well-made
+ * admin console. Cool neutral greys, a blue focus ring and one of six accents.
  *
  * Every color token is set in both themes. The dark block appears twice
  * (system preference and explicit choice) and both copies must match;
- * `tests/unit/theme-tokens.test.ts` checks that and the contrast ratios.
+ * `tests/unit/theme-tokens.test.ts` checks that and the contrast ratios of
+ * every theme with every accent.
+ *
+ * Accents: `data-accent` on <html> (set by the pre-paint script, see
+ * app/lib/accent.ts) picks a pair of raw values, `--accent-light` and
+ * `--accent-dark`. The theme blocks point `--accent` at the pair member for
+ * their theme, so a section with its own `data-theme` keeps the page's
+ * accent. `accent-fg` is the same for every accent.
  *
  * Contrast (WCAG 2.2; on surface / surface-raised)
- *   light: fg 16.8 / 18.1, fg-muted 6.6 / 7.1, accent 5.0 / 5.4,
- *          accent-fg on accent 5.2, focus 5.4 / 5.8
- *   dark:  fg 16.8 / 15.5, fg-muted 8.1 / 7.5, accent 11.7 / 10.8,
- *          accent-fg on accent 11.7, focus 10.3 / 9.5
+ *   light: fg 16.8 / 18.1, fg-muted 6.6 / 7.1, focus 5.4 / 5.8
+ *   dark:  fg 16.8 / 15.5, fg-muted 8.1 / 7.5, focus 10.3 / 9.5
+ *   accent as text on surface / surface-raised, and accent-fg on the accent:
+ *            light               dark
+ *   green    5.0 / 5.4, 5.2     11.7 / 10.8, 11.7
+ *   purple   5.6 / 6.0, 5.8     10.1 / 9.3, 10.1
+ *   gold     5.2 / 5.6, 5.4     12.2 / 11.3, 12.2
+ *   red      5.4 / 5.8, 5.6      9.2 / 8.5, 9.2
+ *   blue     5.2 / 5.6, 5.4     10.5 / 9.6, 10.5
+ *   orange   5.2 / 5.6, 5.4     10.0 / 9.3, 10.0
  */
+
+/* accent: green (default) */
+:root,
+[data-accent="green"] {
+  --accent-light: oklch(0.51 0.1 185);
+  --accent-dark: oklch(0.82 0.12 180);
+}
+
+/* accent: purple */
+[data-accent="purple"] {
+  --accent-light: oklch(0.52 0.17 300);
+  --accent-dark: oklch(0.8 0.11 300);
+}
+
+/* accent: gold (a dark, olive gold in light, so text stays readable) */
+[data-accent="gold"] {
+  --accent-light: oklch(0.52 0.1 85);
+  --accent-dark: oklch(0.85 0.13 85);
+}
+
+/* accent: red */
+[data-accent="red"] {
+  --accent-light: oklch(0.53 0.18 25);
+  --accent-dark: oklch(0.78 0.12 25);
+}
+
+/* accent: blue */
+[data-accent="blue"] {
+  --accent-light: oklch(0.52 0.15 255);
+  --accent-dark: oklch(0.8 0.1 250);
+}
+
+/* accent: orange (a burnt orange in light, so text stays readable) */
+[data-accent="orange"] {
+  --accent-light: oklch(0.53 0.14 50);
+  --accent-dark: oklch(0.8 0.13 55);
+}
 
 /* theme: light */
 :root,
@@ -185,7 +237,7 @@
   --fg: oklch(0.2 0.012 255);
   --fg-muted: oklch(0.46 0.016 255);
   --line: oklch(0.89 0.006 250);
-  --accent: oklch(0.51 0.1 185);
+  --accent: var(--accent-light);
   --accent-fg: oklch(0.99 0.003 250);
   --focus: oklch(0.52 0.2 265);
 }
@@ -199,7 +251,7 @@
     --fg: oklch(0.95 0.004 250);
     --fg-muted: oklch(0.73 0.012 250);
     --line: oklch(0.31 0.01 255);
-    --accent: oklch(0.82 0.12 180);
+    --accent: var(--accent-dark);
     --accent-fg: oklch(0.16 0.008 255);
     --focus: oklch(0.8 0.12 255);
   }
@@ -213,7 +265,7 @@
   --fg: oklch(0.95 0.004 250);
   --fg-muted: oklch(0.73 0.012 250);
   --line: oklch(0.31 0.01 255);
-  --accent: oklch(0.82 0.12 180);
+  --accent: var(--accent-dark);
   --accent-fg: oklch(0.16 0.008 255);
   --focus: oklch(0.8 0.12 255);
 }

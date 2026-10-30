@@ -14,6 +14,7 @@ import {
   isPaletteShortcut,
 } from "~/components/layout/CommandMenu";
 import { downloadCv } from "~/components/layout/CommandPalette";
+import { ACCENTS } from "~/lib/accent";
 import { projects } from "~/lib/projects";
 
 import { contact } from "../../content/contact";
@@ -62,6 +63,7 @@ beforeEach(() => {
   );
   Element.prototype.scrollIntoView = () => {};
   html.dataset.theme = "light";
+  html.dataset.accent = "green";
   localStorage.clear();
 });
 
@@ -198,6 +200,27 @@ describe("CommandMenu", () => {
     expect(html.dataset.theme).toBe("dark");
     expect(localStorage.getItem("theme")).toBe("dark");
     expect(screen.getByRole("status")).toHaveTextContent(copy.themeOn.dark);
+  });
+
+  it("has one command per accent", async () => {
+    renderMenu();
+    await openWithShortcut();
+    for (const accent of ACCENTS) {
+      expect(
+        option(`${site.accents.names[accent]} ${copy.accent}`),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it("switches the accent, stores it and announces it", async () => {
+    renderMenu();
+    await openWithShortcut();
+    fireEvent.click(option(`${site.accents.names.purple} ${copy.accent}`));
+    expect(html.dataset.accent).toBe("purple");
+    expect(localStorage.getItem("accent")).toBe("purple");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      `${site.accents.names.purple} ${copy.accentOn}`,
+    );
   });
 
   it("downloads the CV", async () => {

@@ -1,4 +1,4 @@
-// Site-wide copy: header, navigation and footer (T-012).
+// Site-wide copy: header, navigation, footer and preferences (T-012).
 // Contact details and the CV link live in content/contact.ts (T-024, D-018).
 export const site = {
   name: "Mohamad Rida Chouman",
@@ -28,6 +28,23 @@ export const site = {
       light: "Switch to light theme",
     },
     themeOn: { dark: "Dark theme on", light: "Light theme on" },
+    // One command per accent: "<name> accent", announced as
+    // "<name> accent on". The names come from `accents` below.
+    accent: "accent",
+    accentOn: "accent on",
+  },
+  // The accent colors a visitor can choose (T-046, D-038), in the order of
+  // app/lib/accent.ts. Used by the command palette and the floating palette.
+  accents: {
+    label: "Accent color",
+    names: {
+      green: "Green",
+      purple: "Purple",
+      gold: "Gold",
+      red: "Red",
+      blue: "Blue",
+      orange: "Orange",
+    },
   },
   navigation: [
     { label: "Work", href: "/work" },
