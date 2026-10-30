@@ -105,7 +105,7 @@ Current phase: **Phase 3: Case studies and imagery**
 - **T-034** · todo · Image pipeline (Owner review: anonymized crops)
   Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
   Done when: all case study images go through the script and none contain real client data.
-- **T-035** · todo · Final hero and About copy (Owner review)
+- **T-035** · doing · Final hero and About copy (Owner review)
   Done when: owner approves the copy and numbers match REQUIREMENTS section 4.
 
 ## Phase 4: Skins and switcher (tag v0.5.0)
