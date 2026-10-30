@@ -37,6 +37,9 @@ export const site = {
   // app/lib/accent.ts. Used by the command palette and the floating palette.
   accents: {
     label: "Accent color",
+    // The floating palette (T-047): the phone button is named
+    // "<label>: <name>", and a choice is announced as "<name> <on>".
+    on: "accent on",
     names: {
       green: "Green",
       purple: "Purple",

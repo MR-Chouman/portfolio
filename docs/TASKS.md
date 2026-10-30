@@ -144,7 +144,7 @@ Current phase: **Phase 5: Lab demo**
   Six accents (green default, purple, gold, red, blue, orange) as accent tokens per theme, AA in light and dark; `app/lib/accent.ts`: get/set, `localStorage` (try/catch), `?accent=` param (stored), `data-accent` set by the pre-paint script; one command per accent in the command palette; accent names in `content/`.
   Done when: no flash on reload; param works; contrast is unit tested for every accent and theme.
   Notes: D-040, F-035 and F-036 (auto). Each accent in `tokens.css` sets `--accent-light` and `--accent-dark` under `[data-accent]` (green also on `:root`); the theme blocks set `--accent: var(--accent-light | --accent-dark)`, so nested `data-theme` sections keep the page's accent; `accent-fg` stays per theme. `app/lib/accent.ts` (+ `useAccent`) follows the old skin store; `prePaintScript` runs the theme and accent scripts in one inline script. The palette lists "<Name> accent" for all six under Preferences, with an announcement. 3D objects also redraw on `data-accent` changes. Tests: `theme-tokens.test.ts` checks every accent in both themes, `accent.test.ts` the script, parameter and store, `accent.spec.ts` the first frame, the parameter, resolved contrast per accent and theme, and the palette command.
-- **T-047** · todo · Floating accent palette
+- **T-047** · doing · Floating accent palette
   Fixed to the left of every page, vertically centred: a vertical rail of six swatches from tablet width up, one swatch that opens the six on phones. Labelled radio group, arrow keys, announces the choice, visible focus.
   Done when: keyboard and screen-reader usable, never covers content at 375/768/1440, unit and e2e tested.
 - **T-048** · todo · Floating header
