@@ -106,9 +106,9 @@ Current phase: **Phase 3: Case studies and imagery**
 - **T-034** · todo · Image pipeline (Owner review: anonymized crops)
   Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
   Done when: all case study images go through the script and none contain real client data.
-- **T-035** · review · Final hero and About copy (Owner review)
+- **T-035** · done · Final hero and About copy (Owner review)
   Done when: owner approves the copy and numbers match REQUIREMENTS section 4.
-  Notes: draft copy for the owner's approval (F-025). Every placeholder in `profile.ts`, `home.ts` (approach, About teaser, contact), `about.ts` and `experience.ts` is replaced; the headline and metrics keep the REQUIREMENTS wording (4 systems, 260+ screens, ~3 years). Facts beyond REQUIREMENTS restate the owner's published CV (`public/cv.pdf`): the timeline (frontend lead since 2026-01, frontend developer 2024-08 to 2026-01, application analyst 2024-01 to 2024-08) with generic organizations, the BSc and MSc universities and the bootcamp certificate, and the CV's frontend and testing skills. No client or employer is named (D-018). Unit tests check that no placeholder text is left, that the headline and metrics match the project count and REQUIREMENTS, and that the timeline runs newest first with one open role. Parked for the owner's review.
+  Notes: draft copy approved by the owner on 2026-10-30, after a check of the timeline against the CV (F-025). Every placeholder in `profile.ts`, `home.ts` (approach, About teaser, contact), `about.ts` and `experience.ts` is replaced; the headline and metrics keep the REQUIREMENTS wording (4 systems, 260+ screens, ~3 years). Facts beyond REQUIREMENTS restate the owner's published CV (`public/cv.pdf`): the timeline (frontend lead since 2026-01, frontend developer 2024-08 to 2026-01, application analyst 2024-01 to 2024-08) with generic organizations, the BSc and MSc universities and the bootcamp certificate, and the CV's frontend and testing skills. No client or employer is named (D-018). Unit tests check that no placeholder text is left, that the headline and metrics match the project count and REQUIREMENTS, and that the timeline runs newest first with one open role. Parked for the owner's review.
 
 ## Phase 4: Skins and switcher (tag v0.5.0)
 
