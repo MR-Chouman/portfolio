@@ -1,10 +1,9 @@
 import { Link, NavLink } from "react-router";
 
-import { ButtonLink } from "~/components/ui";
-
 import { contact } from "../../../content/contact";
 import { site } from "../../../content/site";
 import { CommandMenu } from "./CommandMenu";
+import { CvLink } from "./CvLink";
 import { ThemeToggle } from "./ThemeToggle";
 import { useHeaderOffset } from "./useHeaderOffset";
 
@@ -47,18 +46,16 @@ export function SiteHeader() {
               </ul>
             </nav>
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Visible text is the short label; the accessible name starts
-                with it (WCAG 2.5.3) and says what the link does. */}
-              <ButtonLink
-                href={contact.cv.href}
-                download={contact.cv.fileName}
-                type="application/pdf"
-                aria-label={`${contact.cv.label} (${contact.cv.format})`}
+              {/* Visible text is the short label; the accessible name contains
+                it (WCAG 2.5.3) and says what the link does. It opens the CV
+                preview (T-056). */}
+              <CvLink
+                aria-label={`${contact.cv.previewLabel} (${contact.cv.format})`}
                 variant="secondary"
                 size="sm"
               >
                 {contact.cv.shortLabel}
-              </ButtonLink>
+              </CvLink>
               <CommandMenu />
               <ThemeToggle />
             </div>

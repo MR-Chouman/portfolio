@@ -175,6 +175,8 @@ export const contactSchema = z.strictObject({
     // The visible text of the compact header link; the full label stays the
     // accessible name.
     shortLabel: text,
+    // The name of the header and contact links, which open the preview.
+    previewLabel: text,
     format: text,
     // A PDF at the root of public/.
     href: z.string().regex(/^\/[a-z0-9-]+\.pdf$/, "Use a /name.pdf path"),
@@ -182,6 +184,16 @@ export const contactSchema = z.strictObject({
     fileName: z
       .string()
       .regex(/^[\w-]+\.pdf$/, "Use a file name such as Name-CV.pdf"),
+    // The CV preview dialog (T-056): its heading, the frame's title, the
+    // buttons, and the note shown where the browser cannot show a PDF inline.
+    preview: z.strictObject({
+      title: text,
+      frameTitle: text,
+      close: text,
+      open: text,
+      download: text,
+      fallback: text,
+    }),
   }),
 });
 

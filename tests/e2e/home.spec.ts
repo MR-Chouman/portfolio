@@ -99,7 +99,7 @@ test("the header CV link is on every page and reachable by keyboard", async ({
     await page.goto(path);
     const cv = page
       .getByRole("banner")
-      .getByRole("link", { name: "Download CV (PDF)" });
+      .getByRole("link", { name: "View CV (PDF)" });
     await expect(cv, path).toHaveAttribute("href", "/cv.pdf");
     await cv.focus();
     await expect(cv, path).toBeFocused();

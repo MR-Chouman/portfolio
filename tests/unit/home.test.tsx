@@ -74,16 +74,18 @@ describe("Home route", () => {
     }
   });
 
-  it("links the email, the CV download and the GitHub profile only", () => {
+  it("links the email, the CV preview and the GitHub profile only", () => {
     renderHome();
     const region = screen.getByRole("region", { name: home.contact.title });
     expect(
       within(region).getByRole("link", { name: /^Email / }),
     ).toHaveAttribute("href", `mailto:${contact.email.address}`);
     const cv = within(region).getByRole("link", {
-      name: new RegExp(contact.cv.label),
+      name: new RegExp(contact.cv.previewLabel),
     });
+    // A real download link, which opens the preview once hydrated (T-056).
     expect(cv).toHaveAttribute("href", contact.cv.href);
+    expect(cv).toHaveAttribute("aria-haspopup", "dialog");
     expect(cv).toHaveAttribute("download", contact.cv.fileName);
     expect(
       within(region).getByRole("link", { name: contact.github.label }),

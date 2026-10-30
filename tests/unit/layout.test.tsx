@@ -37,13 +37,13 @@ describe("SiteHeader", () => {
     );
   });
 
-  it("offers the CV download outside the navigation", () => {
+  it("offers the CV preview outside the navigation", () => {
     render(
       <MemoryRouter>
         <SiteHeader />
       </MemoryRouter>,
     );
-    const cv = screen.getByRole("link", { name: "Download CV (PDF)" });
+    const cv = screen.getByRole("link", { name: "View CV (PDF)" });
     expect(cv).toHaveTextContent(contact.cv.shortLabel);
     expect(cv).toHaveAttribute("href", contact.cv.href);
     expect(cv).toHaveAttribute("download", contact.cv.fileName);

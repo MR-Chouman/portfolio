@@ -19,5 +19,13 @@
 
 # The CV keeps one URL (/cv.pdf) when the owner replaces it (T-024), so
 # browsers revalidate it on each visit instead of caching it for a year.
+# The CV preview (T-056, D-046) shows the PDF in a frame on the site's own
+# pages. The site-wide frame-ancestors 'none' and X-Frame-Options: DENY would
+# block that, so this file alone allows framing by the same origin only;
+# other sites still cannot frame it.
 /cv.pdf
   Cache-Control: public, max-age=0, must-revalidate
+  ! Content-Security-Policy
+  ! X-Frame-Options
+  Content-Security-Policy: frame-ancestors 'self'
+  X-Frame-Options: SAMEORIGIN
