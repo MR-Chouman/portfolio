@@ -12,18 +12,19 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Open
 
-_None._
+None.
 
 ## Triaged
 
 - **F-017** · triaged · 2026-10-30 · self · -> T-060
   Cloudflare Pages redirects `/about` to `/about/` (308), because prerendered pages are `<path>/index.html`, while canonical and Open Graph URLs omit the trailing slash. T-060 should make canonical URLs match the served URL (or the reverse) so they do not point at a redirect.
 
-- **F-007** · triaged · 2026-10-23 · owner · -> T-024, T-026
-  The CV goes into a folder whose contents Git ignores (T-026). The published copy goes in `public/` (F-008, T-024).
-
 ## Resolved
 
+- **F-019** · resolved · 2026-10-30 · self · -> T-026
+  Owner action: copy the current CV PDF (the version with the Gmail address) into `private/` and confirm Git ignores it. Done 2026-10-30: the owner saved it as `private/cv.pdf`; `git check-ignore -v private/cv.pdf` prints the `/private/*` rule, `git status` lists nothing under `private/`, and `git ls-files private` lists only `private/.gitkeep`.
+- **F-007** · resolved · 2026-10-30 · owner · -> T-024, T-026
+  The CV goes into a folder whose contents Git ignores (T-026, done). The published copy goes in `public/` (F-008, T-024, done).
 - **F-020** · resolved · 2026-10-30 · self · -> T-024
   Owner action: add the CV PDF the site serves, as `public/cv.pdf` (both links point at `/cv.pdf`), and confirm the email address in `content/contact.ts` is the one on the CV (F-022). Done: the owner saved the CV (the version with the Gmail address, D-018) as `public/cv.pdf`, committed on the T-024 branch, and confirmed the email matches the CV. Playwright now checks that `/cv.pdf` is served as `application/pdf` and that both links download it; `_headers` gives it a revalidating cache.
 - **F-021** · resolved · 2026-10-30 · auto (recommended), checked by the owner · -> T-024
