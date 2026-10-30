@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 4: Skins and switcher**
+Current phase: **Phase 5: Lab demo**
 
 ## Rules
 
