@@ -12,6 +12,7 @@ import { about } from "./about";
 import { contact } from "./contact";
 import { experience } from "./experience";
 import { home } from "./home";
+import { lab } from "./lab";
 import { notFound } from "./not-found";
 import { profile } from "./profile";
 import { work } from "./work";
@@ -20,6 +21,7 @@ import {
   contactSchema,
   experienceSchema,
   homeSchema,
+  labSchema,
   notFoundSchema,
   profileSchema,
   projectFrontmatterSchema,
@@ -29,6 +31,7 @@ import {
   type Contact,
   type Experience,
   type Home,
+  type Lab,
   type NotFound,
   type Profile,
   type ProjectSummary,
@@ -116,6 +119,7 @@ export interface Content {
   home: Home;
   work: Work;
   about: About;
+  lab: Lab;
   contact: Contact;
   notFound: NotFound;
   projects: ProjectSummary[];
@@ -128,6 +132,7 @@ export function loadContent(dir: string = PROJECTS_DIR): Content {
     home: check(homeSchema, home, "content/home.ts"),
     work: check(workSchema, work, "content/work.ts"),
     about: check(aboutSchema, about, "content/about.ts"),
+    lab: check(labSchema, lab, "content/lab.ts"),
     contact: check(contactSchema, contact, "content/contact.ts"),
     notFound: check(notFoundSchema, notFound, "content/not-found.ts"),
     projects: loadProjects(dir),
@@ -144,6 +149,7 @@ export const STATIC_PATHS = [
   "/",
   "/work",
   "/about",
+  "/lab",
   "/style-tile",
   NOT_FOUND_PATH,
 ] as const;
