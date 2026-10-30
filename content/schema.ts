@@ -76,6 +76,16 @@ export const experienceEntrySchema = z
 export const experienceSchema = z.array(experienceEntrySchema).min(1);
 
 // YAML frontmatter of content/projects/<slug>.mdx. The slug is the file name.
+// The models app/components/three/models.ts can build (T-034).
+export const projectObjectKinds = [
+  "airplane",
+  "pallet",
+  "charger",
+  "hospital-bed",
+] as const;
+
+export type ProjectObjectKind = (typeof projectObjectKinds)[number];
+
 export const projectFrontmatterSchema = z.strictObject({
   title: text,
   // One sentence for cards, the case study header and the meta description.
@@ -86,6 +96,12 @@ export const projectFrontmatterSchema = z.strictObject({
   metrics: z.array(metricSchema).min(1),
   // Position in lists (1 = first). Must be unique across projects.
   order: z.int().positive(),
+  // The rotatable 3D object in the case study header (T-034, D-032): which
+  // model stands for the project, and its accessible name.
+  object: z.strictObject({
+    kind: z.enum(projectObjectKinds),
+    label: text,
+  }),
 });
 
 // A site path ("/work"), an in-page anchor ("#contact") or an https URL.
@@ -190,6 +206,10 @@ export const workSchema = z.strictObject({
     next: text,
     // The navigation landmark around the next-project link.
     navigationLabel: text,
+    // Under the 3D object: how to rotate it, and the text shown instead
+    // when the browser cannot draw it (no WebGL).
+    objectHint: text,
+    objectFallback: text,
   }),
 });
 
