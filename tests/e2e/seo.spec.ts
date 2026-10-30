@@ -2,11 +2,14 @@ import { expect, test, type APIRequestContext } from "@playwright/test";
 
 import { SITE_ORIGIN } from "../../app/lib/seo";
 import { loadProjects } from "../../content/load";
+import { MAX_OG_IMAGE_BYTES, pngSize } from "../../scripts/finalize-build";
 
 // Per-route SEO audit (T-060, D-050): every prerendered page has its own
 // title and description, its canonical URL is the address it is served at,
 // the sitemap lists exactly the indexable pages, robots.txt points at the
-// sitemap, and the home page carries a valid JSON-LD Person.
+// sitemap, and the home page carries a valid JSON-LD Person. Link previews
+// (T-061, D-051): every indexable page names a served 1200 x 630 PNG card,
+// and each case study names its own.
 
 const NOINDEX_PAGES = ["/style-tile/", "/404.html"];
 
@@ -164,6 +167,51 @@ test("every page has a unique title and description and a canonical URL at its o
       "twitter:title": head.title,
       "twitter:description": head.description,
     });
+  }
+});
+
+test("link previews get each page's own card image and title", async ({
+  request,
+}) => {
+  const projects = new Map(
+    loadProjects().map((project) => [`/work/${project.slug}/`, project]),
+  );
+  for (const path of await sitemapPaths(request)) {
+    const head = readHead(await (await request.get(path)).text());
+    const project = projects.get(path);
+    const expected = project
+      ? `${SITE_ORIGIN}/og/work/${project.slug}.png`
+      : `${SITE_ORIGIN}/og/site.png`;
+
+    // What LinkedIn and WhatsApp read: og:title, og:image (absolute, with
+    // its type and size) and the large Twitter card for X.
+    expect(head.og, path).toMatchObject({
+      "og:title": head.title,
+      "og:image": expected,
+      "og:image:type": "image/png",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:image:alt": expect.any(String),
+    });
+    if (project) {
+      expect(head.title, path).toContain(project.title);
+      expect(head.og["og:image:alt"], path).toContain(project.title);
+    }
+    expect(head.twitter, path).toMatchObject({
+      "twitter:card": "summary_large_image",
+      "twitter:image": expected,
+      "twitter:image:alt": head.og["og:image:alt"],
+    });
+
+    // The same path is served by this build as a PNG of the declared size.
+    const image = await request.get(new URL(expected).pathname, {
+      maxRedirects: 0,
+    });
+    expect(image.status(), expected).toBe(200);
+    expect(image.headers()["content-type"], expected).toBe("image/png");
+    const body = await image.body();
+    expect(pngSize(body), expected).toEqual({ width: 1200, height: 630 });
+    expect(body.length, expected).toBeLessThanOrEqual(MAX_OG_IMAGE_BYTES);
   }
 });
 

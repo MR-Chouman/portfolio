@@ -8,6 +8,7 @@ import CaseStudy, { meta } from "~/routes/work.$slug";
 
 import { loadProjects } from "../../content/load";
 import { notFound } from "../../content/not-found";
+import { site } from "../../content/site";
 import { work } from "../../content/work";
 import type { Route } from "../../app/routes/+types/work.$slug";
 
@@ -132,6 +133,24 @@ describe("case study meta", () => {
       );
     }
     expect(titles.size).toBe(projects.length);
+  });
+
+  it("points og:image at the project's own card", () => {
+    for (const project of projects) {
+      const tags = meta({
+        params: { slug: project.slug },
+      } as unknown as Route.MetaArgs);
+      expect(tags).toContainEqual({
+        property: "og:image",
+        content: expect.stringMatching(
+          new RegExp(`/og/work/${project.slug}\\.png$`),
+        ),
+      });
+      expect(tags).toContainEqual({
+        property: "og:image:alt",
+        content: `${site.openGraph.caseStudy.alt}: ${project.title}`,
+      });
+    }
   });
 
   it("returns the 404 page's tags for an unknown slug", () => {

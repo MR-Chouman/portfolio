@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { ogImagePath } from "~/lib/og-image";
 import { canonicalUrl, pageMeta, SITE_ORIGIN } from "~/lib/seo";
 import { personJsonLd, personMeta } from "~/lib/structured-data";
 
@@ -37,10 +38,28 @@ describe("pageMeta", () => {
       { property: "og:title", content: "Title" },
       { property: "og:description", content: "Description" },
       { property: "og:url", content: `${SITE_ORIGIN}/work/` },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:image", content: `${SITE_ORIGIN}/og/site.png` },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: site.openGraph.site.alt },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Title" },
       { name: "twitter:description", content: "Description" },
+      { name: "twitter:image", content: `${SITE_ORIGIN}/og/site.png` },
+      { name: "twitter:image:alt", content: site.openGraph.site.alt },
     ]);
+  });
+
+  it("uses a page's own image when given one", () => {
+    const meta = pageMeta({
+      ...base,
+      image: { path: ogImagePath("ev-charging"), alt: "Card" },
+    });
+    const url = `${SITE_ORIGIN}/og/work/ev-charging.png`;
+    expect(meta).toContainEqual({ property: "og:image", content: url });
+    expect(meta).toContainEqual({ property: "og:image:alt", content: "Card" });
+    expect(meta).toContainEqual({ name: "twitter:image", content: url });
   });
 
   it("sets the Open Graph type when asked", () => {
