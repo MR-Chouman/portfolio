@@ -2,27 +2,43 @@
 title: Airline crew management platform
 summary: An admin platform for an airline's crew operations, from rostering and attendance to appraisals and training.
 sector: Aviation
-role: "Placeholder: role, confirmed in T-030"
+role: Frontend lead
 stack: [Next.js, TypeScript, Microsoft SSO]
 metrics:
   - { value: "25", label: "Modules" }
 order: 1
 ---
 
-{/* Placeholder body. The case study is written in T-030 and reviewed by the owner (D-018). It keeps these four sections (REQUIREMENTS section 5) and adds 2-4 captioned images with <Figure src="..." alt="..." caption="..." width={...} height={...} />, using anonymized crops with invented data only (T-034). */}
+{/* T-030 (Owner review, D-018). Written from the project's own codebase and commit history, checked by the owner in review; the client is never named and no client data appears. The scale facts match REQUIREMENTS section 4. No images for now (D-031). */}
 
-## The problem
+## Context
 
-Placeholder: the client's situation and what the platform had to solve, written in T-030.
+An airline needed one place to run its crew operations. The platform covers 25 modules: rostering, attendance, leave, appraisals, qualifications and training, plus the tools around them such as crew profiles, task management, letter generation and delegations. Everyone signs in with their Microsoft work account, and what they see depends on their role and the operation they work in.
 
 ## What I owned
 
-Placeholder: my role, the scope I was responsible for and the team around it, written in T-030.
+I led the frontend from the first commit in March 2026, and I wrote about 95% of its commits. I set up the Next.js App Router structure, the authentication flow, the data layer and the shared component set, then built most of the modules on top of them. A few developers contributed to individual modules along the way.
+
+## Scope
+
+Each module lives in its own feature folder with the same layers: an API service that shapes requests and responses, hooks for queries and mutations, components scoped to the feature, and page-level views. Route files stay thin and only compose those views, so a new module starts from a known shape instead of a blank page.
+
+Shared primitives carry the rest: metric cards, chart and table cards, period filters, pagination, skeleton states, and permission-aware buttons and links. Most screens are dashboards, so getting these right once made every module look and behave alike.
 
 ## Key decisions
 
-Placeholder: the technical and design decisions that shaped the platform, written in T-030.
+### Single sign-on
 
-## Outcome
+Sign-in uses Microsoft's authentication library, with a redirect or popup flow chosen by configuration, and hands off to a server-side session. Route protection runs on the server before a page renders, with client guards kept in step, and users pick their operation scope before they reach any protected screen. Browser requests go through server-side proxy routes that attach the session and forward to the backend, so the backend address never reaches the browser.
 
-Placeholder: what shipped and what changed for the people using it, written in T-030. The facts in the header come from the project list in the requirements.
+### Rostering
+
+The roster screens are analytics as much as schedules: a roster calendar, period comparisons, duty, swap and bid analysis, flights by destination, ticket use, change requests and a roster log. Pages prefetch their first data on the server with the user's token and hand it to the client cache as initial data, so a dashboard paints with real numbers and does not fetch everything twice on load.
+
+### Approvals
+
+Letters are composed from templates with merge fields, and a template moves from draft to pending approval before it can be used, or is sent back. Delegations let one person hand their authority to another for a period, and tasks can be handed over between people. Each of these shows its status in the list, so a reviewer sees where an item stands without opening it.
+
+### Security and quality
+
+I moved the app to a strict Content Security Policy with a fresh nonce per request. That meant replacing every inline style with CSP-safe primitives, including chart sizing, and adding violation reporting. The code is covered by 168 unit and integration test files, with a 70% coverage floor, and Playwright end-to-end specs for the critical flows.
