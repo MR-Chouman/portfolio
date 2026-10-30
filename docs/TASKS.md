@@ -103,10 +103,9 @@ Current phase: **Phase 3: Case studies and imagery**
   Done when: same structure; highlights the 132 screens and 50-module API layer.
 - **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
-- **T-034** · blocked · Image pipeline (Owner review: anonymized crops)
+- **T-034** · todo · Image pipeline (Owner review: anonymized crops)
   Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
   Done when: all case study images go through the script and none contain real client data.
-  Notes: blocked by D-031 (owner decision 2026-10-30: no screenshots in the portfolio for now).
 - **T-035** · todo · Final hero and About copy (Owner review)
   Done when: owner approves the copy and numbers match REQUIREMENTS section 4.
 

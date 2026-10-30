@@ -350,7 +350,7 @@ Status: Superseded by D-031 · 2026-10-30 · Refines D-018, D-026 · Resolves F-
 
 ## D-031 · No screenshots or screen illustrations in case studies for now
 
-Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030 · Defers T-034
+Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030
 
 **Context.** T-030 added three illustrations of typical screens drawn with invented data (D-030). The owner decided not to include screenshots in the portfolio for the time being, and illustrations of app screens count as screenshots for this purpose.
 
@@ -358,6 +358,5 @@ Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030 · Defers T
 - Case studies ship as text only: no screenshots, cropped or anonymized captures, or illustrations of app screens.
 - The T-030 figures, their SVG sources, the AVIF support in `Figure` and the build-time figure check (`content/figures.ts`) are removed. They remain in the history of `task/T-030-airline-crew-case-study` if images come back.
 - `Figure` (D-026) stays as it was, unused, so a later decision can add images without changing the template.
-- T-034 (image pipeline) is `blocked` until the owner reverses this decision.
 
 **Consequences.** T-030 to T-033 no longer require captioned images. REQUIREMENTS section 5 still lists "captioned images" for `/work/:slug`, and it is not changed without the owner's approval. Open Graph images (T-061) are generated cards, not screenshots, so they are not affected.
