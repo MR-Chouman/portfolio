@@ -21,6 +21,9 @@ None.
 
 ## Resolved
 
+- **F-032** · resolved · 2026-10-30 · auto (recommended) · -> T-044, D-037
+  How should the "visual check at 375/768/1440" be done? Chosen: automated layout checks at the three widths in every skin and theme (no sideways scroll, header and h1 inside the viewport), plus a one-off review by eye of full-page screenshots, with no committed screenshot baselines. Alternatives: Playwright `toHaveScreenshot` baselines for every page (font rendering differs between machines and CI, and every copy change would need new baselines); a manual check only (no regression guard). Reason: catches the layout breaks that matter without brittle pixel diffs.
+
 - **F-031** · resolved · 2026-10-30 · auto (recommended) · -> T-043, D-036
   Should the command palette have a visible trigger, or only the Ctrl/Cmd+K shortcut? Chosen: a 36 px icon button (a terminal prompt) in the header between the CV link and the design switcher, named "Open command palette", with the shortcut in its title and `aria-keyshortcuts`; header gaps shrink below 640 px so everything stays on one row at 375 px. Alternatives: shortcut only (touch and mouse visitors would never find it); a wider "Search ⌘K" button (wraps the mobile header). Reason: discoverable on every device and consistent with the theme and design buttons. Owner to check: the icon and whether a visible label or shortcut hint is wanted.
 - **F-030** · resolved · 2026-10-30 · auto (recommended) · -> T-043, D-036

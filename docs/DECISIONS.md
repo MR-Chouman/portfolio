@@ -435,3 +435,17 @@ Status: Accepted · 2026-10-30 · Refines D-008, D-035
 - No animation is added (D-008); the active option uses an accent left border and the raised surface, from tokens.
 
 **Consequences.** A new page or command is one `Command.Item` and its copy. The e2e spec runs in Chromium only, like the other specs except the skin switcher; Firefox was checked locally. Any later change that adds a status region in the header must keep the e2e locators scoped (the skin switcher spec now targets its own region).
+
+## D-037 · Per-skin QA: one spec over every skin, theme, page and width
+Status: Accepted · 2026-10-30 · Refines D-033, D-034
+
+**Context.** T-044 asks for smoke and axe checks per skin through `?skin=`, verified contrast and a visual check at 375, 768 and 1440 px, passing for both skins and both themes. Until now only `tests/e2e/systems-skin.spec.ts` covered the Systems skin, by setting `data-skin` by hand (D-033). The form of the visual check was chosen under `/run-phase` (F-032).
+
+**Decision.**
+- `tests/e2e/per-skin.spec.ts` replaces `systems-skin.spec.ts`. For each skin and theme it loads every route (home, `/work`, each case study from `content/projects`, `/about`, `/style-tile`, a 404 path) with `?skin=` in a fresh browser context, the theme coming from the emulated system color scheme, and checks the `data-skin` and `data-theme` attributes, title, h1, header, footer and axe (WCAG 2.2 AA tags).
+- Contrast is checked twice: the skin files in unit tests (`tests/unit/skins.test.ts`), and the token values the browser resolves on the built page in e2e, with the same helper (`tests/unit/helpers/contrast.ts`, which now also reads the minified `oklch(95% ...)` form).
+- Layout at 375, 768 and 1440 px: no sideways scroll, and the header and h1 stay inside the viewport, on every page in every skin and theme. The visual check is a review of full-page screenshots by eye when the skins change; no screenshot baselines are committed, because font rendering differs between machines and CI.
+- The spec keeps its own skin list, since Playwright cannot import `app/lib/skin.ts` (it imports a font through Vite's `?url`); a test compares it with the list in the built pre-paint script.
+
+**Consequences.** A new skin is added to the spec's list (the drift test fails otherwise) and gets the whole matrix. A new route is added to its route list. The spec runs in Chromium only, in `ci-main`.
+

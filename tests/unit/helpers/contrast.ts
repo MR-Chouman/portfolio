@@ -1,14 +1,16 @@
-// WCAG 2.2 contrast for OKLCH colors, as written in the skin files.
+// WCAG 2.2 contrast for OKLCH colors, as written in the skin files or as the
+// minified build serves them (lightness as a percentage, e.g.
+// `oklch(95% .004 250)`).
 
 type Rgb = [number, number, number];
 
 export function parseOklch(value: string): Rgb {
-  const match = /^oklch\(\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\)$/.exec(
+  const match = /^oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)\s*\)$/.exec(
     value.trim(),
   );
   if (!match) throw new Error(`Not an oklch() color: ${value}`);
-  const [l, c, h] = match.slice(1).map(Number);
-  return oklchToLinearSrgb(l, c, h);
+  const [l, c, h] = [match[1], match[3], match[4]].map(Number);
+  return oklchToLinearSrgb(match[2] ? l / 100 : l, c, h);
 }
 
 function oklchToLinearSrgb(l: number, c: number, h: number): Rgb {
