@@ -49,6 +49,17 @@ export const site = {
       orange: "Orange",
     },
   },
+  // Text on the generated Open Graph cards (T-061, D-051) and their alt text.
+  // Case study cards show the project's title, summary and sector from its
+  // frontmatter; the site card shows the profile's name and headline.
+  openGraph: {
+    site: {
+      eyebrow: "Portfolio",
+      alt: "Portfolio card of Mohamad Rida Chouman, frontend lead",
+    },
+    // The case study card's alt text is "<alt>: <project title>".
+    caseStudy: { eyebrow: "Case study", alt: "Case study card" },
+  },
   navigation: [
     { label: "Work", href: "/work" },
     { label: "About", href: "/about" },

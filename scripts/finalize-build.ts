@@ -15,6 +15,10 @@
 // 3. sitemap.xml and robots.txt are written from the prerendered pages
 //    (T-060, D-050): every page with a canonical URL and no noindex tag is
 //    listed, and its canonical URL must be the URL the page is served at.
+// 4. Every Open Graph image a page names (T-061, D-051) must be a file of
+//    the build, a PNG of the declared size and small enough for WhatsApp,
+//    and every indexable page must name one. scripts/og-images.ts writes the
+//    images just before this runs.
 import { createHash } from "node:crypto";
 import {
   existsSync,
@@ -22,6 +26,7 @@ import {
   readFileSync,
   renameSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -230,11 +235,117 @@ export function writeSeoFiles(clientDir: string): string[] {
   return urls;
 }
 
+// WhatsApp drops link preview images much over 300 kB.
+export const MAX_OG_IMAGE_BYTES = 300 * 1024;
+
+// The content of every <meta> whose property or name is `key`.
+function metaContent(html: string, key: string): string[] {
+  const values: string[] = [];
+  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
+    const name = attribute(tag, "property") ?? attribute(tag, "name");
+    const content = attribute(tag, "content");
+    if (name === key && content !== undefined) values.push(content);
+  }
+  return values;
+}
+
+export interface PageImage {
+  url: string;
+  width?: number;
+  height?: number;
+  twitter?: string;
+}
+
+// The Open Graph image a prerendered page names, if any.
+export function pageImage(html: string): PageImage | undefined {
+  const [url] = metaContent(html, "og:image");
+  if (url === undefined) return undefined;
+  const number = (key: string) => {
+    const [value] = metaContent(html, key);
+    return value === undefined ? undefined : Number(value);
+  };
+  return {
+    url,
+    width: number("og:image:width"),
+    height: number("og:image:height"),
+    twitter: metaContent(html, "twitter:image")[0],
+  };
+}
+
+const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+// Width and height from a PNG's IHDR chunk, or undefined if it is not a PNG.
+export function pngSize(
+  data: Buffer,
+): { width: number; height: number } | undefined {
+  if (
+    data.length < 24 ||
+    !data.subarray(0, 8).equals(PNG_SIGNATURE) ||
+    data.toString("latin1", 12, 16) !== "IHDR"
+  ) {
+    return undefined;
+  }
+  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+}
+
+// Checks the Open Graph image of every page and returns the distinct image
+// files, sorted.
+export function checkOgImages(clientDir: string): string[] {
+  const checked = new Set<string>();
+  for (const page of htmlFiles(clientDir)) {
+    const file = relative(clientDir, page);
+    const html = readFileSync(page, "utf8");
+    const image = pageImage(html);
+    if (!image) {
+      const { canonical, noindex } = pageSeo(html);
+      if (canonical && !noindex) {
+        throw new BuildError(`${file} is indexable but has no og:image.`);
+      }
+      continue;
+    }
+    if (!image.url.startsWith(`${SITE_ORIGIN}/`)) {
+      throw new BuildError(
+        `${file} has the og:image ${image.url}, which is not on ${SITE_ORIGIN}.`,
+      );
+    }
+    if (image.twitter !== image.url) {
+      throw new BuildError(
+        `${file} has a twitter:image (${image.twitter}) other than its og:image (${image.url}).`,
+      );
+    }
+    const path = new URL(image.url).pathname;
+    const imageFile = join(clientDir, ...path.split("/").filter(Boolean));
+    if (!existsSync(imageFile)) {
+      throw new BuildError(
+        `${file} names the og:image ${path}, which the build did not write.`,
+      );
+    }
+    const size = pngSize(readFileSync(imageFile));
+    if (!size) {
+      throw new BuildError(`The og:image ${path} of ${file} is not a PNG.`);
+    }
+    if (size.width !== image.width || size.height !== image.height) {
+      throw new BuildError(
+        `The og:image ${path} is ${size.width} x ${size.height}, but ${file} declares ${image.width} x ${image.height}.`,
+      );
+    }
+    const bytes = statSync(imageFile).size;
+    if (bytes > MAX_OG_IMAGE_BYTES) {
+      throw new BuildError(
+        `The og:image ${path} is ${bytes} bytes, over ${MAX_OG_IMAGE_BYTES}.`,
+      );
+    }
+    checked.add(path);
+  }
+  return [...checked].sort();
+}
+
 export function finalizeBuild(clientDir: string): void {
   moveNotFoundPage(clientDir);
   const hashes = writeHeaders(clientDir);
   const urls = writeSeoFiles(clientDir);
+  const images = checkOgImages(clientDir);
   console.info(
-    `Finalize: ${relative(process.cwd(), join(clientDir, "404.html"))} written; CSP lists ${hashes.length} inline script hashes; sitemap lists ${urls.length} pages.`,
+    `Finalize: ${relative(process.cwd(), join(clientDir, "404.html"))} written; CSP lists ${hashes.length} inline script hashes; sitemap lists ${urls.length} pages; ${images.length} Open Graph images checked.`,
   );
 }

@@ -16,14 +16,18 @@ import {
   BuildError,
   CSP_PLACEHOLDER,
   MAX_HEADERS_LINE,
+  MAX_OG_IMAGE_BYTES,
   SITEMAP_URL,
+  checkOgImages,
   cspHash,
   fillHeaders,
   finalizeBuild,
   indexablePages,
   inlineScripts,
   moveNotFoundPage,
+  pageImage,
   pageSeo,
+  pngSize,
   robotsTxt,
   servedPath,
   sitemapXml,
@@ -93,8 +97,9 @@ describe("finalizeBuild", () => {
     writeFileSync(join(dir, "404", "index.html"), "<script>nf()</script>");
     writeFileSync(
       join(dir, "index.html"),
-      `${canonical("/")}<script>home()</script>`,
+      `${canonical("/")}${ogImage("/og/site.png")}<script>home()</script>`,
     );
+    writePage(dir, "og/site.png", png(1200, 630));
     writeFileSync(join(dir, "_headers"), template);
 
     finalizeBuild(dir);
@@ -121,7 +126,34 @@ function canonical(path: string): string {
 }
 const noindex = '<meta name="robots" content="noindex"/>';
 
-function writePage(dir: string, file: string, html: string): void {
+// The Open Graph and Twitter image tags pageMeta writes.
+function ogImage(
+  path: string,
+  { width = 1200, height = 630, twitter = `${SITE_ORIGIN}${path}` } = {},
+): string {
+  return [
+    `<meta property="og:image" content="${SITE_ORIGIN}${path}"/>`,
+    `<meta property="og:image:width" content="${width}"/>`,
+    `<meta property="og:image:height" content="${height}"/>`,
+    `<meta name="twitter:image" content="${twitter}"/>`,
+  ].join("");
+}
+
+// The start of a PNG file: signature and IHDR chunk with the given size.
+function png(width: number, height: number, padding = 0): Buffer {
+  const ihdr = Buffer.alloc(25);
+  ihdr.writeUInt32BE(13, 0);
+  ihdr.write("IHDR", 4, "latin1");
+  ihdr.writeUInt32BE(width, 8);
+  ihdr.writeUInt32BE(height, 12);
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    ihdr,
+    Buffer.alloc(padding),
+  ]);
+}
+
+function writePage(dir: string, file: string, html: string | Buffer): void {
   const path = join(dir, file);
   mkdirSync(join(path, ".."), { recursive: true });
   writeFileSync(path, html);
@@ -206,5 +238,86 @@ describe("sitemapXml and robotsTxt", () => {
       `User-agent: *\nAllow: /\n\nSitemap: ${SITEMAP_URL}\n`,
     );
     expect(SITEMAP_URL).toBe(`${SITE_ORIGIN}/sitemap.xml`);
+  });
+});
+
+describe("Open Graph image checks", () => {
+  it("reads a PNG's size from its header", () => {
+    expect(pngSize(png(1200, 630))).toEqual({ width: 1200, height: 630 });
+    expect(pngSize(Buffer.from("<svg/>"))).toBeUndefined();
+  });
+
+  it("reads the image a page names", () => {
+    expect(pageImage(`<head>${ogImage("/og/a.png")}</head>`)).toEqual({
+      url: `${SITE_ORIGIN}/og/a.png`,
+      width: 1200,
+      height: 630,
+      twitter: `${SITE_ORIGIN}/og/a.png`,
+    });
+    expect(pageImage("<head></head>")).toBeUndefined();
+  });
+
+  it("accepts pages whose images exist with their declared size", () => {
+    const dir = tempDir();
+    writePage(dir, "index.html", canonical("/") + ogImage("/og/site.png"));
+    writePage(
+      dir,
+      "work/a/index.html",
+      canonical("/work/a/") + ogImage("/og/work/a.png"),
+    );
+    writePage(
+      dir,
+      "style-tile/index.html",
+      canonical("/style-tile/") + noindex,
+    );
+    writePage(dir, "og/site.png", png(1200, 630));
+    writePage(dir, "og/work/a.png", png(1200, 630));
+    expect(checkOgImages(dir)).toEqual(["/og/site.png", "/og/work/a.png"]);
+  });
+
+  it("fails when an indexable page has no image", () => {
+    const dir = tempDir();
+    writePage(dir, "about/index.html", canonical("/about/"));
+    expect(() => checkOgImages(dir)).toThrow(/has no og:image/);
+  });
+
+  it("fails when the image file is missing", () => {
+    const dir = tempDir();
+    writePage(dir, "index.html", canonical("/") + ogImage("/og/site.png"));
+    expect(() => checkOgImages(dir)).toThrow(/did not write/);
+  });
+
+  it("fails when the image is not a PNG of the declared size", () => {
+    const dir = tempDir();
+    writePage(dir, "index.html", canonical("/") + ogImage("/og/site.png"));
+    writePage(dir, "og/site.png", "<svg/>");
+    expect(() => checkOgImages(dir)).toThrow(/not a PNG/);
+    writePage(dir, "og/site.png", png(1200, 600));
+    expect(() => checkOgImages(dir)).toThrow(/1200 x 600/);
+  });
+
+  it("fails when the image is too large for WhatsApp", () => {
+    const dir = tempDir();
+    writePage(dir, "index.html", canonical("/") + ogImage("/og/site.png"));
+    writePage(dir, "og/site.png", png(1200, 630, MAX_OG_IMAGE_BYTES));
+    expect(() => checkOgImages(dir)).toThrow(/bytes, over/);
+  });
+
+  it("fails on an image on another origin or a different Twitter image", () => {
+    const dir = tempDir();
+    writePage(
+      dir,
+      "index.html",
+      canonical("/") +
+        '<meta property="og:image" content="https://example.com/a.png"/>',
+    );
+    expect(() => checkOgImages(dir)).toThrow(/not on/);
+    writePage(
+      dir,
+      "index.html",
+      canonical("/") +
+        ogImage("/og/site.png", { twitter: `${SITE_ORIGIN}/og/other.png` }),
+    );
+    expect(() => checkOgImages(dir)).toThrow(/twitter:image/);
   });
 });
