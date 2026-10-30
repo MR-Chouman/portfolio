@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 2: Content and pages**
+Current phase: **Phase 3: Case studies and imagery**
 
 ## Rules
 
