@@ -22,6 +22,9 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-040** · resolved · 2026-10-30 · auto (recommended) · -> T-049, D-043
+  How wide should the per-accent QA matrix be? Chosen: every route in every accent and both themes for smoke and axe (108 tests), contrast per accent and theme, and the layout of every route per accent, theme and width, in one new spec next to `per-theme.spec.ts`; the visual check is a by-eye review of screenshots, with no committed baselines. Alternatives: axe on the home page only per accent (faster, but an accent-colored element on another page could fail unseen); screenshot baselines per accent (font rendering differs between machines and CI, D-037). Reason: "Done when" asks for every accent in both themes, and the full matrix adds about two and a half minutes to the `ci-main` e2e run.
+
 - **F-039** · resolved · 2026-10-30 · auto (recommended) · -> T-048, D-042
   How does the floating header stay in view and how do anchor and focus targets learn its height? Chosen: a sticky header (in the flow, with a top gap) whose bar height is measured by a `ResizeObserver` into `--header-height`, used by `scroll-padding-top`, with a CSS fallback before hydration. Alternatives: a fixed header with a matching top padding on the body (the padding must track the height, so a wrap or zoom shifts content); a hard-coded scroll padding per breakpoint (breaks when the bar wraps or text is zoomed). Reason: sticky cannot cause layout shift, and the measured height stays right at every width and zoom level.
 - **F-038** · resolved · 2026-10-30 · auto (recommended) · -> T-047, D-041
