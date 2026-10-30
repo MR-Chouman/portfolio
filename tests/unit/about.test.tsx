@@ -46,11 +46,10 @@ describe("About route", () => {
   it("lists the experience timeline in order, with machine-readable dates", () => {
     renderAbout();
     const region = screen.getByRole("region", { name: about.experience.title });
-    // The timeline entries, not their highlights.
+    // The timeline is the first list; each entry may nest a highlights list.
+    const [timeline] = within(region).getAllByRole("list");
     const entries = Array.from(
-      within(region)
-        .getByRole("list")
-        .querySelectorAll<HTMLElement>(":scope > li"),
+      timeline?.querySelectorAll<HTMLElement>(":scope > li") ?? [],
     );
     expect(entries).toHaveLength(experience.length);
     experience.forEach((entry, index) => {
@@ -64,6 +63,9 @@ describe("About route", () => {
       ).toHaveAttribute("dateTime", entry.start);
       if (entry.end === null) {
         expect(entries[index]).toHaveTextContent(about.experience.present);
+      }
+      for (const highlight of entry.highlights) {
+        expect(item.getByText(highlight)).toBeInTheDocument();
       }
     });
   });
