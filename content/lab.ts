@@ -2,26 +2,59 @@
 // create and edit drawer (T-052) and its component gallery (T-053).
 // Validated by labSchema at build time (content/load.ts). The records the
 // table lists are invented demo data generated in app/lib/lab/records.ts
-// (D-044). The page introduction is refined in T-054.
+// (D-044). T-054 adds how each pattern works and links to its source in
+// the site's public repository (files on main, the production branch).
 import type { Lab } from "./schema";
 
 export const lab = {
   meta: {
     title: "Lab · Mohamad Rida Chouman",
     description:
-      "Live demos of admin platform patterns: a server-style data table with filters, sorting, pagination and URL state, and a create and edit drawer, over invented data.",
+      "Live admin platform patterns over invented data: a server-style data table with URL state, a create and edit drawer with optimistic saves, and a component gallery.",
   },
   header: {
     eyebrow: "Lab",
     title: "Admin patterns, live",
     intro:
-      "Working versions of the patterns behind the case studies, running on invented data in your browser. Nothing here talks to a real server.",
+      "Three patterns that large admin platforms are built on, working in your browser: a server-style data table, a create and edit drawer, and the component gallery both are made from. Each one says how it works and links to its code. The data is invented and nothing here talks to a real server.",
+    source: {
+      label: "Browse the lab's source on GitHub",
+      href: "https://github.com/MR-Chouman/portfolio/tree/main/app/components/lab",
+    },
   },
   table: {
     eyebrow: "Pattern",
     title: "Server-style data table",
     intro:
       "Filtering, sorting and pagination happen behind a mock endpoint with a short delay, the way a real list API answers. The whole state lives in the URL, so reload, share or use back and forward.",
+    notes: {
+      title: "How the table works",
+      points: [
+        "The URL is the only state. Every control writes the whole query (search, filters, sort, page and rows per page) to the address, so a reload, a shared link or back and forward bring back the same view.",
+        "A React Router client loader reads the URL and asks the mock endpoint for one page. A new request aborts the one it replaces, so a slow answer never overwrites a newer one.",
+        "While a request runs, the controls already show the new state and the old rows stay, dimmed and marked busy. The empty and error states are part of the table, and Try again keeps your filters.",
+        "The mock endpoint filters, sorts and pages 240 seeded records after a short delay, the way a list API answers.",
+      ],
+      sourceTitle: "Source on GitHub",
+      source: [
+        {
+          label: "AssetTable.tsx",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/components/lab/AssetTable.tsx",
+        },
+        {
+          label: "routes/lab.tsx",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/routes/lab.tsx",
+        },
+        {
+          label: "lib/lab/client.ts",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/lib/lab/client.ts",
+        },
+        {
+          label: "lib/lab/query.ts",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/lib/lab/query.ts",
+        },
+      ],
+    },
     caption: "Equipment assets (invented data)",
     regionLabel: "Asset table, scrolls sideways on small screens",
     columns: {
@@ -84,6 +117,33 @@ export const lab = {
   },
   crud: {
     hint: "Create or edit an asset in a drawer. A save shows in the table at once and rolls back if the mock server fails it; changes last until you reload.",
+    notes: {
+      title: "How the drawer works",
+      points: [
+        "The drawer is a native modal dialog: the page behind it is inert, Escape closes it and focus goes back to the button that opened it.",
+        "A Zod schema checks the form on submit and moves focus to the first error, then checks again as you type. Each error is tied to its field.",
+        "Saves are optimistic: the row changes in the table at once, marked as saving, and rolls back with an alert if the mock server fails the save.",
+      ],
+      sourceTitle: "Source on GitHub",
+      source: [
+        {
+          label: "AssetDrawer.tsx",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/components/lab/AssetDrawer.tsx",
+        },
+        {
+          label: "lib/lab/asset-form.ts",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/lib/lab/asset-form.ts",
+        },
+        {
+          label: "lib/lab/optimistic.ts",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/lib/lab/optimistic.ts",
+        },
+        {
+          label: "lib/lab/api.ts",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/lib/lab/api.ts",
+        },
+      ],
+    },
     create: "New asset",
     edit: "Edit {name}",
     editShort: "Edit",
@@ -134,6 +194,29 @@ export const lab = {
     title: "Component gallery",
     intro:
       "The table and the drawer above are built from these primitives. Components use semantic color tokens only, so one set of markup serves both themes and all six accents: each panel below sets its own theme, and the accent rows set each accent in place. Hover, focus and use them to see the live states.",
+    notes: {
+      title: "How the gallery works",
+      points: [
+        "Components are styled with semantic tokens only (surface, text, line and accent), never raw colors, so one set of markup serves both themes and every accent.",
+        "A theme or an accent is a data attribute that redefines the tokens below it: the panels set data-theme and the accent rows set data-accent.",
+        "The table and the drawer use these same primitives, so a change to a primitive reaches every screen built from it.",
+      ],
+      sourceTitle: "Source on GitHub",
+      source: [
+        {
+          label: "components/ui",
+          href: "https://github.com/MR-Chouman/portfolio/tree/main/app/components/ui",
+        },
+        {
+          label: "ComponentGallery.tsx",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/components/lab/ComponentGallery.tsx",
+        },
+        {
+          label: "styles/tokens.css",
+          href: "https://github.com/MR-Chouman/portfolio/blob/main/app/styles/tokens.css",
+        },
+      ],
+    },
     themes: {
       light: "Light theme",
       dark: "Dark theme",
