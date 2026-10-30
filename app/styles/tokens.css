@@ -54,6 +54,8 @@
  *     --space-section   vertical gap between page sections (py-section, ...)
  *     --container-page  max content width (max-w-page)
  *     --container-reading max reading width (max-w-reading)
+ *     --space-rail      left room kept for the floating accent palette;
+ *                       page-container never starts its content inside it
  *
  * Motion (use as `duration-(--duration-base) ease-standard`)
  *   --duration-fast 120 ms   hover, press
@@ -130,6 +132,9 @@
   --space-section: clamp(4rem, 3rem + 4.3vw, 7rem);
   --width-page: 72rem;
   --width-reading: 42rem;
+  /* Room kept free on the left for the floating accent palette (T-047):
+     the phone tab, then the tablet and desktop rail, plus a gap. */
+  --space-rail: 2rem;
 
   --duration-fast: 120ms;
   --duration-base: 200ms;
@@ -153,6 +158,12 @@
   --radius-control: 4px;
   --radius-card: 6px;
   --radius-surface: 8px;
+}
+
+@media (width >= 48rem) {
+  :root {
+    --space-rail: 3.25rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

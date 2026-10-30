@@ -8,6 +8,7 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { AccentPalette } from "./components/layout/AccentPalette";
 import { SiteFooter } from "./components/layout/SiteFooter";
 import { SiteHeader } from "./components/layout/SiteHeader";
 import { SkipLink } from "./components/layout/SkipLink";
@@ -46,6 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <SkipLink />
         <SiteHeader />
+        <AccentPalette />
         <main id="main" tabIndex={-1} className="flex-1">
           {children}
         </main>

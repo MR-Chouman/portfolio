@@ -22,6 +22,10 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-038** · resolved · 2026-10-30 · auto (recommended) · -> T-047, D-041
+  What does the phone swatch look like and when does it close? Chosen: a 24 x 48 px tab flush with the left edge, filled with the current accent with a chevron, opening the six-swatch rail beside it; Escape (focus back to the tab), a press outside or focus moving away closes it, choosing a color does not. Alternatives: a round floating swatch like the rail (wider, so more content room lost); closing on each choice (arrow keys would close it after one step). Reason: the smallest target that still meets the 24 px minimum, and arrow keys keep working.
+- **F-037** · resolved · 2026-10-30 · auto (recommended) · -> T-047, D-041
+  How does the palette avoid covering content at 375 and 768 px, where the gutter is narrower than a swatch? Chosen: a `--space-rail` token (2rem on phones, 3.25rem from tablet) and a `page-container` start padding that grows only when the page margin is narrower, so wide screens keep their layout. Alternatives: let the palette overlap the gutter and content (breaks "never covers content"); hide it below a width (D-038 asks for it on phones). Reason: meets D-038 on every page with one rule. Owner to check: the slightly narrower content on phones (16 px) and tablets.
 - **F-036** · resolved · 2026-10-30 · auto (recommended) · -> T-046, D-040
   What form do the accent commands take in the command palette? Chosen: six commands "Green accent" ... "Orange accent" in the Preferences group after the theme command, searchable by "accent color", each storing the choice and announcing "<Name> accent on"; the current accent is not marked. Alternatives: one "Change accent" command opening a sub-list (cmdk pages, more state and code); list only the five other accents (the list would change order and length on every switch). Reason: the task asks for one command per accent, and the floating palette (T-047) is where the current choice is shown.
 - **F-035** · resolved · 2026-10-30 · auto (recommended) · -> T-046, D-040

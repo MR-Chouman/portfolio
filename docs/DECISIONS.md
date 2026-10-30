@@ -489,3 +489,17 @@ Status: Accepted · 2026-10-30 · Implements D-038
 - `tests/unit/theme-tokens.test.ts` checks every accent with both themes (accent as text on both surfaces, `accent-fg` on the accent); `tests/e2e/accent.spec.ts` checks the first frame, the parameter, the contrast the browser resolves for every accent and theme, and the palette command.
 
 **Consequences.** A new accent is one `tokens.css` block, one entry in `ACCENTS`, one name in content and one in the e2e list. Swatches that show another accent than the current one (T-047) cannot reuse `--accent` on a nested `data-accent` alone, because `--accent` is resolved where the theme is set; they need the theme on the swatch too, or their own selectors.
+
+## D-041 · Floating accent palette: native radios, a phone tab and reserved left room
+Status: Accepted · 2026-10-30 · Implements D-038
+
+**Context.** T-047 adds the floating palette of D-038: fixed to the left, vertically centred, a rail of six swatches from tablet width up and one swatch that opens them on phones; a labelled radio group with arrow keys and an announcement, never covering content at 375, 768 and 1440 px. At 375 and 768 px the page gutter (16 to 23 px) is narrower than any usable control. The form of the phone control and the way content stays clear were chosen under `/run-phase` (F-037, F-038).
+
+**Decision.**
+- `app/components/layout/AccentPalette.tsx`, rendered once in `root.tsx` right after the header (so the keyboard reaches it after the header controls). It is a `div role="radiogroup"` named "Accent color" holding six native radio inputs (visually hidden) inside round swatch labels: the browser provides one tab stop, arrow keys that move and choose, and the checked state; each swatch has its name as text (`content/site.ts`), a check mark on the current accent (not color alone) and the focus ring on the swatch through `has-focus-visible`. A polite status message says "<Name> accent on". Controls are disabled until hydration, like the other preferences.
+- Phones (below 48rem): a 24 x 48 px tab flush with the left edge, filled with the current accent and named "Accent color: <Name>", with `aria-expanded` and `aria-controls`; it shows the rail beside it. Escape closes it and returns focus to the tab; a press outside or focus moving elsewhere closes it; choosing does not, so arrow keys keep working.
+- Swatches carry their own `data-accent`; `.accent-swatch` in `base.css` paints `--accent-light` or `--accent-dark` for the page's theme (D-040 consequence).
+- `--space-rail` (2rem on phones, 3.25rem from 48rem) in `tokens.css` is the room kept free on the left. `page-container`'s start padding is the larger of the gutter and what is still missing once the auto margin is counted, so wide screens are unchanged and narrow ones start content after the palette.
+- `tests/unit/accent-palette.test.tsx` covers the group, choice, storage, announcement, tab and closing rules; `tests/e2e/accent-palette.spec.ts` checks every page at 375, 768 and 1440 px (palette right edge never past the content's left edge, no sideways scroll), the centred fixed position, the phone flow, keyboard and focus ring, swatch colors per theme and axe.
+
+**Consequences.** Content on phones is 16 px narrower and on tablets about 29 px narrower. A layout that does not use `page-container` must keep its own content clear of `--space-rail`. The open phone rail sits over the page until closed, like a menu.
