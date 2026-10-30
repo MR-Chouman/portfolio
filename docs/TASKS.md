@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 1: Design foundations**
+Current phase: **Phase 2: Content and pages**
 
 ## Rules
 
@@ -11,6 +11,7 @@ Current phase: **Phase 1: Design foundations**
 - Tasks marked **Owner** need input or an action from the owner; if it is missing, mark `blocked` and add a FEEDBACK item.
 - Tasks marked **Owner review** are never auto-merged: `/finish-task` opens the PR, waits for CI, then stops for the owner's review.
 - `/start-task` picks the first eligible `todo` task of the current phase in ID order (it skips `blocked` tasks and tasks listed under an open FEEDBACK item's "blocks").
+- `/run-phase [phase] [max=N]` runs a phase's tasks (default: the current phase) one after another, each in a fresh subagent with `--auto`: questions get the recommended answer (logged in FEEDBACK as `auto (recommended)`), Owner review and Owner action tasks are parked, and `/finish-phase` runs only when every task is `done` (D-024).
 - Phase end: `/finish-phase` opens `dev` -> `main`, merges it with a merge commit when everything is clean, tags `v0.N.0` (Phase 0 -> `v0.1.0`, ..., Phase 6 -> `v0.7.0`, Phase 7 -> `v1.0.0`) and advances "Current phase".
 
 ---
@@ -62,27 +63,34 @@ Current phase: **Phase 1: Design foundations**
 
 ## Phase 2: Content and pages (tag v0.3.0)
 
-- **T-020** · todo · Content layer
+- **T-020** · done · Content layer
   Zod schemas in `content/schema.ts`; `profile.ts`, `experience.ts`; projects as MDX with validated frontmatter (verify the MDX Vite plugin works with React Router framework mode, record in DECISIONS). Derive the `prerender` path list from content.
   Done when: invalid content fails `npm run build`, and every project slug is prerendered.
-- **T-021** · todo · Home page
+  Notes: D-025. MDX works in framework mode via `@mdx-js/rollup`. Content is validated in Node when `react-router.config.ts` builds the prerender list (checked by breaking a project's `order`: the build stops naming the file and field). A minimal `/work/:slug` route ships here and T-022 extends it (F-011); project, profile and experience copy is placeholder or REQUIREMENTS facts only (F-010). Unknown `/work/*` slugs show the generic error page until T-025.
+- **T-021** · done · Home page
   Hero, metrics strip, selected work, "How I build" teaser, About teaser, contact block. Placeholder content allowed until Phase 3.
   Done when: home is complete at all breakpoints with per-route `meta`.
-- **T-022** · todo · Work index and case study template
+  Notes: copy lives in `content/home.ts`, validated by `homeSchema` at build time (links must be site paths, `#anchors` or `https://` URLs); the headline and metrics come from `profile.ts` and the work list from the project files. Approach, About and contact text are marked placeholders for T-035 (F-012). The contact block links the GitHub profile only; T-024 adds the email and CV (F-013). "All case studies" and "More about me" lead to the not-found page until T-022 and T-023. Playwright checks 375/768/1440 px, both themes with axe, and the prerendered meta.
+- **T-022** · done · Work index and case study template
   `/work` and `/work/:slug`: summary header, sections, captioned images, next-project link, per-route `meta`.
   Done when: each slug has its own prerendered HTML with its own title and Open Graph tags.
-- **T-023** · todo · About page
+  Notes: D-026. `/work` lists every project (copy in `content/work.ts`, validated by `workSchema`). The case study template has a back link, a summary header (sector, title, summary, role, stack, metrics), the MDX body whose `##` headings are the sections, and a "Next project" link that wraps from the last project to the first. Captioned images use `<Figure>`, available in MDX without an import; no images ship until T-030 to T-034. Each project body now has the four REQUIREMENTS sections with placeholder text (F-014). Case studies use `og:type` `article`. Playwright checks the prerendered title and Open Graph tags of `/work` and every slug, the next-project chain, and axe in both themes at 375 and 1440 px.
+- **T-023** · done · About page
   Story, experience timeline, skills, education.
   Done when: page is complete and content comes only from `content/`.
-- **T-024** · todo · Contact and CV (Owner: CV PDF in `public/`)
+  Notes: `/about` is prerendered with its own `meta`. Page titles and labels live in `content/about.ts` (validated by `aboutSchema`); the story, skills and education come from `profile.ts` and the timeline from `experience.ts`, rendered as an ordered list with `<time>` dates. Typographic, no headshot (D-018). The story, timeline entry, university and page intro are marked placeholders for T-035 (F-015); skills and education restate REQUIREMENTS facts only. The header "About" link and the home "More about me" link now reach the page. Playwright checks the prerendered meta, both links, and every section, horizontal scroll and axe in both themes at 375, 768 and 1440 px.
+- **T-024** · done · Contact and CV (Owner: CV PDF in `public/`)
   `mailto:` link (the Gmail address) and the GitHub profile only (D-018). No LinkedIn, no phone number on the pages. The owner adds the CV PDF to `public/` (F-008); it may include the phone number (D-018).
   Done when: CV downloads from the header and contact block.
-- **T-025** · todo · 404 and headers
+  Notes: the owner added the CV as `public/cv.pdf` and confirmed the email address matches it (F-020). Contact details live in `content/contact.ts`, validated by `contactSchema` (email address, https GitHub URL, `/name.pdf` CV path; unknown keys such as a LinkedIn entry are rejected). The header shows a compact "CV" link (accessible name "Download CV (PDF)") between the navigation and the theme toggle on every page; the home contact block links the email address (`mailto:`), "Download CV" and the GitHub profile, which moved there from `home.ts` (F-021, F-022). Both CV links point at `/cv.pdf` with `download="Mohamad-Rida-Chouman-CV.pdf"`. Playwright checks both CV links and the `mailto:` link in the prerendered HTML, that no LinkedIn or `tel:` link exists, and the header link on `/`, `/work` and `/about`; it also checks that `/cv.pdf` is served with a 200 status as `application/pdf` and that the header and contact block links download it as `Mohamad-Rida-Chouman-CV.pdf` under the built CSP. `_headers` gives `/cv.pdf` `Cache-Control: public, max-age=0, must-revalidate`, since its URL stays the same when the CV changes.
+- **T-025** · done · 404 and headers
   404 page; `public/_headers` with long-cache for hashed assets and sensible security headers.
   Done when: an unknown URL returns the 404 page with a 404 status on the Cloudflare preview.
-- **T-026** · todo · Private CV folder (Owner action)
+  Notes: D-027. A catch-all route renders the 404 page (copy in `content/not-found.ts`); it is prerendered at `/404` and moved to `build/client/404.html` after the build, which Pages serves with a 404 status. Unknown case study slugs and client-side navigation to missing routes (`/lab` until Phase 5) show the same page. `_headers` long-caches `/assets/*` and sets a CSP whose inline script hashes are filled in at build time, plus HSTS, nosniff, frame, referrer, permissions and opener policies. Playwright checks the 404 page (three URL shapes, axe in both themes at 375 and 1440 px), the built `_headers`, and replays the CSP on every page type. Only `dev` is built by Cloudflare, so the 404 status on the preview is checked right after the merge (F-016); before it, the `dev` preview answered unknown URLs with a 200.
+- **T-026** · done · Private CV folder (Owner action, F-019)
   `private/` exists and Git ignores everything in it except its `.gitkeep` (created with F-007's triage). The owner adds the current CV PDF there (the version with the Gmail address).
   Done when: the CV is in `private/` and `git status` does not show it.
+  Notes: preparation checked 2026-10-30: `.gitignore` has `/private/*` and `!/private/.gitkeep`, only `private/.gitkeep` is tracked, and a probe `private/__probe.pdf` was reported as ignored (`!!`) and absent from `git status`. Only the owner step in F-019 remains. Done 2026-10-30: the owner added `private/cv.pdf`; it is ignored by `/private/*`, absent from `git status`, and `git ls-files private` lists only `private/.gitkeep` (F-019 resolved).
 
 ## Phase 3: Case studies and imagery (tag v0.4.0)
 

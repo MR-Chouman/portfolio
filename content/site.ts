@@ -1,5 +1,5 @@
 // Site-wide copy: header, navigation and footer (T-012).
-// Contact links (email, GitHub profile, CV) are added in T-024 (D-018).
+// Contact details and the CV link live in content/contact.ts (T-024, D-018).
 export const site = {
   name: "Mohamad Rida Chouman",
   role: "Frontend lead",

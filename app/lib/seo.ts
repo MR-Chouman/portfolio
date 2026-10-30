@@ -8,6 +8,8 @@ interface PageMeta {
   description: string;
   path: string;
   noindex?: boolean;
+  // Open Graph object type: case studies are articles, other pages websites.
+  type?: "website" | "article";
 }
 
 export function pageMeta({
@@ -15,13 +17,14 @@ export function pageMeta({
   description,
   path,
   noindex = false,
+  type = "website",
 }: PageMeta): MetaDescriptor[] {
   const url = new URL(path, SITE_ORIGIN).href;
   return [
     { title },
     { name: "description", content: description },
     { tagName: "link", rel: "canonical", href: url },
-    { property: "og:type", content: "website" },
+    { property: "og:type", content: type },
     { property: "og:title", content: title },
     { property: "og:description", content: description },
     { property: "og:url", content: url },

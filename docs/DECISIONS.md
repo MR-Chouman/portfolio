@@ -251,3 +251,72 @@ Status: Accepted · 2026-10-23 · Refines D-005
 - Switching uses `document.startViewTransition` with a 200 ms cross-fade of the root (`--duration-base`). It is instant when the API is missing or the visitor prefers reduced motion.
 
 **Consequences.** A Content Security Policy (T-025) must allow this inline script by its `sha256` hash, recomputed whenever `themeScript` changes. A visitor whose storage is blocked keeps a choice until the next reload.
+
+## D-024 · Autonomous phase runs with `/run-phase`
+Status: Accepted · 2026-10-29 · Refines D-012
+
+**Context.** Running a phase took one `/start-task`, `/finish-task` and `/clear` per task, plus the owner answering every question. The owner wants a phase to run unattended, with a clean context per task.
+
+**Decision.**
+- `/run-phase` is a thin orchestrator. It picks each eligible task and runs it in a fresh general-purpose subagent, which follows `/start-task` and `/finish-task` with `--auto`. A command cannot clear its own chat, so a new subagent per task is how each task gets a clean context; the orchestrator keeps only each task's RESULT block.
+- In `--auto` mode, questions are answered with the recommended option and logged as `auto (recommended)` FEEDBACK items and in the PR notes. Claims about the owner's work stay placeholders. Hard stops (client names, confidential or personal data, secrets, `docs/REQUIREMENTS.md`, contradicting a decision) block the task instead.
+- Draft verification PRs from the task branch into `dev` or `main` are pre-authorized and closed unmerged (as in F-009).
+- Owner review tasks are parked in `review` and Owner action tasks are parked as `blocked`; later tasks that depend on a parked task are skipped. A failed task stops the run, with no automatic retry.
+- `/finish-phase` runs automatically only when every task of the phase is `done` and nothing was parked or failed; its own merge conditions still apply.
+
+**Consequences.** Auto-answered choices land without the owner seeing them first, so the owner reviews `auto (recommended)` FEEDBACK items after a run. A phase release can deploy to production without an owner in the loop when every check is green.
+
+## D-025 · Content layer: build-time Zod validation, MDX through `@mdx-js/rollup`
+Status: Accepted · 2026-10-30 · Records the MDX check asked for in D-007
+
+**Context.** T-020 needs typed, validated content that fails the build when it is wrong, case studies written in MDX with frontmatter, and a prerender list derived from content. D-007 asked to verify that an MDX plugin works with React Router framework mode (React Router 8.5, Vite 8 with Rolldown).
+
+**Decision.**
+- `content/schema.ts` holds Zod 4 schemas for the profile, the experience timeline and the project frontmatter. Objects are strict (unknown keys fail, which catches typos), with no transforms or defaults, so the data the app renders is exactly the data that was validated. Slugs are the MDX file names and must be lowercase kebab-case; project `order` values must be unique.
+- Validation runs at build time only. `react-router.config.ts` sets `prerender` to a function that calls `content/load.ts`: it validates `profile.ts` and `experience.ts`, reads each `content/projects/*.mdx` file's YAML frontmatter with `yaml`, validates it, and returns the static paths plus `/work/<slug>` for every project. Any error stops `npm run build` with the file and field named. The app imports only the inferred types (`import type`), so Zod is not in the client bundle; `profile.ts` and `experience.ts` use `satisfies` for compile-time checks.
+- MDX: `@mdx-js/rollup` 3.1 with `remark-frontmatter` and `remark-mdx-frontmatter` (YAML exported as `frontmatter`), added before the React Router plugin with `enforce: "pre"` in a shared `mdx.config.ts` used by Vite and Vitest. **Verified:** it works in framework mode with `ssr: false` and prerendering; each case study page is prerendered with its MDX body, title and Open Graph tags. The compiled MDX imports only `react/jsx-runtime`, so it adds no client dependency. A unit test checks that the MDX pipeline and `content/load.ts` read the same frontmatter.
+- `app/lib/projects.ts` loads the MDX modules with `import.meta.glob` (eager), so case study pages need no `loader` and client-side navigation makes no data request. A minimal `/work/:slug` route ships with T-020 because prerendering a path that matches no route fails the build; T-022 builds the full template on it.
+- New dev dependencies (build time only, nothing shipped to the browser): `zod`, `yaml`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `@types/mdx`. `tsconfig.json` allows `.ts` extensions in imports so `vite.config.ts` can import `mdx.config.ts` in the form Vite's future native config loader requires.
+
+**Consequences.** Adding a case study means adding one MDX file; its page is prerendered automatically. All case study bodies are in the `/work/:slug` route chunk, which is fine for four projects; T-062 can split them with a lazy glob if they grow. Unknown `/work/*` slugs render the generic error page until T-025 adds the 404 page. When a client-side feature needs Zod at runtime (the CRUD drawer, T-052), it moves to `dependencies`.
+
+## D-026 · Work index and case study template
+Status: Accepted · 2026-10-30 · Refines D-025
+
+**Context.** T-022 extends the minimal `/work/:slug` route of T-020 into the full case study template and adds the `/work` index. REQUIREMENTS section 5 lists a summary header, problem, what I owned, key decisions, outcome, captioned images and a next-project link. The case study texts and images are written later (T-030 to T-034).
+
+**Decision.**
+- Page titles and labels for both routes live in `content/work.ts`, validated by `workSchema` with the other content at build time. Project facts stay in the MDX frontmatter. `/work` is a static prerender path.
+- Sections are the `##` headings of each MDX body, not frontmatter fields, so each case study can phrase and order them and place figures inside them. The project files carry the four REQUIREMENTS sections as placeholders (F-014).
+- Captioned images use `Figure` (`<figure>`, `<img>` with required `width`, `height` and `alt`, and `<figcaption>`), lazy-loaded unless `priority` is set. The route passes it to the MDX content through `components`, so MDX files use `<Figure ... />` without importing it. Styles live in `.prose-content` so skins can restyle them (D-005).
+- "Next project" follows display order and wraps from the last project to the first, so every case study ends with a next step. It sits in a `nav` landmark, and its link is named "Next project: <title>".
+- Case studies set `og:type` to `article` (`pageMeta` takes an optional `type`); other pages stay `website`.
+
+**Consequences.** Adding a component for case studies means adding it to the route's MDX `components` map. Figures need the AVIF/WebP files from the image pipeline (T-034) before any case study uses them.
+
+## D-027 · 404 page as a prerendered 404.html; `_headers` with a hashed CSP
+Status: Accepted · 2026-10-30 · Refines D-002, D-023
+
+**Context.** T-025 needs unknown URLs to return the 404 page with a 404 status on Cloudflare Pages, long caching for hashed assets, and sensible security headers. Without a top-level `404.html`, Pages treats the site as a single-page app and answers every unknown URL with the home page and a 200 status (checked on the `dev` preview before this change). React Router refuses to prerender a path that answers 404, and the prerendered HTML carries inline scripts: the pre-paint theme script (D-023) and React Router's hydration and scroll restoration scripts, which differ per page.
+
+**Decision.**
+- A catch-all route (`*`, `app/routes/not-found.tsx`) renders the 404 page. `/404` is in the prerender list; the `buildEnd` hook in `react-router.config.ts` runs `scripts/finalize-build.ts`, which moves `404/index.html` to `build/client/404.html`. Pages serves that file with a 404 status for any URL that matches no file. In the browser the catch-all route matches the same URL, so the page hydrates cleanly and client-side navigation to a missing route shows the same page. Copy lives in `content/not-found.ts` (`notFoundSchema`). The page is `noindex` and has no canonical or Open Graph tags, since it is served at whatever URL was requested.
+- Unknown case study slugs render the same `NotFound` section from `/work/:slug` (same markup as `404.html`, so hydration matches). A `data()` thrown from a component is not a route error response, so the old code showed the generic error page. The root error boundary renders `NotFound` for 404 responses and a generic error page with copy from `content/not-found.ts` otherwise.
+- `public/_headers` sets, for `/*`: a Content-Security-Policy (`default-src 'self'`, `script-src 'self'` plus hashes, `style-src 'self'`, `img-src 'self' data:`, `font-src 'self'`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`), HSTS, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, a `Permissions-Policy` that turns off camera, microphone, geolocation, payment and USB, and `Cross-Origin-Opener-Policy: same-origin`. `/assets/*` (Vite's content-hashed JavaScript, CSS and fonts) gets `Cache-Control: public, max-age=31536000, immutable`; HTML keeps Pages' default revalidation.
+- The CSP's script hashes are computed at build time: `finalize-build.ts` hashes (sha256) every inline script in the prerendered HTML and replaces a placeholder in `_headers`. No `'unsafe-inline'`, and no hash to recompute by hand when `themeScript` changes. The build fails if the placeholder is missing, no inline script is found, a line exceeds Cloudflare's 2,000-character limit or the file exceeds 100 rules.
+- `npm run preview` serves `404.html` as its fallback, like Pages (sirv answers it with a 200 status). Playwright checks the built `404.html` and `_headers`, and replays the CSP on each page type to prove it blocks nothing (hydration, the theme toggle).
+
+**Consequences.** One site-wide policy lists about two hashes per prerendered page; with 16 hashes the CSP line is about 1,100 characters, so roughly 15 more pages fit before the build stops and the policy must move to per-path rules. Anything that loads a third-party script or connects elsewhere (Cloudflare Web Analytics in T-072) must extend `script-src` and `connect-src`. Inline `style` attributes are blocked by `style-src 'self'`; styles stay in CSS (setting styles from JavaScript is unaffected). `__spa-fallback.html` is still emitted but Pages no longer uses it.
+
+## D-028 · TypeScript 7 for type checking, TypeScript 6 kept for the compiler API
+
+Status: Accepted · 2026-10-30
+
+**Context.** The owner asked to move from TypeScript 5.9 to 7.0 (Dependabot PR #27). TypeScript 7 is the native (Go) compiler: its `typescript` package ships `tsc` but no JavaScript compiler API until at least 7.1. typescript-eslint imports that API, and every release (8.72.1, canary 8.72.2-alpha) declares `typescript >=4.8.4 <6.1.0`, so `npm ci` fails on #27 with ERESOLVE. The maintainers say TS 7 support is blocked on a TS 7 API (typescript-eslint#10940, #12518) and point to the side-by-side setup in Microsoft's TypeScript 7.0 announcement.
+
+**Decision.** Follow that setup, with npm aliases and no `overrides`, `--force` or `--legacy-peer-deps`:
+- `"typescript": "npm:@typescript/typescript6@^6.0.2"`: the official compatibility package. It re-exports the TypeScript 6 API (and a `tsc6` binary), so typescript-eslint gets a version inside its supported range.
+- `"typescript-7": "npm:typescript@^7.0.2"`: the real TypeScript 7 compiler. `npm run typecheck` calls it by path (`node node_modules/typescript-7/bin/tsc`), because the TypeScript 6 package that `@typescript/typescript6` depends on also installs a `tsc` binary and wins the `node_modules/.bin/tsc` link.
+- typescript-eslint is the only dependency that imports the compiler API. Vite, Vitest, React Router typegen and MDX do not, so nothing else changes. The tsconfig already uses only options TS 7 accepts (`moduleResolution: bundler`, no `baseUrl`, `esModuleInterop` on, explicit `types`), and the code type-checks cleanly with no changes.
+
+**Consequences.** CI type checking runs on TS 7. Lint type information comes from TS 6, which shares TS 7's type checker logic. Editors that read `node_modules/typescript` find the compatibility package rather than a full TS install, so use the editor's bundled TypeScript (or the TS 7 extension). Once typescript-eslint supports TS 7 (expected after TS 7.1 ships an API), drop both aliases for a plain `"typescript": "^7"` and restore `tsc` in the typecheck script. Dependabot may propose bumping the aliased packages oddly; check what it targets before accepting.
