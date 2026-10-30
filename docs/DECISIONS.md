@@ -637,3 +637,21 @@ Status: Accepted · 2026-10-31 · Extends D-011, D-018, D-027, D-029
 - `tests/e2e/seo.spec.ts` is the per-route audit: unique titles and descriptions on every page, canonical URLs served without a redirect, matching Open Graph and Twitter tags, a well-formed sitemap of exactly the indexable pages, robots.txt, and the home JSON-LD. Lighthouse CI's SEO category (>= 0.95, D-016) stays the external check.
 
 **Consequences.** No new dependency. Adding a page needs no sitemap edit; a page that should stay out of search sets `noindex`. Canonical URLs on production change to the slash form at the Phase 6 release. T-061 adds `og:image` and switches the Twitter card to `summary_large_image`.
+
+## D-051 · Open Graph images: SVG cards rendered to PNG by resvg after the build
+
+Status: Accepted · 2026-10-31 · Extends D-050 · Adds a dev dependency
+
+**Context.** T-061 asks for an Open Graph image per case study, generated at build time, so that LinkedIn and WhatsApp previews show the right image and title (REQUIREMENTS section 6). Scrapers read only static files: the image must be an absolute URL to a PNG or JPEG (WhatsApp and LinkedIn do not all read WebP, AVIF or SVG), ideally 1200 x 630 and small (WhatsApp drops images much over 300 kB). The choices were made under `/run-phase` (F-051, F-052).
+
+**Decision.**
+
+- `scripts/og-images.ts` draws each card as an SVG string and rasterizes it to a 1200 x 630 PNG with `@resvg/resvg-js` 2.6.2 (dev dependency, a prebuilt native binary of about 4 MB per platform; nothing is shipped to the browser). It runs in `buildEnd` (react-router.config.ts) before `finalizeBuild`, writing `build/client/og/site.png` and `build/client/og/work/<slug>.png`.
+- Cards use the site's typefaces: static TTF copies of Geist Regular and SemiBold and Geist Mono Regular in `scripts/og-fonts/` (SIL OFL 1.1, license beside them), because resvg cannot read the WOFF2 files the site serves. Text is measured by resvg itself, so titles wrap on words (two lines, shrinking from 64 to 48 px if needed) and summaries end with an ellipsis when too long.
+- Colors are the dark theme's tokens with the default accent, read from `app/styles/tokens.css` and converted from OKLCH to sRGB hex (`scripts/oklch.ts`, now also used by the contrast test helper). A case study card shows "Case study · <sector>", the title, the summary, the owner's name and the site's host; the site card shows the name, headline and role. Copy comes from `content/` (project frontmatter, `profile`, `site.openGraph`).
+- `pageMeta` takes an optional `image` (path and alt) and defaults to the site card, adding `og:image` (absolute, on the production origin), `og:image:type`, `og:image:width`, `og:image:height`, `og:image:alt`, and `twitter:card` `summary_large_image` with `twitter:image` and `twitter:image:alt`. Case studies pass their own card (`ogImagePath(slug)` in `app/lib/og-image.ts`).
+- `finalizeBuild` checks every page: an indexable page must name an `og:image`; each image must be on the production origin, equal `twitter:image`, exist in the build, be a PNG of the declared size and weigh at most 300 kB. Any failure fails the build.
+
+**Alternatives.** Satori plus resvg (JSX layout, but another dependency and it still needs TTF or WOFF fonts); screenshots of an HTML card with Playwright's Chromium during the build (Cloudflare Pages' build image has no browser); PNGs rendered once and committed (they drift when a title changes, and the task asks for build-time generation); one generic image for every page (previews of case studies would all look the same).
+
+**Consequences.** Adding a case study adds its card with no extra step. Images keep a stable URL per page, so a scraper that cached an old card needs a refresh (LinkedIn Post Inspector) after a title change. `og:image` points at the production origin, so previews of `dev` preview URLs show the production cards, and the new cards appear on production at the Phase 6 release.
