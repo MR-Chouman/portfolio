@@ -37,7 +37,7 @@ Clients are never named: generic descriptions ("a regional airline") and invente
 |---|---|
 | `/` | Hero, metrics strip, selected work (4), "How I build", About teaser, contact |
 | `/work` | Index of case studies |
-| `/work/:slug` | Case study: summary header with a rotatable 3D object that stands for the project, problem, what I owned, key decisions, outcome, next project (no screenshots for now, D-031) |
+| `/work/:slug` | Case study: summary header with a rotatable 3D object that stands for the project, context, what I owned, scope, key decisions, next project (no screenshots for now, D-031) |
 | `/lab` | Live patterns demo: server-style data table, CRUD drawer flow, component gallery (mock data only) |
 | `/about` | Short first-person story, experience timeline, skills, education |
 | `404` | Helpful not-found page |
