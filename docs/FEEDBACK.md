@@ -12,8 +12,7 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Open
 
-- **F-020** · open · 2026-10-30 · self · blocks T-024
-  Owner action: add the CV PDF the site serves. Steps: (1) export the CV as PDF (the version with the Gmail address; the phone number may stay in it, D-018, but nothing confidential about clients, D-018); (2) save it as `public/cv.pdf` on the `task/T-024-contact-and-cv` branch (exactly that name: both links point at `/cv.pdf`); (3) commit it (`chore: add the downloadable CV PDF`) and push, or tell Claude it is in place; (4) Claude then adds a Playwright check that `/cv.pdf` is served as a PDF, sets T-024 to `done` and runs `/finish-task T-024`. Also confirm the email address in `content/contact.ts` is the one on the CV (F-022).
+_None._
 
 ## Triaged
 
@@ -25,10 +24,12 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
-- **F-021** · resolved · 2026-10-30 · auto (recommended) · -> T-024
+- **F-020** · resolved · 2026-10-30 · self · -> T-024
+  Owner action: add the CV PDF the site serves, as `public/cv.pdf` (both links point at `/cv.pdf`), and confirm the email address in `content/contact.ts` is the one on the CV (F-022). Done: the owner saved the CV (the version with the Gmail address, D-018) as `public/cv.pdf`, committed on the T-024 branch, and confirmed the email matches the CV. Playwright now checks that `/cv.pdf` is served as `application/pdf` and that both links download it; `_headers` gives it a revalidating cache.
+- **F-021** · resolved · 2026-10-30 · auto (recommended), checked by the owner · -> T-024
   Where and how should the CV download appear? Chosen: one file path `/cv.pdf` saved as `Mohamad-Rida-Chouman-CV.pdf` (the `download` attribute); a compact "CV" button in the header between the navigation and the theme toggle (accessible name "Download CV (PDF)"), on every page; in the home contact block, the email address as the primary button, then "Download CV" with a "PDF" hint, then the GitHub profile. Contact details move to `content/contact.ts` (validated by `contactSchema`) so the header and home share one source. Alternatives: a CV item inside the main navigation (it is a file, not a page); a text-only link in the footer (the task asks for the header); a dated file name such as `cv-2026.pdf` (links would change on each update). Reason: one stable URL, a short header item that fits at 375 px, and no new navigation semantics.
-- **F-022** · resolved · 2026-10-30 · auto (recommended) · -> T-024
-  Which email address does the `mailto:` link use? Chosen: the Gmail address that is the owner's Git identity in this public repository's history, which D-018 and F-004 name as the address on the CV; the address is the visible text of the contact button so visitors without a mail client can copy it. Alternatives: a "Email me" label that hides the address; wait for the owner to type it. Reason: D-018 already decided to publish the Gmail address; the owner confirms it matches the CV with F-020.
+- **F-022** · resolved · 2026-10-30 · auto (recommended), checked by the owner · -> T-024
+  Which email address does the `mailto:` link use? Chosen: the Gmail address that is the owner's Git identity in this public repository's history, which D-018 and F-004 name as the address on the CV; the address is the visible text of the contact button so visitors without a mail client can copy it. Alternatives: a "Email me" label that hides the address; wait for the owner to type it. Reason: D-018 already decided to publish the Gmail address; the owner confirmed it matches the CV (F-020).
 - **F-016** · resolved · 2026-10-30 · auto (recommended) · -> T-025, D-027
   "Done when" asks for a 404 status on the Cloudflare preview, but Cloudflare builds only `dev` (README), so a task branch cannot be checked there before it merges. Chosen: prove it locally (the build writes a top-level `404.html`, which Pages serves with a 404 status; Playwright checks the page, `_headers` and the CSP), merge, then check `https://dev.portfolio-4q6.pages.dev/<unknown>` right after the merge and report the result. Alternatives: park the task in `review` for the owner; temporarily enable preview builds for task branches in Cloudflare. Reason: the check is only possible after the merge into `dev`, which is staging, and `/finish-phase` re-checks before production.
 
