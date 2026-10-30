@@ -96,7 +96,7 @@ Current phase: **Phase 3: Case studies and imagery**
 
 - **T-030** · review · Case study: airline crew management platform (Owner review, D-018)
   Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome. No images (D-031).
-  Notes: D-030, superseded by D-031. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; it states only REQUIREMENTS facts and leaves the role and the narrative as marked placeholders for the owner (F-024). The three invented-data figures first added (F-023) and the figure tooling around them were removed on the owner's decision to show no screenshots for now (D-031).
+  Notes: D-030, superseded by D-031. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; the role and narrative were first placeholders (F-024), then written from the project's codebase and commit history at the owner's request, with only the day-to-day outcome left as a placeholder. The three invented-data figures first added (F-023) and the figure tooling around them were removed on the owner's decision to show no screenshots for now (D-031).
 - **T-031** · todo · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
 - **T-032** · todo · Case study: EV charging platform (Owner review, D-018)

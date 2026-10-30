@@ -2,45 +2,49 @@
 title: Airline crew management platform
 summary: An admin platform for an airline's crew operations, from rostering and attendance to appraisals and training.
 sector: Aviation
-role: "Placeholder: my role on this platform, confirmed by the owner in the T-030 review"
+role: Frontend lead
 stack: [Next.js, TypeScript, Microsoft SSO]
 metrics:
   - { value: "25", label: "Modules" }
 order: 1
 ---
 
-{/* T-030 (Owner review, D-018). Facts come only from REQUIREMENTS section 4: the sector, the stack, the 25 modules and the module areas named there. Every other sentence is a marked placeholder for the owner to replace; the client is never named. No images for now (D-031). */}
+{/* T-030 (Owner review, D-018). Written from the project's own codebase and commit history, checked by the owner in review; the client is never named and no client data appears. The scale facts match REQUIREMENTS section 4. No images for now (D-031). */}
 
 ## Context
 
-The platform runs crew operations for an airline: 25 modules covering rostering, attendance, leave, appraisals, qualifications and training, built with Next.js and TypeScript, with sign-in through Microsoft single sign-on.
-
-Placeholder: the situation before the platform (how crew operations were handled, what was slow or error-prone) and what the airline needed from it. To be written by the owner in the T-030 review.
+An airline needed one place to run its crew operations. The platform covers 25 modules: rostering, attendance, leave, appraisals, qualifications and training, plus the tools around them such as crew profiles, task management, letter generation and delegations. Everyone signs in with their Microsoft work account, and what they see depends on their role and the operation they work in.
 
 ## What I owned
 
-Placeholder: my role on the project, the team around me, who I worked with on the airline's side, and the parts of the frontend I was responsible for. To be written by the owner in the T-030 review.
+I led the frontend from the first commit in March 2026, and I wrote about 95% of its commits. I set up the Next.js App Router structure, the authentication flow, the data layer and the shared component set, then built most of the modules on top of them. A few developers contributed to individual modules along the way.
 
 ## Scope
 
-Among the 25 modules are the ones that plan crew work (rostering, attendance and leave) and the ones that track crew development (appraisals, qualifications and training).
+Each module lives in its own feature folder with the same layers: an API service that shapes requests and responses, hooks for queries and mutations, components scoped to the feature, and page-level views. Route files stay thin and only compose those views, so a new module starts from a known shape instead of a blank page.
 
-Placeholder: how the modules were delivered (order, phases, timeline), which users each area serves, and what was shared between modules. To be written by the owner in the T-030 review.
+Shared primitives carry the rest: metric cards, chart and table cards, period filters, pagination, skeleton states, and permission-aware buttons and links. Most screens are dashboards, so getting these right once made every module look and behave alike.
 
 ## Key decisions
 
 ### Single sign-on
 
-Placeholder: why sign-in goes through Microsoft single sign-on, how roles and permissions follow from the signed-in account, and what that meant for the frontend. To be written by the owner in the T-030 review.
+Sign-in uses Microsoft's authentication library, with a redirect or popup flow chosen by configuration, and hands off to a server-side session. Route protection runs on the server before a page renders, with client guards kept in step, and users pick their operation scope before they reach any protected screen. Browser requests go through server-side proxy routes that attach the session and forward to the backend, so the backend address never reaches the browser.
 
 ### Rostering
 
-Placeholder: how the roster screens were designed (views, editing, publishing) and the decisions that kept them fast and readable with many crew members and duties. To be written by the owner in the T-030 review.
+The roster screens are analytics as much as schedules: a roster calendar, period comparisons, duty, swap and bid analysis, flights by destination, ticket use, change requests and a roster log. Pages prefetch their first data on the server with the user's token and hand it to the client cache as initial data, so a dashboard paints with real numbers and does not fetch everything twice on load.
 
 ### Approvals
 
-Placeholder: how requests such as leave move through approval steps, who approves at each step, and how the screens show where a request stands. To be written by the owner in the T-030 review.
+Letters are composed from templates with merge fields, and a template moves from draft to pending approval before it can be used, or is sent back. Delegations let one person hand their authority to another for a period, and tasks can be handed over between people. Each of these shows its status in the list, so a reviewer sees where an item stands without opening it.
+
+### Security and quality
+
+I moved the app to a strict Content Security Policy with a fresh nonce per request. That meant replacing every inline style with CSP-safe primitives, including chart sizing, and adding violation reporting. The code is covered by 168 unit and integration test files, with a 70% coverage floor, and Playwright end-to-end specs for the critical flows.
 
 ## Outcome
 
-Placeholder: what shipped, who uses it day to day, and what changed for crew and crew control, with any numbers the owner can share. To be written by the owner in the T-030 review.
+The platform runs crew operations across its modules on one shared foundation, and new modules ship by following the same feature shape.
+
+Placeholder: who uses it day to day and what changed for crew and crew control, with any numbers that can be shared.
