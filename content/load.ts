@@ -9,6 +9,7 @@ import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 
 import { about } from "./about";
+import { contact } from "./contact";
 import { experience } from "./experience";
 import { home } from "./home";
 import { notFound } from "./not-found";
@@ -16,6 +17,7 @@ import { profile } from "./profile";
 import { work } from "./work";
 import {
   aboutSchema,
+  contactSchema,
   experienceSchema,
   homeSchema,
   notFoundSchema,
@@ -24,6 +26,7 @@ import {
   slugSchema,
   workSchema,
   type About,
+  type Contact,
   type Experience,
   type Home,
   type NotFound,
@@ -113,6 +116,7 @@ export interface Content {
   home: Home;
   work: Work;
   about: About;
+  contact: Contact;
   notFound: NotFound;
   projects: ProjectSummary[];
 }
@@ -124,6 +128,7 @@ export function loadContent(dir: string = PROJECTS_DIR): Content {
     home: check(homeSchema, home, "content/home.ts"),
     work: check(workSchema, work, "content/work.ts"),
     about: check(aboutSchema, about, "content/about.ts"),
+    contact: check(contactSchema, contact, "content/contact.ts"),
     notFound: check(notFoundSchema, notFound, "content/not-found.ts"),
     projects: loadProjects(dir),
   };

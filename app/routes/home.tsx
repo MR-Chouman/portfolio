@@ -9,6 +9,7 @@ import {
 import { projects } from "~/lib/projects";
 import { pageMeta } from "~/lib/seo";
 
+import { contact as contactDetails } from "../../content/contact";
 import { home } from "../../content/home";
 import { profile } from "../../content/profile";
 import type { Route } from "./+types/home";
@@ -135,13 +136,32 @@ export default function Home() {
         >
           <p className="max-w-reading text-fg-muted">{contact.body}</p>
           <ul className="mt-6 flex flex-wrap gap-3">
-            {contact.links.map((link) => (
-              <li key={link.href}>
-                <ButtonLink href={link.href} variant="secondary">
-                  {link.label}
-                </ButtonLink>
-              </li>
-            ))}
+            <li>
+              <ButtonLink
+                href={`mailto:${contactDetails.email.address}`}
+                aria-label={`${contactDetails.email.label} ${contactDetails.email.address}`}
+              >
+                {contactDetails.email.address}
+              </ButtonLink>
+            </li>
+            <li>
+              <ButtonLink
+                href={contactDetails.cv.href}
+                download={contactDetails.cv.fileName}
+                type="application/pdf"
+                variant="secondary"
+              >
+                {contactDetails.cv.label}
+                <span className="font-mono text-xs text-fg-muted">
+                  {contactDetails.cv.format}
+                </span>
+              </ButtonLink>
+            </li>
+            <li>
+              <ButtonLink href={contactDetails.github.href} variant="secondary">
+                {contactDetails.github.label}
+              </ButtonLink>
+            </li>
           </ul>
         </Section>
       </div>

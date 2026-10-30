@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { projects } from "~/lib/projects";
 import Home, { meta } from "~/routes/home";
 
+import { contact } from "../../content/contact";
 import { home } from "../../content/home";
 import { profile } from "../../content/profile";
 import { homeSchema } from "../../content/schema";
@@ -73,14 +74,21 @@ describe("Home route", () => {
     }
   });
 
-  it("lists the contact links", () => {
+  it("links the email, the CV download and the GitHub profile only", () => {
     renderHome();
-    const contact = screen.getByRole("region", { name: home.contact.title });
-    for (const link of home.contact.links) {
-      expect(
-        within(contact).getByRole("link", { name: link.label }),
-      ).toHaveAttribute("href", link.href);
-    }
+    const region = screen.getByRole("region", { name: home.contact.title });
+    expect(
+      within(region).getByRole("link", { name: /^Email / }),
+    ).toHaveAttribute("href", `mailto:${contact.email.address}`);
+    const cv = within(region).getByRole("link", {
+      name: new RegExp(contact.cv.label),
+    });
+    expect(cv).toHaveAttribute("href", contact.cv.href);
+    expect(cv).toHaveAttribute("download", contact.cv.fileName);
+    expect(
+      within(region).getByRole("link", { name: contact.github.label }),
+    ).toHaveAttribute("href", contact.github.href);
+    expect(within(region).getAllByRole("link")).toHaveLength(3);
   });
 });
 
