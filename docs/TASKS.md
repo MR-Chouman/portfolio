@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 5: Lab demo**
+Current phase: **Phase 6: Quality and SEO**
 
 ## Rules
 
