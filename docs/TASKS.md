@@ -125,7 +125,7 @@ Current phase: **Phase 4: Skins and switcher**
   Header control, keyboard accessible, announces state; View Transitions circular reveal from the control; preload the target skin's fonts before switching; instant when reduced motion/unsupported.
   Done when: switch works in Chrome, Safari and Firefox with a graceful fallback, no layout jump.
   Notes: D-035, F-028 and F-029 (auto). An icon button "Switch design" next to the theme toggle, described by the current design and announcing the new one in a status region. `switchSkin` loads the target skin's fonts (capped at 1 s), then reveals the skin with a View Transitions circle from the button (`--duration-slow`); instant with reduced motion or without the API. Root preloads only Geist; the pre-paint script preloads Fraunces for Editorial only. `tests/e2e/skin-switcher.spec.ts` runs in Chromium, Firefox and WebKit (new Playwright projects; `ci-main` installs the three browsers): keyboard, announcement, fonts ready before the skin applies, unchanged control position, the reveal, reduced motion, no View Transitions, preloads. Unit tests in `tests/unit/skin-switcher.test.tsx`. Chromium and Firefox pass locally, including the reveal. WebKit was checked on draft verification PR #50 into `main` (closed unmerged): 111 passed, 1 skipped; the skip is the reveal test, because Playwright's Linux WebKit build has no View Transitions, so WebKit exercised the instant fallback. Real Safari 18+ supports the API, so it gets the reveal.
-- **T-043** · todo · Command palette
+- **T-043** · doing · Command palette
   `cmdk`-based; navigate, switch design/theme, download CV.
   Done when: opens with Ctrl/Cmd+K, fully keyboard and screen-reader usable, lazy loaded.
 - **T-044** · todo · Per-skin QA
