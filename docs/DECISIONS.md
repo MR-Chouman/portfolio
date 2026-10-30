@@ -476,3 +476,16 @@ Status: Accepted · 2026-10-30 · Implements D-038 · Changes D-020, D-035, D-03
 - Playwright runs in Chromium only, and `ci-main` installs only Chromium (F-033). The theme cross-fade has an instant fallback and is unit tested.
 
 **Consequences.** A visitor who stored a `skin` value keeps a harmless, unused `localStorage` key. Pages render pixel for pixel as the Systems skin did, apart from the removed header button (checked by screenshot comparison against `dev` with `?skin=systems`). Cross-engine e2e can come back as a project in `playwright.config.ts` if a later feature needs it.
+
+## D-040 · Accent tokens per theme through `data-accent`, set before the first paint
+Status: Accepted · 2026-10-30 · Implements D-038
+
+**Context.** T-046 adds the six accents of D-038 (green default, purple, gold, red, blue, orange). Each must meet WCAG 2.2 AA in both themes, apply before the first paint, and leave components on the semantic `accent` tokens. Theme selectors also match nested elements (D-039), so a section in the other theme must keep the page's accent. The shades and the palette commands were chosen under `/run-phase` (F-035, F-036).
+
+**Decision.**
+- `tokens.css` has one block per accent, `[data-accent="<name>"]` (green also on `:root`, first, as the default), setting two raw values: `--accent-light` and `--accent-dark`. The theme blocks set `--accent: var(--accent-light)` or `var(--accent-dark)`; `--accent-fg` stays one value per theme. A nested `data-theme` section re-resolves `--accent` from the inherited pair, so it keeps the page's accent in its own theme.
+- `app/lib/accent.ts` holds the accent list, the `?accent=` parameter, `localStorage` (try/catch) and a small store (`setAccent`, `subscribeAccent`, `useAccent`), with the order of the pre-paint script: parameter (stored when valid), stored choice, green. `prePaintScript` joins the theme and accent scripts in one inline `<head>` script, so there is no flash on reload. A switch changes only color tokens and runs without a transition.
+- Accent names live in `content/site.ts` (`accents`), in the order of `ACCENTS`; a unit test keeps both in step. The command palette has one command per accent (F-036). 3D objects also redraw when `data-accent` changes.
+- `tests/unit/theme-tokens.test.ts` checks every accent with both themes (accent as text on both surfaces, `accent-fg` on the accent); `tests/e2e/accent.spec.ts` checks the first frame, the parameter, the contrast the browser resolves for every accent and theme, and the palette command.
+
+**Consequences.** A new accent is one `tokens.css` block, one entry in `ACCENTS`, one name in content and one in the e2e list. Swatches that show another accent than the current one (T-047) cannot reuse `--accent` on a nested `data-accent` alone, because `--accent` is resolved where the theme is set; they need the theme on the swatch too, or their own selectors.

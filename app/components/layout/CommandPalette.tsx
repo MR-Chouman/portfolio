@@ -2,7 +2,9 @@ import { Command } from "cmdk";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { ACCENTS, setAccent } from "~/lib/accent";
 import { projects } from "~/lib/projects";
+import { useAccent } from "~/lib/useAccent";
 import { setTheme } from "~/lib/theme";
 import { useTheme } from "~/lib/useTheme";
 
@@ -10,6 +12,7 @@ import { contact } from "../../../content/contact";
 import { site } from "../../../content/site";
 
 const copy = site.commandPalette;
+const accentNames = site.accents.names;
 
 // Starts the CV download the header link offers, from a command.
 export function downloadCv(): void {
@@ -36,8 +39,8 @@ const itemClass =
 const groupClass =
   "px-1 py-2 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-fg-muted";
 
-// The command palette (T-043): go to a page or case study, switch the theme,
-// download the CV. A native modal <dialog> keeps focus inside
+// The command palette (T-043): go to a page or case study, switch the theme
+// or the accent (T-046), download the CV. A native modal <dialog> keeps focus inside
 // and makes the page behind it inert; cmdk provides the combobox and the
 // filtered list (D-036). Loaded lazily by CommandMenu.
 export default function CommandPalette({
@@ -49,6 +52,9 @@ export default function CommandPalette({
   const input = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const theme = useTheme();
+  // Null until hydration, like the theme: the commands appear once the
+  // page can apply them.
+  const hydrated = useAccent() !== null;
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -152,6 +158,25 @@ export default function CommandPalette({
                 {copy.theme[otherTheme]}
               </Command.Item>
             )}
+            {hydrated &&
+              ACCENTS.map((option) => {
+                const label = `${accentNames[option]} ${copy.accent}`;
+                return (
+                  <Command.Item
+                    key={option}
+                    value={`${label} ${site.accents.label}`}
+                    onSelect={() =>
+                      run(() => {
+                        setAccent(option);
+                        onAnnounce(`${accentNames[option]} ${copy.accentOn}`);
+                      })
+                    }
+                    className={itemClass}
+                  >
+                    {label}
+                  </Command.Item>
+                );
+              })}
           </Command.Group>
           <Command.Group heading={copy.groups.files} className={groupClass}>
             <Command.Item

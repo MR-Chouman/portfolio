@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { ACCENTS } from "~/lib/accent";
+
 import { contrast } from "./helpers/contrast";
 
 const colorTokens = [
@@ -17,11 +19,11 @@ const colorTokens = [
 
 type Palette = Record<(typeof colorTokens)[number], string>;
 
-// Reads the declarations of the block that follows a `/* theme: <name> */`
-// marker in tokens.css.
-function themeBlock(css: string, marker: string): Palette {
-  const start = css.indexOf(`/* theme: ${marker} */`);
-  if (start === -1) throw new Error(`Missing theme marker: ${marker}`);
+// The declarations of the block that follows a `/* <kind>: <name> */` marker
+// in tokens.css.
+function block(css: string, marker: string): Record<string, string> {
+  const start = css.indexOf(`/* ${marker}`);
+  if (start === -1) throw new Error(`Missing marker: ${marker}`);
   // The innermost block holding the first declaration after the marker
   // (this also skips an enclosing @media block).
   const firstDeclaration = css.indexOf("--", start);
@@ -29,15 +31,34 @@ function themeBlock(css: string, marker: string): Palette {
     css.lastIndexOf("{", firstDeclaration) + 1,
     css.indexOf("}", firstDeclaration),
   );
+  const declarations: Record<string, string> = {};
+  for (const [, name, value] of body.matchAll(/--([\w-]+):\s*([^;]+);/g)) {
+    declarations[name] = value.trim();
+  }
+  return declarations;
+}
+
+function themeBlock(css: string, marker: string): Palette {
+  const declarations = block(css, `theme: ${marker} */`);
   const palette: Partial<Palette> = {};
   for (const token of colorTokens) {
-    const match = new RegExp(`--${token}:\\s*([^;]+);`).exec(body);
-    if (match) palette[token] = match[1].trim();
+    if (token in declarations) palette[token] = declarations[token];
   }
   return palette as Palette;
 }
 
-// The color values for both themes live at the end of tokens.css (D-038).
+// The palette a theme resolves to with an accent: its `--accent` is a
+// `var()` pointing at one of the accent's raw values.
+function withAccent(palette: Palette, accent: Record<string, string>): Palette {
+  const match = /^var\(--([\w-]+)\)$/.exec(palette.accent);
+  if (!match) throw new Error(`--accent is not a var(): ${palette.accent}`);
+  const value = accent[match[1]];
+  if (!value) throw new Error(`The accent does not set --${match[1]}`);
+  return { ...palette, accent: value };
+}
+
+// The color values for both themes and every accent live at the end of
+// tokens.css (D-038, D-040).
 describe("theme tokens", () => {
   const css = readFileSync(
     join(process.cwd(), "app/styles/tokens.css"),
@@ -57,7 +78,25 @@ describe("theme tokens", () => {
     expect(themeBlock(css, "dark (system preference)")).toEqual(themes.dark);
   });
 
-  describe.each(Object.entries(themes))("%s theme", (_, palette) => {
+  it("points the accent at the value for its theme", () => {
+    expect(themes.light.accent).toBe("var(--accent-light)");
+    expect(themes.dark.accent).toBe("var(--accent-dark)");
+  });
+
+  it("has one block per accent, green first as the default", () => {
+    const markers = [...css.matchAll(/\/\* accent: (\w+)/g)].map((m) => m[1]);
+    expect(markers).toEqual([...ACCENTS]);
+    expect(css).toMatch(/\/\* accent: green \(default\) \*\/\s*:root,/);
+  });
+
+  const cases = ACCENTS.flatMap((accent) =>
+    Object.entries(themes).map(([theme, palette]) => ({
+      name: `${theme} theme, ${accent} accent`,
+      palette: withAccent(palette, block(css, `accent: ${accent}`)),
+    })),
+  );
+
+  describe.each(cases)("$name", ({ palette }) => {
     it.each(["surface", "surface-raised"] as const)(
       "meets WCAG AA on %s",
       (background) => {
