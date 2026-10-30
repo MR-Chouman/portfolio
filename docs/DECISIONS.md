@@ -558,3 +558,18 @@ Status: Accepted · 2026-10-30 · Extends D-002, D-044
 - No table library: seven columns and one data source do not need one, and it keeps the bundle small.
 
 **Consequences.** No new dependency. The table code is client-only and reusable for T-052 (the drawer can revalidate the same loader after a mutation). Pushing a history entry per change means back steps through each filter change, which is what "survives back/forward" asks for.
+
+## D-046 · CV preview: a native dialog over the download link, with a same-origin frame for the PDF only
+
+Status: Accepted · 2026-10-30 · Extends D-018, D-027, D-036
+
+**Context.** T-056 asks for the CV link to open a modal that previews the PDF and offers a download, with a note instead of a broken preview on phones that cannot show a PDF inline. The site sends `frame-ancestors 'none'` and `X-Frame-Options: DENY` on every path (D-027), which would block the PDF in a frame on our own pages. No PDF library may be added (over ~10 kB). The choices were made under `/run-phase` (F-043, F-044).
+
+**Decision.**
+
+- `CvLink` (`app/components/layout/CvLink.tsx`) is used by the header and the home contact card. It stays a real `/cv.pdf` download link (works before hydration and without JavaScript); once hydrated, a plain left click opens the preview, while modified and middle clicks keep the browser's behaviour. The link's name is "View CV" (`contact.cv.previewLabel`), with `aria-haspopup="dialog"`; the command palette keeps its direct "Download CV" command.
+- The preview is a native modal `<dialog>` like the command palette (D-036): the page behind is inert, Escape, the Close button and a click on the backdrop close it, focus starts on Close and returns to the link. It is mounted only while open, so the PDF is fetched only on request.
+- The PDF is shown in an `<iframe>` (the page CSP's `object-src 'none'` rules out `<object>`/`<embed>`) only when `navigator.pdfViewerEnabled` is not false and the screen is not phone-like (`(max-width: 39.99rem), (hover: none) and (pointer: coarse)`). Otherwise (Android Chrome, iOS Safari, narrow windows, browsers without a viewer) the dialog shows a short note. "Open in a new tab" and "Download" are always offered.
+- `public/_headers` gives `/cv.pdf` alone `Content-Security-Policy: frame-ancestors 'self'` and `X-Frame-Options: SAMEORIGIN`, detaching the site-wide values first. Other sites still cannot frame the CV, and every other path keeps `frame-ancestors 'none'` and `DENY`. The e2e header replay now applies each path's matching rules (with detach), so the framed PDF is tested with the headers Cloudflare sends.
+
+**Consequences.** No new dependency. The preview uses the browser's own PDF viewer, so it looks different per browser and is not shown in headless test Chromium (the tests report a viewer and check the frame and its headers). The detach-then-set behaviour of Cloudflare's `_headers` must be checked once on the `dev` preview (F-043).
