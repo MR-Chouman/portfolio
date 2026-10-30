@@ -1,13 +1,11 @@
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type FormEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 
-import { Button } from "~/components/ui";
+import {
+  Button,
+  Field,
+  controlStyles,
+  fieldDescribedBy,
+} from "~/components/ui";
 import {
   ASSET_FIELDS,
   NAME_MAX,
@@ -50,64 +48,6 @@ export interface AssetDrawerProps {
   onSubmit: (submission: AssetSubmission) => void;
   // Called once the dialog has closed, however it was closed.
   onClosed: () => void;
-}
-
-const fieldClass =
-  "mt-2 block h-10 w-full rounded-md border border-fg-muted bg-surface px-3 text-sm text-fg aria-invalid:border-2 aria-invalid:border-fg";
-
-function Field({
-  id,
-  label,
-  hint,
-  error,
-  children,
-}: {
-  id: string;
-  label: string;
-  hint?: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className="text-sm font-medium">
-        {label}
-      </label>
-      {children}
-      {hint && (
-        <p id={`${id}-hint`} className="mt-1 text-sm text-fg-muted">
-          {hint}
-        </p>
-      )}
-      {error && (
-        <p
-          id={`${id}-error`}
-          className="mt-1 flex items-start gap-1.5 text-sm font-medium"
-        >
-          {/* A mark beside the text, so the error never relies on color. */}
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            className="mt-0.5 size-4 shrink-0"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-          >
-            <circle cx="8" cy="8" r="6.25" />
-            <path d="M8 4.75v4M8 11.25v.01" />
-          </svg>
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
-
-// aria-describedby for a field: its hint, then its error.
-function describedBy(id: string, hint: boolean, error: boolean) {
-  const ids = [hint && `${id}-hint`, error && `${id}-error`].filter(Boolean);
-  return ids.length ? ids.join(" ") : undefined;
 }
 
 export function AssetDrawer({ asset, onSubmit, onClosed }: AssetDrawerProps) {
@@ -166,8 +106,8 @@ export function AssetDrawer({ asset, onSubmit, onClosed }: AssetDrawerProps) {
       name: field,
       value: values[field],
       "aria-invalid": error ? true : undefined,
-      "aria-describedby": describedBy(id, hint, Boolean(error)),
-      className: fieldClass,
+      "aria-describedby": fieldDescribedBy(id, hint, Boolean(error)),
+      className: controlStyles,
     } as const;
   }
 

@@ -22,6 +22,9 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-047** · resolved · 2026-10-31 · auto (recommended) · -> T-053, D-048
+  How does the component gallery show "both themes and every accent"? Chosen: a section on `/lab` with a light and a dark panel side by side, every primitive's variants and states in each, plus an "Every accent" block of six rows (each row sets its accent with the panel's theme), while the rest follows the floating palette's accent; the drawer field and filter chip become shared primitives so the gallery shows the lab's own parts. Alternatives: a gallery-only accent switcher (a second control doing what the floating palette does); a full grid of every component in 6 accents x 2 themes (twelve copies, very long); linking to the internal style tile (not indexed, no lab parts). Reason: every theme and accent is visible at once without a new control or new markup per accent. Owner to check: the gallery intro and sample labels in `content/lab.ts` (T-054 refines the page copy).
+
 - **F-046** · resolved · 2026-10-30 · auto (recommended) · -> T-052, D-047
   Zod validation in the browser: which build, and where do the error messages live? Chosen: `zod/mini` (tree-shakable) in `app/lib/lab/asset-form.ts`, with error codes as messages and the text in `content/lab.ts` (`crud.errors`); the `/lab` chunk grows from about 6.3 to 15.5 kB gzipped. Alternatives: classic `zod` (larger, not tree-shakable); hand-written checks (the task asks for Zod); messages written in the schema (copy outside `content/`). Reason: the task's Zod requirement at the smallest cost, with copy kept in `content/`. Owner to check: the error wording in `content/lab.ts`.
 
