@@ -531,3 +531,16 @@ Status: Accepted · 2026-10-30 · Extends D-037, D-040, D-041, D-042
 
 **Consequences.** A new accent is added to the spec's list (the drift test fails otherwise) and gets the whole matrix; a new route is added to its route list. The spec adds 157 tests (about 2.5 minutes locally) to the Chromium e2e run in `ci-main`.
 
+## D-044 · Lab mock data: seeded in-memory records behind a fake async endpoint
+Status: Accepted · 2026-10-30 · Extends D-002
+
+**Context.** T-050 asks for a typed mock data layer with pagination, sorting and filtering for the `/lab` demo, with no runtime server (D-002) and seeded fake records, from static JSON or MSW. The choice was made under `/run-phase` (F-041).
+
+**Decision.**
+- Records are generated in TypeScript (`app/lib/lab/records.ts`) from a seeded mulberry32 PRNG and a fixed base date, not committed as a JSON file and not dated from "now", so the data is the same on every build, prerender and test run. They describe an invented equipment inventory (assets, sites, categories, statuses): no people, customers, orders or client names. The record vocabulary is demo data, not site copy, so it stays out of `content/`.
+- Queries are a pure function (`app/lib/lab/query.ts`) shaped like a list endpoint: filters, a sort field and direction with a stable tie-break by id, a page size from a fixed list, a clamped page, and a result with `total` and `pageCount`. The same module parses and writes URL search parameters (defaults omitted, invalid values fall back), so the table (T-051) keeps its state in the URL.
+- A small fake client (`app/lib/lab/api.ts`) wraps the queries in promises with a simulated latency, `AbortSignal` support, cloned results and an injectable failure, so the UI exercises real loading, cancel and error paths.
+- No MSW: it adds a service worker file, a dependency well over 10 kB gzipped and CSP work, and offers nothing a static site needs over an in-process function.
+
+**Consequences.** No new dependency. Swapping in a real endpoint means replacing `createMockApi` with a `fetch` client of the same shape. T-052 adds create and update to the same client. Changing the seed, count or generator changes the demo data everywhere at once.
+
