@@ -380,3 +380,72 @@ Status: Accepted · 2026-10-30 · Owner decision · Refines D-008, D-026 · Foll
 
 **Consequences.** Case study pages load about 135 kB more JavaScript, after first paint. Home and `/work` are unchanged, and Playwright checks that they never request the chunk. A new model means a new builder and a new value in `projectObjectKinds`.
 
+
+## D-033 · Systems skin: console look from tokens and scoped element styles
+Status: Accepted · 2026-10-30 · Refines D-005, D-019, D-020
+
+**Context.** T-040 adds the second skin (D-005). It has to look clearly different from Editorial while keeping the same markup, every token contract (D-019) and WCAG AA in both themes. Its design direction was chosen under `/run-phase` (F-026).
+
+**Decision.**
+- `app/styles/skins/systems.css`, imported after `editorial.css`. The look of a well-made admin console: cool neutral greys, a teal accent (`oklch(0.51 0.1 185)` light, `oklch(0.82 0.12 180)` dark), a blue focus ring, Geist for headings and text, Geist Mono for labels, radii of 3/4/6/8 px and a faint 32 px blueprint grid drawn from `--line` behind the page.
+- No new font: Geist and Geist Mono already ship with Editorial (D-020).
+- Every rule is scoped to `[data-skin="systems"]`. Theme blocks use `[data-skin="systems"][data-theme]` and `[data-skin="systems"] [data-theme]` (and `:root[data-skin="systems"]:not([data-theme="light"])` for the system preference), so they are more specific than Editorial's and a nested `[data-theme]` section keeps the skin.
+- Structural styles target elements only (headings, `dd`, the page header and footer, `.prose-content`), never component utility classes: heading tracking and weight, tabular figures, a mono `#` marker before prose `h2` (empty alternative text), a mono non-italic blockquote and solid header and footer bands over the grid.
+- `tests/unit/skins.test.ts` runs the color and contrast checks for both skins and fails on any rule in `systems.css` that is not scoped to the skin. `tests/e2e/systems-skin.spec.ts` sets the skin on `<html>` and runs axe on every page in both themes, checks the tokens, fonts and nested themes, and that no page scrolls sideways at 375 px.
+
+**Consequences.** The skin is visible only when `data-skin="systems"` is set; T-041 sets it from storage and `?skin=`, and T-044 moves the e2e checks onto the parameter. Root still preloads Fraunces, which the Systems skin does not use; T-042 handles per-skin font preloading. Contrast ratios are listed in the file header and must be rechecked when a color changes.
+
+## D-034 · Skin mechanism: parameter, stored choice, default, set before the first paint
+Status: Accepted · 2026-10-30 · Refines D-005
+
+**Context.** T-041 makes the Systems skin (D-033) reachable: the skin must be applied before the first paint, like the theme (T-014), and be settable from a `?skin=` parameter for shared links and per-skin tests (D-005). Whether the parameter is stored was chosen under `/run-phase` (F-027).
+
+**Decision.**
+- `app/lib/skin.ts` holds the skin list (`editorial`, `systems`), the default (`editorial`), the storage key and parameter name (both `skin`), the inline pre-paint script, and the client helpers (`readSkinParam`, `readStoredSkin`, `resolveSkin`, `currentSkin`, `setSkin`, `subscribeSkin`); `app/lib/useSkin.ts` exposes it to React like `useTheme`.
+- Order: a valid `?skin=` value, then the stored choice, then `editorial`. A valid parameter is also stored; unknown values are ignored. Every storage access is in try/catch, so blocked storage falls back to the parameter and the default. The script always sets `data-skin`, so the attribute is the single source of truth.
+- The theme keeps its own default, the system preference (T-014). `prePaintScript` joins the theme and skin scripts with a semicolon into one inline script in `<head>`, before the stylesheets; its CSP hash is computed by the build (D-027).
+- `setSkin` stores and applies at once and notifies subscribers; the switcher and its transition are T-042.
+
+**Consequences.** Shared links with `?skin=` persist the skin for that visitor. The URL keeps the parameter; canonical URLs never include it. T-044 can drive per-skin checks with `?skin=` in a fresh browser context.
+
+
+## D-035 · Skin switcher: icon button, fonts first, circular View Transitions reveal
+Status: Accepted · 2026-10-30 · Refines D-008, D-023, D-033, D-034
+
+**Context.** T-042 adds the header control that switches skins (D-005, D-034). It must be keyboard and screen-reader usable, reveal the new skin with a circle from the control, never paint the new skin with fallback fonts, stay instant under reduced motion or without View Transitions, and work in Chrome, Safari and Firefox. The form of the control and the cross-browser check were chosen under `/run-phase` (F-028, F-029).
+
+**Decision.**
+- `SkinSwitcher` (`app/components/layout/SkinSwitcher.tsx`) is a 36 px icon button next to the theme toggle, named "Switch design". With two skins it moves to the next one (`nextSkin`). `aria-describedby` points to a hidden "Current design: Editorial" text, and a polite `role="status"` region announces "Systems design on" after a switch. Like the theme toggle, it is disabled until hydration. Copy lives in `content/site.ts`.
+- `switchSkin` (`app/lib/skin.ts`) first calls `loadSkinFonts`: `document.fonts.load` for every family of the target skin (`SKIN_FONTS`), capped at 1 s (`FONT_TIMEOUT_MS`) and never rejecting. Then it sets `data-skin-transition` on `<html>`, calls `document.startViewTransition(() => setSkin(skin))` and, once the transition is ready, animates `clip-path: circle()` on `::view-transition-new(root)` from the button's centre to the farthest viewport corner, using `--duration-slow` and `--easing-standard`. `base.css` turns off the root cross-fade while the attribute is set. With reduced motion or no View Transitions, it calls `setSkin` directly. If a second switch starts while fonts load, only the latest applies. The Web Animations API is not restricted by the CSP's `style-src`, and no library is added (D-008).
+- Per-skin preloading (D-033): root.tsx now preloads only Geist, which every skin uses. The pre-paint script adds a `<link rel="preload" as="font">` for each font only the active skin uses (`SKIN_PRELOADS`: Fraunces for Editorial), so Systems visitors no longer download Fraunces up front. The hashed file URL is written into the script at build time, and the CSP hash follows it (D-027).
+- `playwright.config.ts` adds Firefox and WebKit projects that run only `tests/e2e/skin-switcher.spec.ts`. `ci-main` installs all three browsers (the cache key includes the browser set). The spec covers the keyboard, the description and announcement, fonts loaded before `data-skin` changes, an unchanged control position, the circular reveal, reduced motion, missing View Transitions and the per-skin preloads.
+
+**Consequences.** A skin added later needs entries in `SKINS`, `SKIN_FONTS`, `SKIN_PRELOADS` and `site.skinSwitcher.names` (a unit test checks the names). The command palette (T-043) can call `switchSkin` without an origin, so the reveal starts from the top centre. The e2e job in `ci-main` takes a little longer because of the two extra browsers.
+
+## D-036 · Command palette: cmdk in a native dialog, loaded on first open
+Status: Accepted · 2026-10-30 · Refines D-008, D-035
+
+**Context.** T-043 adds the command palette of REQUIREMENTS §6.3: open with Ctrl/Cmd+K, go to a page or case study, switch design or theme, download the CV; fully keyboard and screen-reader usable and lazy loaded. The task names `cmdk`, which depends on Radix Dialog and is over the ~10 kB gzipped threshold. The build and the trigger were chosen under `/run-phase` (F-030, F-031).
+
+**Decision.**
+- Dependency: `cmdk` 1.1.1 (pinned). It brings `@radix-ui/react-dialog` and a few small Radix packages; the palette chunk is about 17.7 kB gzipped. It is imported only by `app/components/layout/CommandPalette.tsx`, which `CommandMenu` loads with `React.lazy` on the first open (and prefetches on hover or focus of the header button). Home's initial JavaScript gains only the small `CommandMenu` component.
+- The dialog is a native modal `<dialog>` (`showModal`): it makes the page inert, keeps Tab inside and closes on Escape without extra code. The search field is focused explicitly after `showModal`, because browsers differ on what a dialog focuses first. When the dialog closes (Escape, the shortcut again, a command or a backdrop click), focus returns to the element that had it.
+- cmdk provides the combobox (`aria-activedescendant`, `aria-expanded`) and the labelled listbox with grouped options, filtering and arrow-key navigation with wrap-around. Commands: Pages (Home and the header navigation), Case studies (from `~/lib/projects`, already loaded on home), Preferences (`switchSkin` without an origin, so the reveal starts from the top centre as D-035 foresaw, and `setTheme`), Files (the CV, through a temporary download link). Design and theme changes are announced in a polite status region beside the button. Copy lives in `content/site.ts`.
+- The header button is an icon button like the theme and design controls, disabled until hydration, with `aria-haspopup="dialog"` and `aria-keyshortcuts="Control+K Meta+K"`. Ctrl/Cmd+K with Shift or Alt is left to the browser.
+- No animation is added (D-008); the active option uses an accent left border and the raised surface, from tokens.
+
+**Consequences.** A new page or command is one `Command.Item` and its copy. The e2e spec runs in Chromium only, like the other specs except the skin switcher; Firefox was checked locally. Any later change that adds a status region in the header must keep the e2e locators scoped (the skin switcher spec now targets its own region).
+
+## D-037 · Per-skin QA: one spec over every skin, theme, page and width
+Status: Accepted · 2026-10-30 · Refines D-033, D-034
+
+**Context.** T-044 asks for smoke and axe checks per skin through `?skin=`, verified contrast and a visual check at 375, 768 and 1440 px, passing for both skins and both themes. Until now only `tests/e2e/systems-skin.spec.ts` covered the Systems skin, by setting `data-skin` by hand (D-033). The form of the visual check was chosen under `/run-phase` (F-032).
+
+**Decision.**
+- `tests/e2e/per-skin.spec.ts` replaces `systems-skin.spec.ts`. For each skin and theme it loads every route (home, `/work`, each case study from `content/projects`, `/about`, `/style-tile`, a 404 path) with `?skin=` in a fresh browser context, the theme coming from the emulated system color scheme, and checks the `data-skin` and `data-theme` attributes, title, h1, header, footer and axe (WCAG 2.2 AA tags).
+- Contrast is checked twice: the skin files in unit tests (`tests/unit/skins.test.ts`), and the token values the browser resolves on the built page in e2e, with the same helper (`tests/unit/helpers/contrast.ts`, which now also reads the minified `oklch(95% ...)` form).
+- Layout at 375, 768 and 1440 px: no sideways scroll, and the header and h1 stay inside the viewport, on every page in every skin and theme. The visual check is a review of full-page screenshots by eye when the skins change; no screenshot baselines are committed, because font rendering differs between machines and CI.
+- The spec keeps its own skin list, since Playwright cannot import `app/lib/skin.ts` (it imports a font through Vite's `?url`); a test compares it with the list in the built pre-paint script.
+
+**Consequences.** A new skin is added to the spec's list (the drift test fails otherwise) and gets the whole matrix. A new route is added to its route list. The spec runs in Chromium only, in `ci-main`.
+

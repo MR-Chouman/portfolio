@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 3: Case studies and imagery**
+Current phase: **Phase 4: Skins and switcher**
 
 ## Rules
 
@@ -113,21 +113,26 @@ Current phase: **Phase 3: Case studies and imagery**
 
 ## Phase 4: Skins and switcher (tag v0.5.0)
 
-- **T-040** · todo · Systems skin (light and dark)
+- **T-040** · done · Systems skin (light and dark)
   `app/styles/skins/systems.css`: different tokens plus structural CSS only, same markup.
   Done when: every page looks finished in both skins, both themes.
-- **T-041** · todo · Skin mechanism
+  Notes: D-033, F-026 (auto). Cool greys, teal accent, Geist headings and Geist Mono labels, 3-8 px radii, a blueprint grid from `--line`, all scoped to `[data-skin="systems"]`; no markup or new font. Checked with screenshots of every page at 1440 and 375 px in both themes. Unit tests run the contrast checks for both skins and reject unscoped rules; `tests/e2e/systems-skin.spec.ts` sets the skin on `<html>` (until T-041 adds `?skin=`) and runs axe on every page in both themes, plus token, nested-theme and 375 px overflow checks. The style tile copy now says "the active skin".
+- **T-041** · done · Skin mechanism
   `app/lib/skin.ts`: get/set, `localStorage` (try/catch), `?skin=` param, system theme default; pre-paint script extended.
   Done when: no flash on reload; param works; unit tested.
-- **T-042** · todo · Skin switcher and transition
+  Notes: D-034, F-027 (auto). The pre-paint script always sets `data-skin` (parameter, then stored choice, then `editorial`); a valid `?skin=` is stored, unknown values are ignored. The theme still defaults to the system preference. `prePaintScript` joins the theme and skin scripts in one inline script. `setSkin` applies instantly; T-042 adds the switcher and transition. Tested in `tests/unit/skin.test.tsx` and `tests/e2e/skin.spec.ts` (first-frame skin, reload, blocked storage).
+- **T-042** · done · Skin switcher and transition
   Header control, keyboard accessible, announces state; View Transitions circular reveal from the control; preload the target skin's fonts before switching; instant when reduced motion/unsupported.
   Done when: switch works in Chrome, Safari and Firefox with a graceful fallback, no layout jump.
-- **T-043** · todo · Command palette
+  Notes: D-035, F-028 and F-029 (auto). An icon button "Switch design" next to the theme toggle, described by the current design and announcing the new one in a status region. `switchSkin` loads the target skin's fonts (capped at 1 s), then reveals the skin with a View Transitions circle from the button (`--duration-slow`); instant with reduced motion or without the API. Root preloads only Geist; the pre-paint script preloads Fraunces for Editorial only. `tests/e2e/skin-switcher.spec.ts` runs in Chromium, Firefox and WebKit (new Playwright projects; `ci-main` installs the three browsers): keyboard, announcement, fonts ready before the skin applies, unchanged control position, the reveal, reduced motion, no View Transitions, preloads. Unit tests in `tests/unit/skin-switcher.test.tsx`. Chromium and Firefox pass locally, including the reveal. WebKit was checked on draft verification PR #50 into `main` (closed unmerged): 111 passed, 1 skipped; the skip is the reveal test, because Playwright's Linux WebKit build has no View Transitions, so WebKit exercised the instant fallback. Real Safari 18+ supports the API, so it gets the reveal.
+- **T-043** · done · Command palette
   `cmdk`-based; navigate, switch design/theme, download CV.
   Done when: opens with Ctrl/Cmd+K, fully keyboard and screen-reader usable, lazy loaded.
-- **T-044** · todo · Per-skin QA
+  Notes: D-036, F-030 and F-031 (auto). `CommandMenu` (header) adds an icon button "Open command palette" (`aria-haspopup="dialog"`, `aria-keyshortcuts`) and the Ctrl/Cmd+K listener; `CommandPalette` and cmdk load with `React.lazy` on first open (also prefetched on hover or focus of the button), about 17.7 kB gzipped, nothing on first load. A native modal `<dialog>` holds cmdk's combobox and listbox: Pages, Case studies, Preferences (switch design via `switchSkin`, switch theme), Files (CV download). Escape, the shortcut or a backdrop click close it and focus returns; design and theme changes are announced in a status region. Header gaps shrink below `sm` so the four controls and the navigation stay on one row at 375 px. Tests: `tests/unit/command-palette.test.tsx`, `tests/e2e/command-palette.spec.ts` (lazy load, both shortcuts, focus, inert page, arrow keys and `aria-activedescendant`, filtering, each command, axe in both skins and themes, 375 px); the theme and skin switcher specs follow the new tab order and status region. Passed locally in Chromium and Firefox.
+- **T-044** · done · Per-skin QA
   Playwright smoke and axe checks run for each skin via `?skin=`; contrast verified; visual check at 375/768/1440.
   Done when: all checks pass for both skins and both themes.
+  Notes: D-037, F-032 (auto). `tests/e2e/per-skin.spec.ts` replaces `systems-skin.spec.ts`: every route (home, `/work`, the four case studies, `/about`, `/style-tile`, a 404 path) is loaded with `?skin=` in a fresh context for each skin, with the theme from the emulated system color scheme, and checked for `data-skin`/`data-theme`, title, h1, header and footer, and no axe violations (36 tests). Per skin and theme it also checks WCAG AA contrast on the tokens the browser resolves (the contrast helper now reads the minified `oklch(95% ...)` form) and that no page scrolls sideways, and the header and h1 fit, at 375, 768 and 1440 px. A test fails if the skins in the built pre-paint script and the spec drift apart. The token, font and nested-theme checks moved over and load the skin with `?skin=`. Visual check: 72 full-page screenshots (6 pages x 2 skins x 2 themes x 3 widths) reviewed by eye, no issue found; no baselines are committed.
 
 ## Phase 5: Lab demo (tag v0.6.0)
 

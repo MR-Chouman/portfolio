@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./skins/editorial.css";
+@import "./skins/systems.css";
 
 /*
  * Layout utilities (T-012)
@@ -198,6 +199,15 @@
 ::view-transition-new(root) {
   animation-duration: var(--duration-base);
   animation-timing-function: var(--easing-standard);
+}
+
+/* Skin switch (T-042): no cross-fade; switchSkin (app/lib/skin.ts) reveals
+   the new skin with a circle growing from the switcher, on the new
+   snapshot. Reduced motion skips the transition altogether. */
+:root[data-skin-transition]::view-transition-old(root),
+:root[data-skin-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 /*

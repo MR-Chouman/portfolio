@@ -4,6 +4,8 @@ import { ButtonLink } from "~/components/ui";
 
 import { contact } from "../../../content/contact";
 import { site } from "../../../content/site";
+import { CommandMenu } from "./CommandMenu";
+import { SkinSwitcher } from "./SkinSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
@@ -18,9 +20,9 @@ export function SiteHeader() {
             {site.role}
           </span>
         </Link>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <nav aria-label={site.navigationLabel}>
-            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            <ul className="flex flex-wrap gap-x-4 gap-y-2 sm:gap-x-6">
               {site.navigation.map((item) => (
                 <li key={item.href}>
                   <NavLink
@@ -33,7 +35,7 @@ export function SiteHeader() {
               ))}
             </ul>
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Visible text is the short label; the accessible name starts
                 with it (WCAG 2.5.3) and says what the link does. */}
             <ButtonLink
@@ -46,6 +48,8 @@ export function SiteHeader() {
             >
               {contact.cv.shortLabel}
             </ButtonLink>
+            <CommandMenu />
+            <SkinSwitcher />
             <ThemeToggle />
           </div>
         </div>
