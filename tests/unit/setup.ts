@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import { afterEach } from "vitest";
 
 // jsdom has no matchMedia. Default: no media query matches (light theme, motion
@@ -34,6 +34,12 @@ if (typeof window.IntersectionObserver !== "function") {
     }
   };
 }
+
+// findBy* and waitFor give up after 1 s by default. The lab tests (T-051,
+// T-052) wait on mock requests and React Router revalidations, which can take
+// longer when every test file runs in parallel; they still fail on a wrong
+// result, only later.
+configure({ asyncUtilTimeout: 5000 });
 
 afterEach(() => {
   cleanup();
