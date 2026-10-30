@@ -516,3 +516,18 @@ Status: Accepted · 2026-10-30 · Implements D-038
 - `tests/e2e/floating-header.spec.ts` checks every page at 375, 768 and 1440 px in both themes (rounded, shadowed, inset, same place after scrolling to the end, controls usable), anchor and focus targets landing below the bar, the published height, layout shift and the skip link above the bar.
 
 **Consequences.** Content scrolls behind the bar and shows in the gap above it, as with any floating bar. A hard-coded offset would break on zoom or wrapped labels; the measured one follows them. Other surfaces that float over the page can reuse `shadow-raised`.
+
+## D-043 · Accent and header QA: one spec over every accent, theme, page and width
+Status: Accepted · 2026-10-30 · Extends D-037, D-040, D-041, D-042
+
+**Context.** T-049 asks for smoke and axe checks per theme, contrast per accent and theme on the built page, the layout at 375, 768 and 1440 px with the floating header and accent palette, and a visual check of every accent, passing for all six accents in both themes. `per-theme.spec.ts` covered both themes with the default accent only; the accent, palette and header specs each checked their own part. The width of the matrix was chosen under `/run-phase` (F-040).
+
+**Decision.**
+- `tests/e2e/per-accent.spec.ts` loads every route with `?accent=` in a fresh context for each accent and theme (theme from the emulated color scheme) and checks the `data-theme` and `data-accent` attributes, title, h1, header, footer, the checked palette radio and axe (WCAG 2.2 AA tags).
+- Contrast per accent and theme is checked on the tokens the browser resolves, on the page and inside the style tile's nested light and dark sections, with the shared helper (`tests/unit/helpers/contrast.ts`).
+- Layout per accent, theme and width on every route: no sideways scroll, the header bar inset inside the viewport, the h1 inside it, exactly one visible palette control, left of the content and below the header bar.
+- The spec keeps its own accent list (Playwright cannot import `app/lib/accent.ts`); a test compares it with the list in the built pre-paint script.
+- The visual check stays a by-eye review of screenshots when accents, the header or the palette change; no baselines are committed (D-037).
+
+**Consequences.** A new accent is added to the spec's list (the drift test fails otherwise) and gets the whole matrix; a new route is added to its route list. The spec adds 157 tests (about 2.5 minutes locally) to the Chromium e2e run in `ci-main`.
+
