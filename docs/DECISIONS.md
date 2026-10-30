@@ -394,3 +394,17 @@ Status: Accepted · 2026-10-30 · Refines D-005, D-019, D-020
 - `tests/unit/skins.test.ts` runs the color and contrast checks for both skins and fails on any rule in `systems.css` that is not scoped to the skin. `tests/e2e/systems-skin.spec.ts` sets the skin on `<html>` and runs axe on every page in both themes, checks the tokens, fonts and nested themes, and that no page scrolls sideways at 375 px.
 
 **Consequences.** The skin is visible only when `data-skin="systems"` is set; T-041 sets it from storage and `?skin=`, and T-044 moves the e2e checks onto the parameter. Root still preloads Fraunces, which the Systems skin does not use; T-042 handles per-skin font preloading. Contrast ratios are listed in the file header and must be rechecked when a color changes.
+
+## D-034 · Skin mechanism: parameter, stored choice, default, set before the first paint
+Status: Accepted · 2026-10-30 · Refines D-005
+
+**Context.** T-041 makes the Systems skin (D-033) reachable: the skin must be applied before the first paint, like the theme (T-014), and be settable from a `?skin=` parameter for shared links and per-skin tests (D-005). Whether the parameter is stored was chosen under `/run-phase` (F-027).
+
+**Decision.**
+- `app/lib/skin.ts` holds the skin list (`editorial`, `systems`), the default (`editorial`), the storage key and parameter name (both `skin`), the inline pre-paint script, and the client helpers (`readSkinParam`, `readStoredSkin`, `resolveSkin`, `currentSkin`, `setSkin`, `subscribeSkin`); `app/lib/useSkin.ts` exposes it to React like `useTheme`.
+- Order: a valid `?skin=` value, then the stored choice, then `editorial`. A valid parameter is also stored; unknown values are ignored. Every storage access is in try/catch, so blocked storage falls back to the parameter and the default. The script always sets `data-skin`, so the attribute is the single source of truth.
+- The theme keeps its own default, the system preference (T-014). `prePaintScript` joins the theme and skin scripts with a semicolon into one inline script in `<head>`, before the stylesheets; its CSP hash is computed by the build (D-027).
+- `setSkin` stores and applies at once and notifies subscribers; the switcher and its transition are T-042.
+
+**Consequences.** Shared links with `?skin=` persist the skin for that visitor. The URL keeps the parameter; canonical URLs never include it. T-044 can drive per-skin checks with `?skin=` in a fresh browser context.
+

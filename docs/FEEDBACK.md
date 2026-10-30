@@ -21,6 +21,8 @@ None.
 
 ## Resolved
 
+- **F-027** · resolved · 2026-10-30 · auto (recommended) · -> T-041, D-034
+  Should `?skin=` only preview a skin for that page load, or also store it as the visitor's choice? Chosen: a valid parameter is stored, so a shared link keeps its skin on later pages and visits, and the switcher (T-042) can change it back. Alternatives: apply for the current load only (lost on the next full page load), or strip the parameter from the URL after applying it. Reason: a link such as "see it in the Systems design" should behave like choosing that skin, and the per-skin tests (T-044) get the same result either way.
 - **F-026** · resolved · 2026-10-30 · auto (recommended) · -> T-040, D-033
   What design direction should the Systems skin take, when the owner delegated design to Claude (F-002) but only for Editorial? Chosen: an admin-console look that matches the owner's work: cool neutral greys, a teal accent, blue focus ring, Geist headings with Geist Mono labels (no new font), tight 3-8 px radii, a faint blueprint grid and a few element-level touches (mono `#` before prose headings, tabular figures). Alternatives: a monospace-only terminal look (harder to read at large sizes, weaker hero); a dark-first high-contrast look (the skin must work equally in light). Reason: clearly distinct from Editorial, on-brand for a frontend lead of admin platforms, and free of new font weight. Owner to check: the accent hue and the background grid.
 - **F-023** · resolved · 2026-10-30 · auto (recommended) · -> T-030, D-030

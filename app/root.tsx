@@ -13,7 +13,7 @@ import { SiteHeader } from "./components/layout/SiteHeader";
 import { SkipLink } from "./components/layout/SkipLink";
 import { NotFound, notFoundMeta } from "./components/sections/NotFound";
 import { Link } from "./components/ui";
-import { themeScript } from "./lib/theme";
+import { prePaintScript } from "./lib/skin";
 import "./styles/base.css";
 import { notFound } from "../content/not-found";
 import { site } from "../content/site";
@@ -32,13 +32,13 @@ export const links: Route.LinksFunction = () =>
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    // The pre-paint script sets data-theme before React hydrates.
+    // The pre-paint script sets data-theme and data-skin before React hydrates.
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* Before the stylesheets, so the first paint uses the right theme. */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {/* Before the stylesheets, so the first paint uses the right theme and skin. */}
+        <script dangerouslySetInnerHTML={{ __html: prePaintScript }} />
         <Meta />
         <Links />
       </head>
