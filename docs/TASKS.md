@@ -98,7 +98,7 @@ Current phase: **Phase 3: Case studies and imagery**
   Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome, and 2-4 captioned images.
 - **T-031** · todo · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
-- **T-032** · todo · Case study: EV charging platform (Owner review, D-018)
+- **T-032** · review · Case study: EV charging platform (Owner review, D-018)
   Done when: same structure; highlights the 132 screens and 50-module API layer.
 - **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
