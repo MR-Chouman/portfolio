@@ -590,3 +590,20 @@ Status: Accepted · 2026-10-30 · Extends D-044, D-045, D-046
 - No router `clientAction` or fetcher: one in-flight fetcher per submission loses its result once idle, while a few lines of state give concurrent saves, a rollback notice and pure, unit-tested merging.
 
 **Consequences.** No new dependency. Reusing the drawer for another record type means a new form schema and copy, with the same dialog and pending-change helpers. A real endpoint replaces `createMockApi`'s mutations with `fetch` calls of the same shape.
+
+## D-048 · Lab component gallery: theme panels, per-accent rows, and the lab's parts as primitives
+
+Status: Accepted · 2026-10-31 · Extends D-038, D-040, D-047
+
+**Context.** T-053 asks for a component gallery on `/lab` that shows the design-system approach: every component with its variants and states in both themes and with every accent. The internal style tile (`/style-tile`, not indexed) already shows the site primitives in two theme panels. The choices were made under `/run-phase` (F-047).
+
+**Decision.**
+
+- The gallery is a static section of `/lab` (`app/components/lab/ComponentGallery.tsx`), so it is in the prerendered page. It has a light and a dark panel, each a `section` with its own `data-theme` (the tokens resolve per element, D-040), with one block per primitive and a caption naming each variant or state.
+- Every accent is shown at once, without a second accent control: the last block of each panel has one row per accent carrying `data-accent` and the panel's `data-theme` together, so `--accent` resolves to that accent's value for that theme. The rows hold the accent-colored primitives (primary button, link, accent tag, checked chip, active status). The rest of the gallery follows the page accent from the floating palette (T-047).
+- Hover and focus are not faked: the samples are live components, and only states that are props (disabled, invalid, checked) are set statically.
+- The drawer's labelled field and the table's checkbox chip move to `app/components/ui/Field.tsx` (`Field`, `controlStyles`, `fieldDescribedBy`, `CheckChip`), and the status label to `app/components/lab/StatusLabel.tsx`, so the gallery shows the same parts the table and drawer are built from. Their markup and classes do not change, apart from a disabled style on controls and chips.
+- Sample labels differ from the table's and drawer's ("Publish", "Draft", "Title"), so role and label queries on the page stay unambiguous.
+
+**Consequences.** No new dependency. `/lab` gets longer, and the six accent rows repeat their sample names in each panel, each row a group named "<Accent> accent". A new primitive should get a gallery block in the same PR. The style tile stays as the internal token reference.
+
