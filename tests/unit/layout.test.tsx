@@ -7,6 +7,7 @@ import { SiteHeader } from "~/components/layout/SiteHeader";
 import { SkipLink } from "~/components/layout/SkipLink";
 import { formatDate } from "~/lib/date";
 
+import { contact } from "../../content/contact";
 import { site } from "../../content/site";
 
 describe("SkipLink", () => {
@@ -34,6 +35,20 @@ describe("SiteHeader", () => {
     expect(links.map((link) => link.getAttribute("href"))).toEqual(
       site.navigation.map((item) => item.href),
     );
+  });
+
+  it("offers the CV download outside the navigation", () => {
+    render(
+      <MemoryRouter>
+        <SiteHeader />
+      </MemoryRouter>,
+    );
+    const cv = screen.getByRole("link", { name: "Download CV (PDF)" });
+    expect(cv).toHaveTextContent(contact.cv.shortLabel);
+    expect(cv).toHaveAttribute("href", contact.cv.href);
+    expect(cv).toHaveAttribute("download", contact.cv.fileName);
+    const nav = screen.getByRole("navigation", { name: site.navigationLabel });
+    expect(nav).not.toContainElement(cv);
   });
 
   it("marks the current section", () => {

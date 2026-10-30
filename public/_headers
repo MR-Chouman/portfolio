@@ -16,3 +16,8 @@
 # name, so a changed file always gets a new URL.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The CV keeps one URL (/cv.pdf) when the owner replaces it (T-024), so
+# browsers revalidate it on each visit instead of caching it for a year.
+/cv.pdf
+  Cache-Control: public, max-age=0, must-revalidate

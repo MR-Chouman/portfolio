@@ -136,10 +136,36 @@ export const homeSchema = z.strictObject({
     body: text,
     link: linkSchema,
   }),
+  // The email, CV and GitHub links come from content/contact.ts.
   contact: z.strictObject({
     ...sectionCopy,
     body: text,
-    links: z.array(linkSchema).min(1),
+  }),
+});
+
+// Public contact details and the CV download (content/contact.ts, T-024).
+// Only the email address and the GitHub profile are published (D-018).
+export const contactSchema = z.strictObject({
+  email: z.strictObject({
+    label: text,
+    address: z.email(),
+  }),
+  github: z.strictObject({
+    label: text,
+    href: z.url({ protocol: /^https$/ }),
+  }),
+  cv: z.strictObject({
+    label: text,
+    // The visible text of the compact header link; the full label stays the
+    // accessible name.
+    shortLabel: text,
+    format: text,
+    // A PDF at the root of public/.
+    href: z.string().regex(/^\/[a-z0-9-]+\.pdf$/, "Use a /name.pdf path"),
+    // The file name the browser saves the download as.
+    fileName: z
+      .string()
+      .regex(/^[\w-]+\.pdf$/, "Use a file name such as Name-CV.pdf"),
   }),
 });
 
@@ -211,6 +237,7 @@ export type Link = z.infer<typeof linkSchema>;
 export type Home = z.infer<typeof homeSchema>;
 export type Work = z.infer<typeof workSchema>;
 export type About = z.infer<typeof aboutSchema>;
+export type Contact = z.infer<typeof contactSchema>;
 export type NotFound = z.infer<typeof notFoundSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
