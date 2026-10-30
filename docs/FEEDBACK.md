@@ -22,6 +22,9 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-041** · resolved · 2026-10-30 · auto (recommended) · -> T-050, D-044
+  Which mock data approach for the lab: static JSON or MSW? Chosen: seeded records generated in TypeScript plus a pure query function behind a fake async client (latency, abort, injectable error). Alternatives: a committed static JSON file (same data, but a large file to review and no generator to tune counts); MSW intercepting `fetch` (realistic network tab, but a heavy dependency, a service worker file and CSP changes on a static site). Reason: no dependency, deterministic builds, and the loading, empty and error states T-051 needs are still exercised.
+
 - **F-040** · resolved · 2026-10-30 · auto (recommended) · -> T-049, D-043
   How wide should the per-accent QA matrix be? Chosen: every route in every accent and both themes for smoke and axe (108 tests), contrast per accent and theme, and the layout of every route per accent, theme and width, in one new spec next to `per-theme.spec.ts`; the visual check is a by-eye review of screenshots, with no committed baselines. Alternatives: axe on the home page only per accent (faster, but an accent-colored element on another page could fail unseen); screenshot baselines per accent (font rendering differs between machines and CI, D-037). Reason: "Done when" asks for every accent in both themes, and the full matrix adds about two and a half minutes to the `ci-main` e2e run.
 
