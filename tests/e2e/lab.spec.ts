@@ -25,7 +25,7 @@ test("lab is prerendered with its own title, canonical URL and heading", async (
   const title = /<title>([^<]+)<\/title>/.exec(html)?.[1];
   expect(title).toMatch(/^Lab/);
   expect(html).toContain(`<meta property="og:title" content="${title}"/>`);
-  expect(html).toMatch(/<link rel="canonical" href="[^"]+\/lab"\/>/);
+  expect(html).toMatch(/<link rel="canonical" href="[^"]+\/lab\/"\/>/);
   expect(html).toContain("Server-style data table");
 });
 

@@ -621,3 +621,19 @@ Status: Accepted · 2026-10-31 · Extends D-045, D-047, D-048
 
 **Consequences.** No new dependency. Links to files added in a phase 404 on GitHub until that phase is merged into `main`; the `dev` preview shows them before that. Renaming a linked file means updating `content/lab.ts` in the same PR.
 
+
+## D-050 · SEO: trailing-slash canonical URLs, a sitemap built from the pages, JSON-LD `Person` on home
+
+Status: Accepted · 2026-10-31 · Extends D-011, D-018, D-027, D-029
+
+**Context.** T-060 adds what REQUIREMENTS section 6 lists for per-route SEO that was still missing (Twitter tags, sitemap, robots, JSON-LD `Person`) and audits every route's tags. F-017 noted that Cloudflare Pages serves each prerendered page at `<path>/` and redirects `<path>` there, so the canonical URLs pointed at a redirect. The choices were made under `/run-phase` (F-049, F-050).
+
+**Decision.**
+
+- `canonicalUrl(path)` in `app/lib/seo.ts` gives the address a page is served at: the production origin (D-029), the path with a trailing slash, no query or fragment. `pageMeta` uses it for `rel="canonical"` and `og:url`, and adds `og:site_name`, `og:locale` and Twitter `summary` tags (title and description). Internal links keep their slashless form; client-side navigation never meets the redirect.
+- `app/lib/structured-data.ts` builds one JSON-LD `Person` (name, job title, URL, email, GitHub as `sameAs`, skills as `knowsAbout`) from `content/`, rendered on the home page through React Router's `script:ld+json` meta descriptor. No employer, client, phone number or address (D-018).
+- `scripts/finalize-build.ts` writes `sitemap.xml` and `robots.txt` after prerendering. The sitemap lists every page that has a canonical URL and no `noindex` tag (so `/style-tile/` and the 404 page stay out), without `lastmod`. The build fails if an indexable page's canonical URL is not its own address or two pages share one. robots.txt allows every path (noindex pages must stay crawlable for the tag to be seen) and names the sitemap.
+- JSON-LD blocks are data, not scripts: the CSP hashing step skips inline scripts whose `type` is not JavaScript.
+- `tests/e2e/seo.spec.ts` is the per-route audit: unique titles and descriptions on every page, canonical URLs served without a redirect, matching Open Graph and Twitter tags, a well-formed sitemap of exactly the indexable pages, robots.txt, and the home JSON-LD. Lighthouse CI's SEO category (>= 0.95, D-016) stays the external check.
+
+**Consequences.** No new dependency. Adding a page needs no sitemap edit; a page that should stay out of search sets `noindex`. Canonical URLs on production change to the slash form at the Phase 6 release. T-061 adds `og:image` and switches the Twitter card to `summary_large_image`.

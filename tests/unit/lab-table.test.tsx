@@ -143,7 +143,7 @@ describe("lab copy", () => {
     expect(tags).toContainEqual(
       expect.objectContaining({
         rel: "canonical",
-        href: expect.stringMatching(/\/lab$/),
+        href: expect.stringMatching(/\/lab\/$/),
       }),
     );
   });

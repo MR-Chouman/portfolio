@@ -51,7 +51,7 @@ describe("Work index meta", () => {
     expect(tags).toContainEqual(
       expect.objectContaining({
         rel: "canonical",
-        href: expect.stringMatching(/\/work$/),
+        href: expect.stringMatching(/\/work\/$/),
       }),
     );
     expect(tags).toContainEqual({

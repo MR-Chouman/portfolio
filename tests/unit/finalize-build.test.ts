@@ -16,12 +16,19 @@ import {
   BuildError,
   CSP_PLACEHOLDER,
   MAX_HEADERS_LINE,
+  SITEMAP_URL,
   cspHash,
   fillHeaders,
   finalizeBuild,
+  indexablePages,
   inlineScripts,
   moveNotFoundPage,
+  pageSeo,
+  robotsTxt,
+  servedPath,
+  sitemapXml,
 } from "../../scripts/finalize-build";
+import { SITE_ORIGIN } from "~/lib/seo";
 
 const dirs: string[] = [];
 function tempDir(): string {
@@ -40,6 +47,12 @@ describe("inlineScripts", () => {
     const html = `<head><script>a()</script><script type="module" src="/x.js"></script>
       <script type="module">import "/y.js";</script><script></script></head>`;
     expect(inlineScripts(html)).toEqual(["a()", 'import "/y.js";']);
+  });
+
+  it("skips data blocks such as JSON-LD, which browsers never run", () => {
+    const html = `<script type="application/ld+json">{"a":1}</script>
+      <script type="text/javascript">b()</script>`;
+    expect(inlineScripts(html)).toEqual(["b()"]);
   });
 });
 
@@ -78,7 +91,10 @@ describe("finalizeBuild", () => {
     const dir = tempDir();
     mkdirSync(join(dir, "404"));
     writeFileSync(join(dir, "404", "index.html"), "<script>nf()</script>");
-    writeFileSync(join(dir, "index.html"), "<script>home()</script>");
+    writeFileSync(
+      join(dir, "index.html"),
+      `${canonical("/")}<script>home()</script>`,
+    );
     writeFileSync(join(dir, "_headers"), template);
 
     finalizeBuild(dir);
@@ -89,9 +105,106 @@ describe("finalizeBuild", () => {
     expect(headers).not.toContain(CSP_PLACEHOLDER);
     expect(headers).toContain(cspHash("nf()"));
     expect(headers).toContain(cspHash("home()"));
+    expect(readFileSync(join(dir, "sitemap.xml"), "utf8")).toBe(
+      sitemapXml([`${SITE_ORIGIN}/`]),
+    );
+    expect(readFileSync(join(dir, "robots.txt"), "utf8")).toBe(robotsTxt());
   });
 
   it("fails when the 404 page was not prerendered", () => {
     expect(() => moveNotFoundPage(tempDir())).toThrow(/prerender list/);
+  });
+});
+
+function canonical(path: string): string {
+  return `<link rel="canonical" href="${SITE_ORIGIN}${path}"/>`;
+}
+const noindex = '<meta name="robots" content="noindex"/>';
+
+function writePage(dir: string, file: string, html: string): void {
+  const path = join(dir, file);
+  mkdirSync(join(path, ".."), { recursive: true });
+  writeFileSync(path, html);
+}
+
+describe("pageSeo", () => {
+  it("reads the canonical URL and the noindex directive", () => {
+    expect(pageSeo(`<head>${canonical("/a/")}</head>`)).toEqual({
+      canonical: `${SITE_ORIGIN}/a/`,
+      noindex: false,
+    });
+    expect(pageSeo(`<meta name="robots" content="noindex, follow"/>`)).toEqual({
+      canonical: undefined,
+      noindex: true,
+    });
+    expect(pageSeo(`<meta name="description" content="noindex"/>`)).toEqual({
+      canonical: undefined,
+      noindex: false,
+    });
+  });
+});
+
+describe("servedPath", () => {
+  it("is the URL path Cloudflare Pages serves a file at", () => {
+    expect(servedPath("index.html")).toBe("/");
+    expect(servedPath(join("work", "ev-charging", "index.html"))).toBe(
+      "/work/ev-charging/",
+    );
+    expect(servedPath("404.html")).toBe("/404.html");
+  });
+});
+
+describe("indexablePages", () => {
+  it("lists pages with a canonical URL and no noindex, sorted", () => {
+    const dir = tempDir();
+    writePage(dir, "index.html", canonical("/"));
+    writePage(dir, "work/index.html", canonical("/work/"));
+    writePage(dir, "about/index.html", canonical("/about/"));
+    writePage(
+      dir,
+      "style-tile/index.html",
+      canonical("/style-tile/") + noindex,
+    );
+    writePage(dir, "404.html", noindex);
+    writePage(dir, "__spa-fallback.html", "<title>x</title>");
+
+    expect(indexablePages(dir)).toEqual([
+      `${SITE_ORIGIN}/`,
+      `${SITE_ORIGIN}/about/`,
+      `${SITE_ORIGIN}/work/`,
+    ]);
+  });
+
+  it("fails when a canonical URL is not the page's own address", () => {
+    const dir = tempDir();
+    writePage(dir, "about/index.html", canonical("/about"));
+    expect(() => indexablePages(dir)).toThrow(BuildError);
+    expect(() => indexablePages(dir)).toThrow(/served at .*\/about\//);
+  });
+
+  it("fails when there is nothing to list", () => {
+    const dir = tempDir();
+    writePage(dir, "404.html", noindex);
+    expect(() => indexablePages(dir)).toThrow(/no indexable pages/);
+  });
+});
+
+describe("sitemapXml and robotsTxt", () => {
+  it("writes a sitemaps.org urlset with escaped absolute URLs", () => {
+    const xml = sitemapXml([`${SITE_ORIGIN}/`, `${SITE_ORIGIN}/a/?b=1&c=2`]);
+    expect(xml).toMatch(/^<\?xml version="1.0" encoding="UTF-8"\?>\n/);
+    expect(xml).toContain(
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    );
+    expect(xml).toContain(`<loc>${SITE_ORIGIN}/</loc>`);
+    expect(xml).toContain(`<loc>${SITE_ORIGIN}/a/?b=1&amp;c=2</loc>`);
+    expect(xml.trimEnd()).toMatch(/<\/urlset>$/);
+  });
+
+  it("allows every crawler and points at the sitemap", () => {
+    expect(robotsTxt()).toBe(
+      `User-agent: *\nAllow: /\n\nSitemap: ${SITEMAP_URL}\n`,
+    );
+    expect(SITEMAP_URL).toBe(`${SITE_ORIGIN}/sitemap.xml`);
   });
 });

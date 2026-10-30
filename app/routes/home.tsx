@@ -9,6 +9,7 @@ import {
 } from "~/components/ui";
 import { projects } from "~/lib/projects";
 import { pageMeta } from "~/lib/seo";
+import { personMeta } from "~/lib/structured-data";
 
 import { contact as contactDetails } from "../../content/contact";
 import { home } from "../../content/home";
@@ -19,7 +20,7 @@ import type { Route } from "./+types/home";
 // work, "How I build", About teaser and contact. All copy comes from
 // content/; the work list is every project, in display order.
 export function meta(_: Route.MetaArgs) {
-  return pageMeta({ ...home.meta, path: "/" });
+  return [...pageMeta({ ...home.meta, path: "/" }), personMeta()];
 }
 
 // In-page targets keep clear of the viewport edge when jumped to.
