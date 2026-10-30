@@ -4,8 +4,10 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
+import { about } from "../../content/about";
 import { contact } from "../../content/contact";
 import { experience } from "../../content/experience";
+import { home } from "../../content/home";
 import {
   ContentError,
   PROJECTS_DIR,
@@ -229,5 +231,33 @@ describe("contact content", () => {
         linkedin: { label: "LinkedIn", href: "https://linkedin.com" },
       }).success,
     ).toBe(false);
+  });
+});
+
+// T-035: the hero and About copy is final, and its numbers match
+// REQUIREMENTS section 4 and the project files.
+describe("final hero and About copy", () => {
+  it("has no placeholder text left", () => {
+    const copy = JSON.stringify({ profile, experience, home, about });
+    expect(copy).not.toMatch(/placeholder/i);
+  });
+
+  it("states the headline numbers from REQUIREMENTS section 4", () => {
+    const platforms = loadContent().projects.length;
+    expect(platforms).toBe(4);
+    expect(profile.headline).toContain(`${platforms} systems`);
+    expect(profile.headline).toContain("260+ screens");
+    expect(profile.metrics).toEqual([
+      { value: String(platforms), label: "Admin platforms" },
+      { value: "260+", label: "Admin screens" },
+      { value: "~3 yrs", label: "Experience" },
+    ]);
+  });
+
+  it("dates the timeline newest first, with only the current role open", () => {
+    const starts = experience.map((entry) => entry.start);
+    expect(starts).toEqual([...starts].sort().reverse());
+    expect(experience.filter((entry) => entry.end === null)).toHaveLength(1);
+    expect(experience[0]?.end).toBeNull();
   });
 });
