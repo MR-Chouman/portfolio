@@ -573,3 +573,20 @@ Status: Accepted · 2026-10-30 · Extends D-018, D-027, D-036
 - `public/_headers` gives `/cv.pdf` alone `Content-Security-Policy: frame-ancestors 'self'` and `X-Frame-Options: SAMEORIGIN`, detaching the site-wide values first. Other sites still cannot frame the CV, and every other path keeps `frame-ancestors 'none'` and `DENY`. The e2e header replay now applies each path's matching rules (with detach), so the framed PDF is tested with the headers Cloudflare sends.
 
 **Consequences.** No new dependency. The preview uses the browser's own PDF viewer, so it looks different per browser and is not shown in headless test Chromium (the tests report a viewer and check the frame and its headers). The detach-then-set behaviour of Cloudflare's `_headers` must be checked once on the `dev` preview (F-043).
+
+## D-047 · Lab CRUD drawer: a native dialog, Zod (mini) in the browser, optimistic rows that settle on the reload
+
+Status: Accepted · 2026-10-30 · Extends D-044, D-045, D-046
+
+**Context.** T-052 asks for create and edit in a drawer, with Zod validation and optimistic updates with rollback, keyboard accessible and tested, on the `/lab` table (D-045) over the mock endpoint (D-044). Zod so far ran only at build time over `content/`. The choices were made under `/run-phase` (F-045, F-046).
+
+**Decision.**
+
+- The drawer (`app/components/lab/AssetDrawer.tsx`) is a native modal `<dialog>` pinned to the right edge, full height, up to 28rem wide (the full width on phones), like the CV preview (D-046): the page behind is inert, Escape, Close, Cancel and a backdrop click close it, focus starts on the first field and returns to the button that opened it ("New asset" or the row's "Edit"). It slides in with `@starting-style` and the duration token, which is 0 under reduced motion. It is mounted only while open.
+- Validation is one Zod schema per side in `app/lib/lab/asset-form.ts`: `assetFormSchema` parses the form's strings (the value as digits only), `assetInputSchema` checks the typed input in the mock endpoint, as a real API would. Zod messages are error codes, mapped to copy in `content/lab.ts` (`crud.errors`), so the copy stays in `content/` and the content schema checks there is a message for every code. The form checks on submit (focus moves to the first invalid field), then live on every change; each field has `aria-invalid` and its error in `aria-describedby`, with an icon beside the text so the error never relies on color.
+- The browser imports `zod/mini`, Zod's tree-shakable build, not the classic API. The `/lab` route chunk goes from about 6.3 kB to 15.5 kB gzipped with the drawer and the checks it uses; other routes are unchanged. Zod stays a dev dependency, since Vite bundles it at build time.
+- The mock endpoint gets `createAsset` (next id, `AST-0241` first) and `updateAsset` over a private copy of the records, so changes last until a reload; `fail: true` makes a save fail for the demo, from a "Make this save fail" switch in the drawer.
+- Optimistic updates are pending changes laid over the loader's rows (`app/lib/lab/optimistic.ts`): an edit replaces its row, a create shows on top with "New" as its id, both marked "Saving…" with their Edit button kept but inactive (so returned focus stays). On failure the change is dropped (the rollback: the rows never changed) and an alert says the save was undone. On success the route's loader revalidates and the change stays "settled" over the rows shown before, until the reloaded rows replace them, so the row never flickers back to its old values between the reload resolving and React rendering it.
+- No router `clientAction` or fetcher: one in-flight fetcher per submission loses its result once idle, while a few lines of state give concurrent saves, a rollback notice and pure, unit-tested merging.
+
+**Consequences.** No new dependency. Reusing the drawer for another record type means a new form schema and copy, with the same dialog and pending-change helpers. A real endpoint replaces `createMockApi`'s mutations with `fetch` calls of the same shape.
