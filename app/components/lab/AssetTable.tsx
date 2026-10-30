@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useNavigation, useRevalidator, useSearchParams } from "react-router";
 
-import { Button } from "~/components/ui";
+import { Button, CheckChip, controlStyles } from "~/components/ui";
 import type { LabClient, LabTableData } from "~/lib/lab/client";
 import {
   applyPending,
@@ -42,6 +42,7 @@ import { cx } from "~/lib/cx";
 
 import { lab } from "../../../content/lab";
 import { AssetDrawer, type AssetSubmission } from "./AssetDrawer";
+import { StatusLabel } from "./StatusLabel";
 
 // The lab's server-style data table (T-051): search, filters, sortable
 // columns and pagination over the mock endpoint (D-044). The URL is the only
@@ -94,25 +95,6 @@ function cellText(asset: Asset, field: SortField): ReactNode {
     default:
       return asset[field];
   }
-}
-
-function StatusLabel({ status }: { status: Asset["status"] }) {
-  // Shape and text carry the status, never color alone.
-  return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <span
-        aria-hidden="true"
-        className={cx(
-          "size-2 rounded-full border border-fg-muted",
-          status === "active" && "border-accent bg-accent",
-          status === "maintenance" && "bg-fg-muted",
-          status === "reserved" && "border-dashed",
-          status === "retired" && "rounded-none",
-        )}
-      />
-      {copy.values.status[status]}
-    </span>
-  );
 }
 
 function SortIcon({ direction }: { direction: "asc" | "desc" | undefined }) {
@@ -196,20 +178,14 @@ function FilterGroup<F extends FilterField>({
       </legend>
       <div className="mt-2 flex flex-wrap gap-2">
         {options.map((option) => (
-          <label
+          <CheckChip
             key={option}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-sm border border-line px-2 py-1 text-sm has-checked:border-accent has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus"
-          >
-            <input
-              type="checkbox"
-              name={field}
-              value={option}
-              checked={selected.includes(option)}
-              onChange={() => onToggle(field, option)}
-              className="size-4 accent-accent focus-visible:outline-none"
-            />
-            {labels?.[option] ?? option}
-          </label>
+            name={field}
+            value={option}
+            checked={selected.includes(option)}
+            onChange={() => onToggle(field, option)}
+            label={labels?.[option] ?? option}
+          />
         ))}
       </div>
     </fieldset>
@@ -267,7 +243,7 @@ function SearchField({
           clearTimeout(timer.current);
           timer.current = setTimeout(() => commit(next), SEARCH_DELAY_MS);
         }}
-        className="mt-2 block h-10 w-full rounded-md border border-fg-muted bg-surface px-3 text-sm text-fg placeholder:text-fg-muted"
+        className={controlStyles}
         placeholder={copy.filters.searchHint}
       />
     </form>
