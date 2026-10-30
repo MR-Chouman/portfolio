@@ -380,3 +380,17 @@ Status: Accepted · 2026-10-30 · Owner decision · Refines D-008, D-026 · Foll
 
 **Consequences.** Case study pages load about 135 kB more JavaScript, after first paint. Home and `/work` are unchanged, and Playwright checks that they never request the chunk. A new model means a new builder and a new value in `projectObjectKinds`.
 
+
+## D-033 · Systems skin: console look from tokens and scoped element styles
+Status: Accepted · 2026-10-30 · Refines D-005, D-019, D-020
+
+**Context.** T-040 adds the second skin (D-005). It has to look clearly different from Editorial while keeping the same markup, every token contract (D-019) and WCAG AA in both themes. Its design direction was chosen under `/run-phase` (F-026).
+
+**Decision.**
+- `app/styles/skins/systems.css`, imported after `editorial.css`. The look of a well-made admin console: cool neutral greys, a teal accent (`oklch(0.51 0.1 185)` light, `oklch(0.82 0.12 180)` dark), a blue focus ring, Geist for headings and text, Geist Mono for labels, radii of 3/4/6/8 px and a faint 32 px blueprint grid drawn from `--line` behind the page.
+- No new font: Geist and Geist Mono already ship with Editorial (D-020).
+- Every rule is scoped to `[data-skin="systems"]`. Theme blocks use `[data-skin="systems"][data-theme]` and `[data-skin="systems"] [data-theme]` (and `:root[data-skin="systems"]:not([data-theme="light"])` for the system preference), so they are more specific than Editorial's and a nested `[data-theme]` section keeps the skin.
+- Structural styles target elements only (headings, `dd`, the page header and footer, `.prose-content`), never component utility classes: heading tracking and weight, tabular figures, a mono `#` marker before prose `h2` (empty alternative text), a mono non-italic blockquote and solid header and footer bands over the grid.
+- `tests/unit/skins.test.ts` runs the color and contrast checks for both skins and fails on any rule in `systems.css` that is not scoped to the skin. `tests/e2e/systems-skin.spec.ts` sets the skin on `<html>` and runs axe on every page in both themes, checks the tokens, fonts and nested themes, and that no page scrolls sideways at 375 px.
+
+**Consequences.** The skin is visible only when `data-skin="systems"` is set; T-041 sets it from storage and `?skin=`, and T-044 moves the e2e checks onto the parameter. Root still preloads Fraunces, which the Systems skin does not use; T-042 handles per-skin font preloading. Contrast ratios are listed in the file header and must be rechecked when a color changes.

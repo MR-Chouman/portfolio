@@ -113,9 +113,10 @@ Current phase: **Phase 4: Skins and switcher**
 
 ## Phase 4: Skins and switcher (tag v0.5.0)
 
-- **T-040** · todo · Systems skin (light and dark)
+- **T-040** · done · Systems skin (light and dark)
   `app/styles/skins/systems.css`: different tokens plus structural CSS only, same markup.
   Done when: every page looks finished in both skins, both themes.
+  Notes: D-033, F-026 (auto). Cool greys, teal accent, Geist headings and Geist Mono labels, 3-8 px radii, a blueprint grid from `--line`, all scoped to `[data-skin="systems"]`; no markup or new font. Checked with screenshots of every page at 1440 and 375 px in both themes. Unit tests run the contrast checks for both skins and reject unscoped rules; `tests/e2e/systems-skin.spec.ts` sets the skin on `<html>` (until T-041 adds `?skin=`) and runs axe on every page in both themes, plus token, nested-theme and 375 px overflow checks. The style tile copy now says "the active skin".
 - **T-041** · todo · Skin mechanism
   `app/lib/skin.ts`: get/set, `localStorage` (try/catch), `?skin=` param, system theme default; pre-paint script extended.
   Done when: no flash on reload; param works; unit tested.
