@@ -607,3 +607,17 @@ Status: Accepted · 2026-10-31 · Extends D-038, D-040, D-047
 
 **Consequences.** No new dependency. `/lab` gets longer, and the six accent rows repeat their sample names in each panel, each row a group named "<Accent> accent". A new primitive should get a gallery block in the same PR. The style tile stays as the internal token reference.
 
+## D-049 · Lab source links: files on `main` in the site's repository, checked against the tree
+
+Status: Accepted · 2026-10-31 · Extends D-045, D-047, D-048
+
+**Context.** T-054 asks `/lab` to explain its patterns and link to their source on GitHub. The repository is public (D-011) and the footer already links to it. The choices were made under `/run-phase` (F-048).
+
+**Decision.**
+
+- Each pattern gets a notes card (`app/components/lab/PatternNotes.tsx`) next to its demo: how it works as a short list, and links to its main files. The page intro links to the lab folder. The copy and URLs live in `content/lab.ts`.
+- Links point at the `main` branch (`/blob/main/<file>` or `/tree/main/<folder>`), the code the production site is built from, rather than a commit hash. `labSchema` accepts only those URLs in `https://github.com/MR-Chouman/portfolio` (`SOURCE_REPO` in `content/schema.ts`).
+- A unit test resolves every link to a local path and checks it exists as a file (`blob`) or folder (`tree`), so moving or renaming a linked file fails the tests instead of leaving a dead link.
+
+**Consequences.** No new dependency. Links to files added in a phase 404 on GitHub until that phase is merged into `main`; the `dev` preview shows them before that. Renaming a linked file means updating `content/lab.ts` in the same PR.
+
