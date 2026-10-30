@@ -127,7 +127,7 @@ describe("case study meta", () => {
       expect(tags).toContainEqual(
         expect.objectContaining({
           rel: "canonical",
-          href: expect.stringMatching(new RegExp(`/work/${project.slug}$`)),
+          href: expect.stringMatching(new RegExp(`/work/${project.slug}/$`)),
         }),
       );
     }

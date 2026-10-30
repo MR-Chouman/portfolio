@@ -118,7 +118,7 @@ describe("About meta", () => {
     expect(tags).toContainEqual(
       expect.objectContaining({
         rel: "canonical",
-        href: expect.stringMatching(/\/about$/),
+        href: expect.stringMatching(/\/about\/$/),
       }),
     );
     expect(tags).toContainEqual({

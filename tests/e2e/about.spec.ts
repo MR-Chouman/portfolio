@@ -11,7 +11,7 @@ test("about is prerendered with its own title and Open Graph tags", async ({
   const title = /<title>([^<]+)<\/title>/.exec(html)?.[1];
   expect(title).toMatch(/^About/);
   expect(html).toContain(`<meta property="og:title" content="${title}"/>`);
-  expect(html).toMatch(/<link rel="canonical" href="[^"]+\/about"\/>/);
+  expect(html).toMatch(/<link rel="canonical" href="[^"]+\/about\/"\/>/);
   // The content is in the HTML before JavaScript runs.
   expect(html).toContain("Experience");
 });

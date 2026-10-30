@@ -45,7 +45,7 @@ test.describe("work index", () => {
     const tags = headTags(html);
     expect(tags.title).toBeTruthy();
     expect(tags.ogTitle).toBe(tags.title);
-    expect(tags.ogUrl).toMatch(/\/work$/);
+    expect(tags.ogUrl).toMatch(/\/work\/$/);
     for (const { title } of projects) expect(html).toContain(title);
   });
 
@@ -79,7 +79,7 @@ test.describe("case study pages", () => {
       const tags = headTags(html);
       expect(tags.title).toBeTruthy();
       expect(tags.ogTitle).toBe(tags.title);
-      expect(tags.ogUrl).toMatch(new RegExp(`/work/${slug}$`));
+      expect(tags.ogUrl).toMatch(new RegExp(`/work/${slug}/$`));
       expect(tags.ogType).toBe("article");
 
       const response = await page.goto(`/work/${slug}`);

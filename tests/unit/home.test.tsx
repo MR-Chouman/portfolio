@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it } from "vitest";
 
 import { projects } from "~/lib/projects";
+import { personJsonLd } from "~/lib/structured-data";
 import Home, { meta } from "~/routes/home";
 
 import { contact } from "../../content/contact";
@@ -116,6 +117,12 @@ describe("Home meta", () => {
     expect(tags).toContainEqual({
       property: "og:title",
       content: home.meta.title,
+    });
+  });
+
+  it("adds the JSON-LD Person", () => {
+    expect(meta({} as Route.MetaArgs)).toContainEqual({
+      "script:ld+json": personJsonLd(),
     });
   });
 });
