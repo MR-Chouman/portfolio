@@ -160,7 +160,7 @@ Current phase: **Phase 5: Lab demo**
   Static JSON or MSW; no runtime server; seeded fake records.
   Done when: the data layer is typed and supports pagination, sorting and filtering.
   Notes: D-044, F-041 (auto). In-memory TypeScript, no MSW and no new dependency. `app/lib/lab/records.ts` generates 240 invented equipment assets (id, name, category, status, site, value, `updatedAt`) from a seeded mulberry32 PRNG and a fixed base date, so every build is identical; no people, customers or orders. `app/lib/lab/query.ts`: `queryRecords` filters (search over id and name, multi-value status, category, site), sorts on any column in both directions with ties by id, and paginates (10/25/50, page clamped); `parseListQuery`/`toSearchParams` round-trip the query through URL parameters with defaults left out and invalid values dropped, for T-051. `app/lib/lab/api.ts`: `createMockApi` resolves `listAssets` and `getAsset` after a simulated latency, honours `AbortSignal`, returns copies, and can be told to fail (`shouldFail`) for the error state. Mutations are left to T-052. Tests: `tests/unit/lab-data.test.ts` (21).
-- **T-051** · todo · Server-style data table
+- **T-051** · doing · Server-style data table
   Pagination, sorting, filters, URL-synced state, loading/empty/error states.
   Done when: state survives reload and back/forward; unit and e2e tested.
 - **T-052** · todo · CRUD drawer flow
