@@ -4,8 +4,8 @@
 // The hero headline and metrics come from profile.ts and the selected work
 // from content/projects/*.mdx. Titles below restate facts from REQUIREMENTS
 // sections 3 and 4 only; text marked "Placeholder" is replaced with the
-// owner's approved copy in T-035 (F-012). Email and CV links are added to the
-// contact block in T-024 (D-018).
+// owner's approved copy in T-035 (F-012). The contact block's email, CV and
+// GitHub links come from content/contact.ts (T-024, D-018).
 import type { Home } from "./schema";
 
 export const home = {
@@ -60,7 +60,6 @@ export const home = {
   contact: {
     eyebrow: "Contact",
     title: "Get in touch",
-    body: "Placeholder: a short invitation to get in touch, written in T-035. Email and CV links are added in T-024.",
-    links: [{ label: "GitHub profile", href: "https://github.com/MR-Chouman" }],
+    body: "Placeholder: a short invitation to get in touch, written in T-035.",
   },
 } satisfies Home;
