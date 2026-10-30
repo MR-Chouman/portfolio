@@ -32,6 +32,7 @@ stack: [React]
 metrics:
   - { value: "1", label: "Screens" }
 order: 1
+object: { kind: airplane, label: "A 3D model of an airplane" }
 ---
 
 Body text.
@@ -138,6 +139,29 @@ describe("project validation", () => {
     expect(
       projectFrontmatterSchema.safeParse({ ...frontmatter, metrics: [] })
         .success,
+    ).toBe(false);
+  });
+
+  it("requires a 3D object of a known kind with a label (T-034)", () => {
+    const frontmatter = readFrontmatter(valid, "sample.mdx") as Record<
+      string,
+      unknown
+    >;
+    const { object: _object, ...withoutObject } = frontmatter;
+    expect(projectFrontmatterSchema.safeParse(withoutObject).success).toBe(
+      false,
+    );
+    expect(
+      projectFrontmatterSchema.safeParse({
+        ...frontmatter,
+        object: { kind: "rocket", label: "A rocket" },
+      }).success,
+    ).toBe(false);
+    expect(
+      projectFrontmatterSchema.safeParse({
+        ...frontmatter,
+        object: { kind: "airplane", label: " " },
+      }).success,
     ).toBe(false);
   });
 });

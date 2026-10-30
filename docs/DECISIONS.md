@@ -360,3 +360,23 @@ Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030
 - `Figure` (D-026) stays as it was, unused, so a later decision can add images without changing the template.
 
 **Consequences.** T-030 to T-033 no longer require captioned images. REQUIREMENTS section 5 still lists "captioned images" for `/work/:slug`, and it is not changed without the owner's approval. Open Graph images (T-061) are generated cards, not screenshots, so they are not affected.
+
+## D-032 · Three.js for a rotatable 3D object per case study
+
+Status: Accepted · 2026-10-30 · Owner decision · Refines D-008, D-026 · Follows D-031
+
+**Context.** With no screenshots in the portfolio for now (D-031), the owner wants each case study to show a 3D object standing for the project, which the visitor can rotate through 360 degrees: an airplane for the airline platform. CSS cannot draw a rotatable 3D model, and the site keeps a tight JavaScript budget (REQUIREMENTS section 7).
+
+**Decision.**
+- `three` (0.187.0, MIT) draws the objects, with `@types/three` as a dev dependency. It is a renderer, not an animation library: the motion is a few lines of our own code, so D-008 still holds for everything else.
+- The models are low-poly and built in code from simple shapes (`app/components/three/models.ts`): an airplane, crates on a pallet, an EV charger with its cable, and a hospital bed. There are no model files, loaders or textures. Each case study's frontmatter names its model and accessible label (`object: { kind, label }`).
+- Each model uses three material slots colored from the `--fg`, `--accent` and `--fg-muted` tokens. The colors are read back through a 2D canvas, because tokens may use OKLCH. They are read again whenever `data-theme` or `data-skin` changes on `<html>`, so every skin and theme applies with no per-skin code (D-005).
+- `ProjectObject` is in the case study header. Its box reserves its size in the prerendered HTML, so there is no layout shift. After hydration it imports `scene.ts` once the box scrolls into view. Three.js sits in that separate chunk, about 135 kB gzipped, which only `/work/:slug` loads. Frames are drawn only while the object is on screen, the tab is visible and the view has changed.
+- Interaction:
+  - Dragging or the arrow keys rotate the object; Home resets it. The pitch is clamped to ±35°.
+  - It spins slowly when left alone, starting again 3 s after the last input. It does not spin under reduced motion.
+  - The box is a focusable `role="img"` with the label as its name and the hint as its description.
+  - Without WebGL, the caption says the model cannot be shown and the box leaves the tab order.
+
+**Consequences.** Case study pages load about 135 kB more JavaScript, after first paint. Home and `/work` are unchanged, and Playwright checks that they never request the chunk. A new model means a new builder and a new value in `projectObjectKinds`.
+
