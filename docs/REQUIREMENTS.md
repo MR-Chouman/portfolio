@@ -23,7 +23,7 @@ Exact wording is finalized in T-035. All numbers must stay consistent with the f
 |---|---|---|---|
 | Airline crew management platform | Aviation | Next.js, TypeScript, Microsoft SSO | 25 modules (rostering, attendance, leave, appraisals, qualifications, training) |
 | Business operations platform | Business services | React, Redux Toolkit, Tailwind | 72 screens (sales to projects, assets, stock, purchasing, staff) |
-| EV charging platform | Mobility / EV charging | React, Redux Toolkit, Tailwind | 132 screens, 50-module API layer |
+| EV charging platform | Mobility / EV charging | React, Redux Toolkit, Tailwind | 125 screens, 50-module API layer |
 | Hospital management platform | Healthcare | React, Redux, Tailwind | 33 screens, 57 shared components; built from Aug 2024, led since Jan 2026 |
 
 Headline metrics: 4 platforms, 260+ admin screens (230+ across the three 2026 platforms plus the hospital platform), nearly 3 years of experience.

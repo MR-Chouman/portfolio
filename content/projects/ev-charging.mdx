@@ -5,7 +5,7 @@ sector: Mobility / EV charging
 role: Frontend lead
 stack: [React, Redux Toolkit, Tailwind CSS]
 metrics:
-  - { value: "132", label: "Screens" }
+  - { value: "125", label: "Screens" }
   - { value: "50", label: "API modules" }
 order: 3
 ---
@@ -22,7 +22,7 @@ I led this frontend from December 2025 to June 2026, and I wrote about 80% of it
 
 ## Scope
 
-The 132 screens fall into three kinds. Hub pages group a domain into cards. List pages are the most common kind. Detail pages show a single record with its related actions. Behind them, the API layer has 50 modules, one for each business entity.
+The 125 screens fall into three kinds. Hub pages group a domain into cards. List pages are the most common kind. Detail pages show a single record with its related actions. Behind them, the API layer has 50 modules, one for each business entity.
 
 ## Key decisions
 
@@ -46,9 +46,3 @@ Filters and paging live in the URL query string, which makes every filtered list
 ### Reusable pickers
 
 There are 35 dropdowns for picking related records, and all of them come from one generic component. Each is searchable and scrolls through results page by page. A preselected value that is not on the current page is fetched by its ID, so it still shows its name.
-
-## Outcome
-
-Fifty modules and 132 screens follow the same few patterns, so a new entity takes one API module, one list page and one dialog.
-
-Placeholder: who uses it day to day and what changed for the operator, with any numbers that can be shared.
