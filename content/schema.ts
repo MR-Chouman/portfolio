@@ -337,6 +337,49 @@ export const labSchema = z.strictObject({
       hint: text,
     }),
   }),
+  // The create and edit drawer (T-052). "{name}" and "{id}" are filled in.
+  crud: z.strictObject({
+    hint: text,
+    create: text,
+    edit: text.includes("{name}"),
+    editShort: text,
+    actions: text,
+    newId: text,
+    saving: text,
+    saved: text.includes("{name}"),
+    failed: z.strictObject({
+      title: text.includes("{name}"),
+      body: text,
+      dismiss: text,
+    }),
+    drawer: z.strictObject({
+      createTitle: text,
+      editTitle: text.includes("{id}"),
+      intro: text,
+      close: text,
+      cancel: text,
+      save: text,
+      choose: text,
+      fields: labelsOf(["name", "category", "status", "site", "value"]),
+      valueHint: text,
+      fail: z.strictObject({
+        label: text,
+        hint: text,
+      }),
+    }),
+    // One message per validation error code (app/lib/lab/asset-form.ts).
+    errors: labelsOf([
+      "nameRequired",
+      "nameShort",
+      "nameLong",
+      "categoryRequired",
+      "statusRequired",
+      "siteRequired",
+      "valueRequired",
+      "valueWhole",
+      "valueMax",
+    ]),
+  }),
 });
 
 export type Metric = z.infer<typeof metricSchema>;
