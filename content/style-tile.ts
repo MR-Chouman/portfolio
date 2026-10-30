@@ -2,7 +2,7 @@
 // Samples use public, generic project facts (REQUIREMENTS section 4, D-018).
 export const styleTile = {
   meta: {
-    title: "Style tile",
+    title: "Style tile · Mohamad Rida Chouman",
     description: "The site's tokens and UI primitives, in light and dark.",
   },
   heading: "Style tile",
