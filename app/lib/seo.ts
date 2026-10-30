@@ -1,7 +1,7 @@
 import type { MetaDescriptor } from "react-router";
 
-// Canonical production origin (D-018).
-export const SITE_ORIGIN = "https://portfolio-4q6.pages.dev";
+// Canonical production origin (D-018, D-029).
+export const SITE_ORIGIN = "https://mr-chouman-portfolio.pages.dev";
 
 interface PageMeta {
   title: string;
