@@ -333,3 +333,30 @@ Status: Accepted · 2026-10-30 · Refines D-006 · Supersedes the origin in D-01
 - The old `portfolio-4q6` project stops building and is retired by the owner once the new one serves production.
 
 **Consequences.** Canonical and Open Graph URLs point at the new origin once this reaches `main` at the next phase release; until then production pages carry the old origin. Earlier mentions of `portfolio-4q6` in DECISIONS and FEEDBACK stay as history. T-071 uses the new origin.
+
+## D-030 · Case study figures: invented-data illustrations, AVIF with WebP fallback, checked at build time
+
+Status: Superseded by D-031 · 2026-10-30 · Refines D-018, D-026 · Resolves F-023
+
+**Context.** T-030 needs 2-4 captioned images in the airline case study, but D-018 rules out screenshots of client systems and the image pipeline (T-034) does not exist yet. CLAUDE.md asks for AVIF/WebP images with explicit dimensions.
+
+**Decision.**
+- Case study images are illustrations of typical screens drawn with invented data (crew codes such as "Crew 0142", flight numbers with an "XX" prefix, made-up dates and counts), and each caption says so. Their sources are SVG files in `content/projects/figures/<slug>/`; the served files are WebP and AVIF in `public/images/work/<slug>/`.
+- For T-030 the SVGs were rendered to PNG with Playwright's Chromium (site fonts) and encoded once with ffmpeg (`libwebp` quality 85, `libaom-av1` still picture CRF 30, 4:4:4). T-034 replaces these one-off steps with the image script and re-runs it on these sources.
+- `Figure` takes an optional `avif` prop and then renders a `<picture>` with an `image/avif` source before the WebP `<img>`.
+- `content/figures.ts` checks every `<Figure />` in project MDX at build time (through `content/load.ts`): files under `/images/work/<slug>/`, WebP required and AVIF optional, both present in `public/`, non-empty alt and caption, and `width`/`height` equal to the size read from each file's header.
+
+**Consequences.** A wrong path, a missing file or a stale size fails `npm run build`. No new dependency. Figures must be self-closing JSX with string and integer props so the build-time reader can parse them.
+
+## D-031 · No screenshots or screen illustrations in case studies for now
+
+Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030
+
+**Context.** T-030 added three illustrations of typical screens drawn with invented data (D-030). The owner decided not to include screenshots in the portfolio for the time being, and illustrations of app screens count as screenshots for this purpose.
+
+**Decision.**
+- Case studies ship as text only: no screenshots, cropped or anonymized captures, or illustrations of app screens.
+- The T-030 figures, their SVG sources, the AVIF support in `Figure` and the build-time figure check (`content/figures.ts`) are removed. They remain in the history of `task/T-030-airline-crew-case-study` if images come back.
+- `Figure` (D-026) stays as it was, unused, so a later decision can add images without changing the template.
+
+**Consequences.** T-030 to T-033 no longer require captioned images. REQUIREMENTS section 5 still lists "captioned images" for `/work/:slug`, and it is not changed without the owner's approval. Open Graph images (T-061) are generated cards, not screenshots, so they are not affected.
