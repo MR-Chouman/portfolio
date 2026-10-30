@@ -23,7 +23,7 @@ Exact wording is finalized in T-035. All numbers must stay consistent with the f
 |---|---|---|---|
 | Airline crew management platform | Aviation | Next.js, TypeScript, Microsoft SSO | 25 modules (rostering, attendance, leave, appraisals, qualifications, training) |
 | Business operations platform | Business services | React, Redux Toolkit, Tailwind | 72 screens (sales to projects, assets, stock, purchasing, staff) |
-| EV charging platform | Mobility / EV charging | React, Redux Toolkit, Tailwind | 132 screens, 50-module API layer |
+| EV charging platform | Mobility / EV charging | React, Redux Toolkit, Tailwind | 125 screens, 50-module API layer |
 | Hospital management platform | Healthcare | React, Redux, Tailwind | 33 screens, 57 shared components; built from Aug 2024, led since Jan 2026 |
 
 Headline metrics: 4 platforms, 260+ admin screens (230+ across the three 2026 platforms plus the hospital platform), nearly 3 years of experience.
@@ -37,7 +37,7 @@ Clients are never named: generic descriptions ("a regional airline") and invente
 |---|---|
 | `/` | Hero, metrics strip, selected work (4), "How I build", About teaser, contact |
 | `/work` | Index of case studies |
-| `/work/:slug` | Case study: summary header, problem, what I owned, key decisions, outcome, captioned images, next project |
+| `/work/:slug` | Case study: summary header with a rotatable 3D object that stands for the project, context, what I owned, scope, key decisions, next project (no screenshots for now, D-031) |
 | `/lab` | Live patterns demo: server-style data table, CRUD drawer flow, component gallery (mock data only) |
 | `/about` | Short first-person story, experience timeline, skills, education |
 | `404` | Helpful not-found page |
@@ -52,10 +52,11 @@ Contact is a `mailto:` link plus GitHub (D-018). CV is downloadable as PDF. No c
 4. **Per-route SEO**: title, description, canonical, Open Graph and Twitter tags, sitemap, robots, JSON-LD `Person`.
 5. **Generated Open Graph images** per case study (build time).
 6. **Content layer**: typed and Zod-validated; invalid content fails the build.
+7. **3D project objects** (D-032): one low-poly Three.js model per case study, colored by the active skin and theme, rotatable by drag and keyboard, still under reduced motion.
 
 ## 7. Non-functional requirements
 
-- **Performance** (mobile, default skin): Lighthouse >= 95 in performance, accessibility, best practices, SEO; LCP < 2.0 s; CLS < 0.05; initial JS <= ~110 kB gzipped and CSS <= ~25 kB gzipped on home (targets, tuned in T-062).
+- **Performance** (mobile, default skin): Lighthouse >= 95 in performance, accessibility, best practices, SEO; LCP < 2.0 s; CLS < 0.05; initial JS <= ~110 kB gzipped and CSS <= ~25 kB gzipped on home (targets, tuned in T-062). The 3D objects load only on case study pages, after first paint, and do not count towards home's initial JS.
 - **Accessibility**: WCAG 2.2 AA in every skin and theme; full keyboard use; visible focus; skip link; reduced-motion support; axe checks in Playwright per skin.
 - **Responsive**: designed mobile-first from 375 px; no horizontal scroll.
 - **Browsers**: current and previous major versions of Chrome, Edge, Safari, Firefox. View Transitions are an enhancement, never required.

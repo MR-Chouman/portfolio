@@ -2,27 +2,44 @@
 title: Business operations platform
 summary: One platform for a services business, from sales to projects, assets, stock, purchasing and staff.
 sector: Business services
-role: "Placeholder: role, confirmed in T-031"
+role: Sole frontend developer
 stack: [React, Redux Toolkit, Tailwind CSS]
 metrics:
   - { value: "72", label: "Screens" }
 order: 2
+object:
+  kind: pallet
+  label: "A 3D model of crates stacked on a pallet, standing for the business operations platform"
 ---
 
-{/* Placeholder body. The case study is written in T-031 and reviewed by the owner (D-018). It keeps these four sections (REQUIREMENTS section 5) and adds 2-4 captioned images with <Figure src="..." alt="..." caption="..." width={...} height={...} />, using anonymized crops with invented data only (T-034). */}
+{/* T-031 (Owner review, D-018). Written from the project's own codebase and commit history, checked by the owner in review; the client is never named and no client data appears. No images for now (D-031); the header shows the 3D object named in the frontmatter (D-032). */}
 
-## The problem
+## Context
 
-Placeholder: the client's situation and what the platform had to solve, written in T-031.
+A services business that runs projects and rents out equipment needed one admin platform for the whole chain: sales and quotations, projects and jobs, equipment and assets, warehouses and stock, purchasing, and staff. Before a project starts, a proposal is accepted and handed off into a project workspace, and from there the team reserves equipment, crew and locations.
 
 ## What I owned
 
-Placeholder: my role, the scope I was responsible for and the team around it, written in T-031.
+I am the only frontend developer on this platform. I built all 72 screens between August 2025 and September 2026, along with the layers they share: the API client, the state patterns, the table and filter components and the form controls.
+
+## Scope
+
+The platform covers about 65 business entities. Each has the same set of parts: a Redux slice, a hook that wraps it, a list page, create, edit and view dialogs (93 in total), and a filter drawer (36 in total). Every page is lazy-loaded, so the first load does not carry the whole admin.
 
 ## Key decisions
 
-Placeholder: the technical and design decisions that shaped the platform, written in T-031.
+### A shared CRUD layer
 
-## Outcome
+The first entities were written by hand, and each one repeated the same list, detail, create, edit and delete logic and attached its own auth headers. I replaced that with a slice factory that generates those async actions, the pagination state and memoized selectors. A shared API client attaches the token and signs the user out on a 401. New entities start from the factory, and older ones are moved over to it whenever they are touched.
 
-Placeholder: what shipped and what changed for the people using it, written in T-031. The facts in the header come from the project list in the requirements.
+### Server-side tables
+
+Lists can be long, so paging, sorting and searching happen on the server. One table hook owns that state and builds the request for the backend. A shared data table renders it, as numbered pages or as infinite scroll, and turns rows into cards on small screens. A shared filter drawer holds each list's filters. Because every list page uses these same parts, they all behave alike.
+
+### The API contract
+
+Every endpoint path goes through a helper that checks it against the OpenAPI specification when the module loads, so a typo or a renamed endpoint fails at once instead of in production. Endpoints the backend does not offer yet are declared as such and refused before any request is sent. An audit script fails the build if any source file uses a path that is missing from the specification.
+
+### Weight and layout
+
+Spreadsheet import and export and the rich-text editor are heavy, so they load only when a screen needs them, and vendor code is split into stable chunks. A Playwright audit takes screenshots of the key routes at several viewport sizes in both themes, so layout regressions show up before release.

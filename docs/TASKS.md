@@ -94,19 +94,22 @@ Current phase: **Phase 3: Case studies and imagery**
 
 ## Phase 3: Case studies and imagery (tag v0.4.0)
 
-- **T-030** · todo · Case study: airline crew management platform (Owner review, D-018)
-  Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome, and 2-4 captioned images.
-- **T-031** · todo · Case study: business operations platform (Owner review, D-018)
+- **T-030** · done · Case study: airline crew management platform (Owner review, D-018)
+  Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals). No Outcome section and no images (owner decision, D-031).
+  Notes: D-030, superseded by D-031. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; the role and narrative were first placeholders (F-024), then written from the project's codebase and commit history at the owner's request. The owner then asked for the Outcome section to be removed from every case study. The three invented-data figures first added (F-023) and the figure tooling around them were removed on the owner's decision to show no screenshots for now (D-031).
+- **T-031** · done · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
-- **T-032** · todo · Case study: EV charging platform (Owner review, D-018)
+- **T-032** · done · Case study: EV charging platform (Owner review, D-018)
   Done when: same structure; highlights the 132 screens and 50-module API layer.
 - **T-033** · review · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
-- **T-034** · todo · Image pipeline (Owner review: anonymized crops)
-  Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
-  Done when: all case study images go through the script and none contain real client data.
-- **T-035** · todo · Final hero and About copy (Owner review)
+- **T-034** · done · 3D project objects (Owner review)
+  One rotatable low-poly Three.js object per case study, in place of images (D-031, D-032): airplane, crates on a pallet, EV charger, hospital bed.
+  Done when: each case study header shows its object, rotatable by drag and arrow keys, with reduced-motion and no-WebGL handling; Three.js loads only on `/work/:slug`; home's initial JS is unchanged.
+  Notes: D-032. Owner decision 2026-10-30 replaced the image pipeline with this task. Models are built in code from simple shapes and colored from `--fg`, `--accent` and `--fg-muted`; colors follow theme and skin changes. `scene.ts` (Three.js, ~135 kB gzipped) is imported when the object scrolls into view. Unit tests cover rotation, colors, models (all slots used, centered, within their sphere), the component and the schema; Playwright checks every case study draws and turns its object, the idle spin and reduced motion, and that home, `/work` and `/about` never request the chunk.
+- **T-035** · done · Final hero and About copy (Owner review)
   Done when: owner approves the copy and numbers match REQUIREMENTS section 4.
+  Notes: draft copy approved by the owner on 2026-10-30, after a check of the timeline against the CV (F-025). Every placeholder in `profile.ts`, `home.ts` (approach, About teaser, contact), `about.ts` and `experience.ts` is replaced; the headline and metrics keep the REQUIREMENTS wording (4 systems, 260+ screens, ~3 years). Facts beyond REQUIREMENTS restate the owner's published CV (`public/cv.pdf`): the timeline (frontend lead since 2026-01, frontend developer 2024-08 to 2026-01, application analyst 2024-01 to 2024-08) with generic organizations, the BSc and MSc universities and the bootcamp certificate, and the CV's frontend and testing skills. No client or employer is named (D-018). Unit tests check that no placeholder text is left, that the headline and metrics match the project count and REQUIREMENTS, and that the timeline runs newest first with one open role. Parked for the owner's review.
 
 ## Phase 4: Skins and switcher (tag v0.5.0)
 
