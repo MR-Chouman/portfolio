@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 
 import { cx } from "~/lib/cx";
 
@@ -32,8 +32,10 @@ export function buttonStyles({
   );
 }
 
+// ComponentProps includes `ref`, which React 19 passes to function
+// components as a prop.
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonStyleProps {}
+  extends ComponentProps<"button">, ButtonStyleProps {}
 
 export function Button({
   variant,

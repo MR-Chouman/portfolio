@@ -22,6 +22,12 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-046** · resolved · 2026-10-30 · auto (recommended) · -> T-052, D-047
+  Zod validation in the browser: which build, and where do the error messages live? Chosen: `zod/mini` (tree-shakable) in `app/lib/lab/asset-form.ts`, with error codes as messages and the text in `content/lab.ts` (`crud.errors`); the `/lab` chunk grows from about 6.3 to 15.5 kB gzipped. Alternatives: classic `zod` (larger, not tree-shakable); hand-written checks (the task asks for Zod); messages written in the schema (copy outside `content/`). Reason: the task's Zod requirement at the smallest cost, with copy kept in `content/`. Owner to check: the error wording in `content/lab.ts`.
+
+- **F-045** · resolved · 2026-10-30 · auto (recommended) · -> T-052, D-047
+  How does the CRUD drawer fit the lab page and how is the rollback shown? Chosen: a "New asset" button with a one-line hint between the table's filters and the table, an "Edit" button per row (an "Actions" column), a right-hand native dialog drawer, and a "Make this save fail" switch in the drawer to show the rollback; saved changes last until a reload. Alternatives: a separate section with its own list (two tables of the same data); a page-wide "fail the next save" toggle (less visible when the drawer is open); deleting records too (the task names create and edit only). Reason: the drawer edits the rows the table already shows, and the failure is opt-in per save. Owner to check: the drawer and toolbar copy in `content/lab.ts` (T-054 refines the page copy).
+
 - **F-044** · resolved · 2026-10-30 · auto (recommended) · -> T-056, D-046
   What do the CV links say and do now that they open a preview, and what happens to the command palette's CV command? Chosen: the header and contact card links are named "View CV" (header: visible "CV", name "View CV (PDF)", `aria-haspopup="dialog"`), stay real download links before hydration and for modified clicks, and the palette keeps "Download CV" as a direct download. Alternatives: keep the "Download CV" name (it would no longer say what a click does); make the palette command open the preview too (one more step for a command named "Download"). Reason: each control's name matches what it does. Owner to check: the dialog title "Curriculum vitae" and the button labels in `content/contact.ts`.
 

@@ -2,9 +2,11 @@
 // URL, asks the mock endpoint (D-044) and returns either the page of results
 // or an error, so the table keeps its controls when a request fails. Used as
 // the /lab route's clientLoader, which React Router re-runs on every URL
-// change, including reload and back/forward.
+// change, including reload and back/forward. `save` sends the drawer's
+// creates and updates (T-052) to the same endpoint, so the next load lists them.
 
 import { createMockApi, type MockApiOptions } from "./api";
+import type { AssetInput } from "./asset-form";
 import { parseListQuery, type ListQuery, type ListResult } from "./query";
 import type { Asset } from "./records";
 
@@ -16,6 +18,13 @@ export interface LabClient {
   load(request: Request): Promise<LabTableData>;
   // Makes the next request fail once, to show the error state.
   failNext(): void;
+  // Creates an asset (no id) or updates one; rejects when the save fails.
+  save(change: AssetChange, options?: { fail?: boolean }): Promise<Asset>;
+}
+
+export interface AssetChange {
+  id?: string; // the asset to update; none creates a new one
+  input: AssetInput;
 }
 
 export function createLabClient(
@@ -48,6 +57,11 @@ export function createLabClient(
     },
     failNext() {
       failNext = true;
+    },
+    save({ id, input }, { fail } = {}) {
+      return id === undefined
+        ? api.createAsset(input, { fail })
+        : api.updateAsset(id, input, { fail });
     },
   };
 }

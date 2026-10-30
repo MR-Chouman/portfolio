@@ -4,6 +4,14 @@ import { useNavigation, useRevalidator, useSearchParams } from "react-router";
 import { Button } from "~/components/ui";
 import type { LabClient, LabTableData } from "~/lib/lab/client";
 import {
+  applyPending,
+  dropChange,
+  liveChanges,
+  pendingChange,
+  settleChange,
+  type PendingChange,
+} from "~/lib/lab/optimistic";
+import {
   DEFAULT_QUERY,
   PAGE_SIZES,
   SORT_FIELDS,
@@ -33,6 +41,7 @@ import {
 import { cx } from "~/lib/cx";
 
 import { lab } from "../../../content/lab";
+import { AssetDrawer, type AssetSubmission } from "./AssetDrawer";
 
 // The lab's server-style data table (T-051): search, filters, sortable
 // columns and pagination over the mock endpoint (D-044). The URL is the only
@@ -40,8 +49,14 @@ import { lab } from "../../../content/lab";
 // route's clientLoader, and reload or back/forward bring the same view back.
 // While a request runs, the controls already show the requested query and
 // the previous rows stay, dimmed and marked busy.
+//
+// "New asset" and each row's "Edit" open the create and edit drawer (T-052).
+// A save shows in the table at once as a pending change; when the endpoint
+// answers, the route's loader runs again and the change is dropped, which
+// rolls it back if the save failed (D-047).
 
 const copy = lab.table;
+const crud = lab.crud;
 const SEARCH_DELAY_MS = 300;
 
 const valueFormat = new Intl.NumberFormat("en-US", {
@@ -59,6 +74,8 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
 });
 
 const numericColumns: readonly SortField[] = ["value"];
+// The data columns and the row actions.
+const COLUMN_COUNT = SORT_FIELDS.length + 1;
 
 function cellText(asset: Asset, field: SortField): ReactNode {
   switch (field) {
@@ -380,8 +397,14 @@ function PageButton({
 export interface AssetTableProps {
   // The route's loader data; undefined before the first response.
   data: LabTableData | undefined;
-  client: Pick<LabClient, "failNext">;
+  client: Pick<LabClient, "failNext" | "save">;
 }
+
+// The drawer's subject: a new asset, or the asset being edited.
+type Editing = { asset?: Asset };
+
+type Notice =
+  { kind: "saved"; name: string } | { kind: "failed"; name: string };
 
 export function AssetTable({ data, client }: AssetTableProps) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -416,7 +439,67 @@ export function AssetTable({ data, client }: AssetTableProps) {
   }
 
   const result = data?.result;
-  const rows = result?.items ?? [];
+  const [changes, setChanges] = useState<PendingChange[]>([]);
+  // New loader data replaces the rows saved changes were shown over: forget
+  // those changes (React's "adjust state when a prop changes" pattern).
+  const [rowsData, setRowsData] = useState(data);
+  if (data !== rowsData) {
+    setRowsData(data);
+    setChanges((current) => liveChanges(current, data));
+  }
+  const rows = applyPending(result?.items ?? [], liveChanges(changes, data));
+  // The data on screen, for a save that ends after later renders.
+  const shownData = useRef(data);
+  useEffect(() => {
+    shownData.current = data;
+  }, [data]);
+
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [notice, setNotice] = useState<Notice | null>(null);
+  // The button that opened the drawer, which gets focus back when it closes.
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const createButton = useRef<HTMLButtonElement>(null);
+  const changeCount = useRef(0);
+
+  function openDrawer(button: HTMLButtonElement, asset?: Asset) {
+    trigger.current = button;
+    setEditing({ asset });
+  }
+
+  function closeDrawer() {
+    setEditing(null);
+    // The row's button can be gone once the saved row moved; fall back to
+    // "New asset".
+    const target = trigger.current?.isConnected
+      ? trigger.current
+      : createButton.current;
+    target?.focus();
+  }
+
+  // Optimistic save: show the change now, send it, reload the rows, then drop
+  // the pending change. On failure the rows are unchanged, so dropping it
+  // rolls the table back.
+  async function save({ id, input, fail }: AssetSubmission) {
+    const key = `pending-${++changeCount.current}`;
+    setNotice(null);
+    setChanges((current) => [
+      ...current,
+      pendingChange(key, input, new Date(), id),
+    ]);
+    try {
+      await client.save({ id, input }, { fail });
+    } catch {
+      // Rollback: the rows never changed, so the change just goes.
+      setChanges((current) => dropChange(current, key));
+      setNotice({ kind: "failed", name: input.name });
+      return;
+    }
+    // Keep the change over the current rows until the reload replaces them.
+    const before = shownData.current;
+    await revalidator.revalidate();
+    setChanges((current) => settleChange(current, key, before));
+    setNotice({ kind: "saved", name: input.name });
+  }
 
   return (
     <div>
@@ -479,6 +562,50 @@ export function AssetTable({ data, client }: AssetTableProps) {
         </div>
       </fieldset>
 
+      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <Button
+          ref={createButton}
+          disabled={!data}
+          aria-haspopup="dialog"
+          onClick={(event) => openDrawer(event.currentTarget)}
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          >
+            <path d="M8 3v10M3 8h10" />
+          </svg>
+          {crud.create}
+        </Button>
+        <p className="max-w-reading flex-1 basis-64 text-sm text-fg-muted">
+          {crud.hint}
+        </p>
+      </div>
+      <p aria-live="polite" className="mt-3 text-sm empty:mt-0">
+        {notice?.kind === "saved" && format(crud.saved, { name: notice.name })}
+      </p>
+      {notice?.kind === "failed" && (
+        <div
+          role="alert"
+          className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-lg border border-fg-muted p-4"
+        >
+          <div>
+            <p className="font-medium">
+              {format(crud.failed.title, { name: notice.name })}
+            </p>
+            <p className="mt-1 text-sm text-fg-muted">{crud.failed.body}</p>
+          </div>
+          <Button variant="secondary" size="sm" onClick={() => setNotice(null)}>
+            {crud.failed.dismiss}
+          </Button>
+        </div>
+      )}
+
       <p role="status" className="sr-only">
         {busy
           ? copy.loading
@@ -515,7 +642,9 @@ export function AssetTable({ data, client }: AssetTableProps) {
             // Keyboard users can scroll the table sideways on small screens.
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
             tabIndex={0}
-            className="mt-6 overflow-x-auto rounded-lg border border-line"
+            // relative: the sr-only text in the last header cell stays inside
+            // the scroller instead of widening the page.
+            className="relative mt-6 overflow-x-auto rounded-lg border border-line"
           >
             <table
               aria-busy={busy}
@@ -536,13 +665,19 @@ export function AssetTable({ data, client }: AssetTableProps) {
                       onSort={(next) => update(toggleSort(query, next))}
                     />
                   ))}
+                  <th
+                    scope="col"
+                    className="border-b border-fg-muted px-3 py-2 text-left font-medium whitespace-nowrap"
+                  >
+                    <span className="sr-only">{crud.actions}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {!data ? (
                   <tr>
                     <td
-                      colSpan={SORT_FIELDS.length}
+                      colSpan={COLUMN_COUNT}
                       className="px-3 py-12 text-center text-fg-muted"
                     >
                       {copy.loading}
@@ -550,7 +685,7 @@ export function AssetTable({ data, client }: AssetTableProps) {
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={SORT_FIELDS.length} className="px-3 py-12">
+                    <td colSpan={COLUMN_COUNT} className="px-3 py-12">
                       <p className="text-center font-medium">
                         {copy.empty.title}
                       </p>
@@ -560,9 +695,10 @@ export function AssetTable({ data, client }: AssetTableProps) {
                     </td>
                   </tr>
                 ) : (
-                  rows.map((asset) => (
+                  rows.map(({ asset, saving, isNew }) => (
                     <tr
                       key={asset.id}
+                      aria-busy={saving || undefined}
                       className="border-t border-line first:border-t-0"
                     >
                       {SORT_FIELDS.map((field) =>
@@ -572,7 +708,7 @@ export function AssetTable({ data, client }: AssetTableProps) {
                             scope="row"
                             className="px-3 py-2 text-left font-mono font-normal whitespace-nowrap"
                           >
-                            {asset.id}
+                            {isNew ? crud.newId : asset.id}
                           </th>
                         ) : (
                           <td
@@ -587,6 +723,28 @@ export function AssetTable({ data, client }: AssetTableProps) {
                           </td>
                         ),
                       )}
+                      <td className="px-3 py-1 text-right whitespace-nowrap">
+                        {/* While saving, the button stays (so focus that
+                            returned to it stays too) but does nothing. */}
+                        {saving && (
+                          <span className="me-2 font-mono text-xs text-fg-muted">
+                            {crud.saving}
+                          </span>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-haspopup="dialog"
+                          aria-disabled={saving || undefined}
+                          aria-label={format(crud.edit, { name: asset.name })}
+                          onClick={(event) => {
+                            if (!saving) openDrawer(event.currentTarget, asset);
+                          }}
+                          className="aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
+                        >
+                          {crud.editShort}
+                        </Button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -595,6 +753,14 @@ export function AssetTable({ data, client }: AssetTableProps) {
           </div>
           <Pagination query={query} data={data} onChange={update} />
         </>
+      )}
+
+      {editing && (
+        <AssetDrawer
+          asset={editing.asset}
+          onSubmit={(submission) => void save(submission)}
+          onClosed={closeDrawer}
+        />
       )}
     </div>
   );
