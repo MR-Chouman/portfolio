@@ -320,3 +320,63 @@ Status: Accepted · 2026-10-30
 - typescript-eslint is the only dependency that imports the compiler API. Vite, Vitest, React Router typegen and MDX do not, so nothing else changes. The tsconfig already uses only options TS 7 accepts (`moduleResolution: bundler`, no `baseUrl`, `esModuleInterop` on, explicit `types`), and the code type-checks cleanly with no changes.
 
 **Consequences.** CI type checking runs on TS 7. Lint type information comes from TS 6, which shares TS 7's type checker logic. Editors that read `node_modules/typescript` find the compatibility package rather than a full TS install, so use the editor's bundled TypeScript (or the TS 7 extension). Once typescript-eslint supports TS 7 (expected after TS 7.1 ships an API), drop both aliases for a plain `"typescript": "^7"` and restore `tsc` in the typecheck script. Dependabot may propose bumping the aliased packages oddly; check what it targets before accepting.
+
+## D-029 · New Cloudflare Pages project `mr-chouman-portfolio`
+
+Status: Accepted · 2026-10-30 · Refines D-006 · Supersedes the origin in D-018
+
+**Context.** The first Pages project was created with an auto-assigned name, so the site lived at `portfolio-4q6.pages.dev`. The owner created a new Pages project by hand to choose the name, and it replaces the old one.
+
+**Decision.**
+- The site is hosted by the Pages project `mr-chouman-portfolio`, connected to this repository with the D-006 settings: production branch `main`, `dev` as the staging preview, build command `npm run build`, output `build/client`, `NODE_VERSION=24`.
+- The canonical production origin is `https://mr-chouman-portfolio.pages.dev` (`SITE_ORIGIN` in `app/lib/seo.ts`). Staging is `https://dev.mr-chouman-portfolio.pages.dev`. Still no custom domain (F-003).
+- The old `portfolio-4q6` project stops building and is retired by the owner once the new one serves production.
+
+**Consequences.** Canonical and Open Graph URLs point at the new origin once this reaches `main` at the next phase release; until then production pages carry the old origin. Earlier mentions of `portfolio-4q6` in DECISIONS and FEEDBACK stay as history. T-071 uses the new origin.
+
+## D-030 · Case study figures: invented-data illustrations, AVIF with WebP fallback, checked at build time
+
+Status: Superseded by D-031 · 2026-10-30 · Refines D-018, D-026 · Resolves F-023
+
+**Context.** T-030 needs 2-4 captioned images in the airline case study, but D-018 rules out screenshots of client systems and the image pipeline (T-034) does not exist yet. CLAUDE.md asks for AVIF/WebP images with explicit dimensions.
+
+**Decision.**
+- Case study images are illustrations of typical screens drawn with invented data (crew codes such as "Crew 0142", flight numbers with an "XX" prefix, made-up dates and counts), and each caption says so. Their sources are SVG files in `content/projects/figures/<slug>/`; the served files are WebP and AVIF in `public/images/work/<slug>/`.
+- For T-030 the SVGs were rendered to PNG with Playwright's Chromium (site fonts) and encoded once with ffmpeg (`libwebp` quality 85, `libaom-av1` still picture CRF 30, 4:4:4). T-034 replaces these one-off steps with the image script and re-runs it on these sources.
+- `Figure` takes an optional `avif` prop and then renders a `<picture>` with an `image/avif` source before the WebP `<img>`.
+- `content/figures.ts` checks every `<Figure />` in project MDX at build time (through `content/load.ts`): files under `/images/work/<slug>/`, WebP required and AVIF optional, both present in `public/`, non-empty alt and caption, and `width`/`height` equal to the size read from each file's header.
+
+**Consequences.** A wrong path, a missing file or a stale size fails `npm run build`. No new dependency. Figures must be self-closing JSX with string and integer props so the build-time reader can parse them.
+
+## D-031 · No screenshots or screen illustrations in case studies for now
+
+Status: Accepted · 2026-10-30 · Owner decision · Supersedes D-030
+
+**Context.** T-030 added three illustrations of typical screens drawn with invented data (D-030). The owner decided not to include screenshots in the portfolio for the time being, and illustrations of app screens count as screenshots for this purpose.
+
+**Decision.**
+- Case studies ship as text only: no screenshots, cropped or anonymized captures, or illustrations of app screens.
+- The T-030 figures, their SVG sources, the AVIF support in `Figure` and the build-time figure check (`content/figures.ts`) are removed. They remain in the history of `task/T-030-airline-crew-case-study` if images come back.
+- `Figure` (D-026) stays as it was, unused, so a later decision can add images without changing the template.
+
+**Consequences.** T-030 to T-033 no longer require captioned images. REQUIREMENTS section 5 still lists "captioned images" for `/work/:slug`, and it is not changed without the owner's approval. Open Graph images (T-061) are generated cards, not screenshots, so they are not affected.
+
+## D-032 · Three.js for a rotatable 3D object per case study
+
+Status: Accepted · 2026-10-30 · Owner decision · Refines D-008, D-026 · Follows D-031
+
+**Context.** With no screenshots in the portfolio for now (D-031), the owner wants each case study to show a 3D object standing for the project, which the visitor can rotate through 360 degrees: an airplane for the airline platform. CSS cannot draw a rotatable 3D model, and the site keeps a tight JavaScript budget (REQUIREMENTS section 7).
+
+**Decision.**
+- `three` (0.187.0, MIT) draws the objects, with `@types/three` as a dev dependency. It is a renderer, not an animation library: the motion is a few lines of our own code, so D-008 still holds for everything else.
+- The models are low-poly and built in code from simple shapes (`app/components/three/models.ts`): an airplane, crates on a pallet, an EV charger with its cable, and a hospital bed. There are no model files, loaders or textures. Each case study's frontmatter names its model and accessible label (`object: { kind, label }`).
+- Each model uses three material slots colored from the `--fg`, `--accent` and `--fg-muted` tokens. The colors are read back through a 2D canvas, because tokens may use OKLCH. They are read again whenever `data-theme` or `data-skin` changes on `<html>`, so every skin and theme applies with no per-skin code (D-005).
+- `ProjectObject` is in the case study header. Its box reserves its size in the prerendered HTML, so there is no layout shift. After hydration it imports `scene.ts` once the box scrolls into view. Three.js sits in that separate chunk, about 135 kB gzipped, which only `/work/:slug` loads. Frames are drawn only while the object is on screen, the tab is visible and the view has changed.
+- Interaction:
+  - Dragging or the arrow keys rotate the object; Home resets it. The pitch is clamped to ±35°.
+  - It spins slowly when left alone, starting again 3 s after the last input. It does not spin under reduced motion.
+  - The box is a focusable `role="img"` with the label as its name and the hint as its description.
+  - Without WebGL, the caption says the model cannot be shown and the box leaves the tab order.
+
+**Consequences.** Case study pages load about 135 kB more JavaScript, after first paint. Home and `/work` are unchanged, and Playwright checks that they never request the chunk. A new model means a new builder and a new value in `projectObjectKinds`.
+

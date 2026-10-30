@@ -18,6 +18,23 @@ if (typeof window.matchMedia !== "function") {
     }) satisfies MediaQueryList;
 }
 
+// jsdom has no IntersectionObserver. Default: nothing ever scrolls into view,
+// so the 3D objects (T-034) stay unloaded. Tests that need it stub their own.
+if (typeof window.IntersectionObserver !== "function") {
+  window.IntersectionObserver = class {
+    readonly root = null;
+    readonly rootMargin = "0px";
+    readonly thresholds = [0];
+    readonly scrollMargin = "0px";
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+  };
+}
+
 afterEach(() => {
   cleanup();
 });

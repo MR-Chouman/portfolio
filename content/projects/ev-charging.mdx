@@ -2,28 +2,50 @@
 title: EV charging platform
 summary: The admin side of an electric vehicle charging network, on a shared API layer.
 sector: Mobility / EV charging
-role: "Placeholder: role, confirmed in T-032"
+role: Frontend lead
 stack: [React, Redux Toolkit, Tailwind CSS]
 metrics:
-  - { value: "132", label: "Screens" }
+  - { value: "125", label: "Screens" }
   - { value: "50", label: "API modules" }
 order: 3
+object:
+  kind: charger
+  label: "A 3D model of an EV charging station with its cable, standing for the EV charging platform"
 ---
 
-{/* Placeholder body. The case study is written in T-032 and reviewed by the owner (D-018). It keeps these four sections (REQUIREMENTS section 5) and adds 2-4 captioned images with <Figure src="..." alt="..." caption="..." width={...} height={...} />, using anonymized crops with invented data only (T-034). */}
+{/* T-032 (Owner review, D-018). Written from the project's own codebase and commit history, checked by the owner in review; the client is never named and no client data appears. No images for now (D-031); the header shows the 3D object named in the frontmatter (D-032). */}
 
-## The problem
+## Context
 
-Placeholder: the client's situation and what the platform had to solve, written in T-032.
+An electric vehicle charging operator also sells batteries and mobile services, and it needed an admin platform for all of it: users and companies, products, bundles and prices, charging stations and plans, vans, drivers and shifts, stock, promotions, orders, branch schedules and the content of its mobile app.
 
 ## What I owned
 
-Placeholder: my role, the scope I was responsible for and the team around it, written in T-032.
+I led this frontend from December 2025 to June 2026, and I wrote about 80% of its commits. I designed the data layer and the list and detail patterns that the screens are built on, and I built most of the screens. Another developer added some of the pages.
+
+## Scope
+
+The 125 screens fall into three kinds. Hub pages group a domain into cards. List pages are the most common kind. Detail pages show a single record with its related actions. Behind them, the API layer has 50 modules, one for each business entity.
 
 ## Key decisions
 
-Placeholder: the technical and design decisions that shaped the platform, written in T-032.
+### One API, fifty modules
 
-## Outcome
+All the API modules are injected into a single RTK Query API that shares one base query (bearer auth, sign-out on a 401) and one list of cache tags. Each module has the same shape:
 
-Placeholder: what shipped and what changed for the people using it, written in T-032. The facts in the header come from the project list in the requirements.
+- it cleans its parameters
+- a mapper turns backend rows into camelCase frontend objects, so components never touch raw backend fields
+- it offers list, detail, create, update and delete
+- it tags its cache so a change refreshes only what it affects, and only when the change succeeds
+
+### Feedback in one place
+
+A middleware watches every mutation and shows a success or error toast, working out the verb from the endpoint's name. The backend sometimes reports an error inside a successful HTTP response, and the middleware catches that case too. For form errors it also highlights and focuses the field at fault in the open dialog, so no screen has to wire up its own messages.
+
+### The URL holds the filters
+
+Filters and paging live in the URL query string, which makes every filtered list shareable and lets the back button work as expected. Active filters show up as removable chips, and each chip resolves its label from the record's ID.
+
+### Reusable pickers
+
+There are 35 dropdowns for picking related records, and all of them come from one generic component. Each is searchable and scrolls through results page by page. A preselected value that is not on the current page is fetched by its ID, so it still shows its name.

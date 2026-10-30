@@ -28,10 +28,10 @@ Git hooks run ESLint and Prettier on staged files, and commit messages must foll
 
 ## Deployments
 
-| Environment | Branch | URL                                 |
-| ----------- | ------ | ----------------------------------- |
-| Production  | `main` | https://portfolio-4q6.pages.dev     |
-| Staging     | `dev`  | https://dev.portfolio-4q6.pages.dev |
+| Environment | Branch | URL                                        |
+| ----------- | ------ | ------------------------------------------ |
+| Production  | `main` | https://mr-chouman-portfolio.pages.dev     |
+| Staging     | `dev`  | https://dev.mr-chouman-portfolio.pages.dev |
 
 Cloudflare Pages builds `main` to production and `dev` to a preview alias (D-006). Other branches are not built.
 
