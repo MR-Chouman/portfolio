@@ -12,20 +12,25 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Open
 
-- **F-016** · open · 2026-10-30 · self · blocks T-024
-  Owner action: add the CV PDF the site serves. Steps: (1) export the CV as PDF (the version with the Gmail address; the phone number may stay in it, D-018, but nothing confidential about clients, D-018); (2) save it as `public/cv.pdf` on the `task/T-024-contact-and-cv` branch (exactly that name: both links point at `/cv.pdf`); (3) commit it (`chore: add the downloadable CV PDF`) and push, or tell Claude it is in place; (4) Claude then adds a Playwright check that `/cv.pdf` is served as a PDF, sets T-024 to `done` and runs `/finish-task T-024`. Also confirm the email address in `content/contact.ts` is the one on the CV (F-018).
+- **F-020** · open · 2026-10-30 · self · blocks T-024
+  Owner action: add the CV PDF the site serves. Steps: (1) export the CV as PDF (the version with the Gmail address; the phone number may stay in it, D-018, but nothing confidential about clients, D-018); (2) save it as `public/cv.pdf` on the `task/T-024-contact-and-cv` branch (exactly that name: both links point at `/cv.pdf`); (3) commit it (`chore: add the downloadable CV PDF`) and push, or tell Claude it is in place; (4) Claude then adds a Playwright check that `/cv.pdf` is served as a PDF, sets T-024 to `done` and runs `/finish-task T-024`. Also confirm the email address in `content/contact.ts` is the one on the CV (F-022).
 
 ## Triaged
+
+- **F-017** · triaged · 2026-10-30 · self · -> T-060
+  Cloudflare Pages redirects `/about` to `/about/` (308), because prerendered pages are `<path>/index.html`, while canonical and Open Graph URLs omit the trailing slash. T-060 should make canonical URLs match the served URL (or the reverse) so they do not point at a redirect.
 
 - **F-007** · triaged · 2026-10-23 · owner · -> T-024, T-026
   The CV goes into a folder whose contents Git ignores (T-026). The published copy goes in `public/` (F-008, T-024).
 
 ## Resolved
 
-- **F-017** · resolved · 2026-10-30 · auto (recommended) · -> T-024
+- **F-021** · resolved · 2026-10-30 · auto (recommended) · -> T-024
   Where and how should the CV download appear? Chosen: one file path `/cv.pdf` saved as `Mohamad-Rida-Chouman-CV.pdf` (the `download` attribute); a compact "CV" button in the header between the navigation and the theme toggle (accessible name "Download CV (PDF)"), on every page; in the home contact block, the email address as the primary button, then "Download CV" with a "PDF" hint, then the GitHub profile. Contact details move to `content/contact.ts` (validated by `contactSchema`) so the header and home share one source. Alternatives: a CV item inside the main navigation (it is a file, not a page); a text-only link in the footer (the task asks for the header); a dated file name such as `cv-2026.pdf` (links would change on each update). Reason: one stable URL, a short header item that fits at 375 px, and no new navigation semantics.
-- **F-018** · resolved · 2026-10-30 · auto (recommended) · -> T-024
-  Which email address does the `mailto:` link use? Chosen: the Gmail address that is the owner's Git identity in this public repository's history, which D-018 and F-004 name as the address on the CV; the address is the visible text of the contact button so visitors without a mail client can copy it. Alternatives: a "Email me" label that hides the address; wait for the owner to type it. Reason: D-018 already decided to publish the Gmail address; the owner confirms it matches the CV with F-016.
+- **F-022** · resolved · 2026-10-30 · auto (recommended) · -> T-024
+  Which email address does the `mailto:` link use? Chosen: the Gmail address that is the owner's Git identity in this public repository's history, which D-018 and F-004 name as the address on the CV; the address is the visible text of the contact button so visitors without a mail client can copy it. Alternatives: a "Email me" label that hides the address; wait for the owner to type it. Reason: D-018 already decided to publish the Gmail address; the owner confirms it matches the CV with F-020.
+- **F-016** · resolved · 2026-10-30 · auto (recommended) · -> T-025, D-027
+  "Done when" asks for a 404 status on the Cloudflare preview, but Cloudflare builds only `dev` (README), so a task branch cannot be checked there before it merges. Chosen: prove it locally (the build writes a top-level `404.html`, which Pages serves with a 404 status; Playwright checks the page, `_headers` and the CSP), merge, then check `https://dev.portfolio-4q6.pages.dev/<unknown>` right after the merge and report the result. Alternatives: park the task in `review` for the owner; temporarily enable preview builds for task branches in Cloudflare. Reason: the check is only possible after the merge into `dev`, which is staging, and `/finish-phase` re-checks before production.
 
 - **F-015** · resolved · 2026-10-30 · auto (recommended) · -> T-023, T-035
   What copy should the About page use before the owner writes it? Chosen: section titles and labels in `content/about.ts`; the story as three paragraphs following the REQUIREMENTS arc (biology, bioinformatics MSc with machine learning on protein sequences, frontend lead), each marked "Placeholder"; the single timeline entry, the university and the page intro stay placeholders, now pointing at T-035 (the Owner review task for About copy); skills and education restate REQUIREMENTS facts only. Alternatives: draft the full story and timeline now; hide unfinished sections until T-035. Reason: the page is complete in structure without inventing claims, dates or employers.

@@ -1,5 +1,3 @@
-import { data } from "react-router";
-
 import {
   Anchor,
   Figure,
@@ -9,6 +7,7 @@ import {
   Prose,
   TagList,
 } from "~/components/ui";
+import { NotFound, notFoundMeta } from "~/components/sections/NotFound";
 import { getNextProject, getProject } from "~/lib/projects";
 import { pageMeta } from "~/lib/seo";
 
@@ -22,11 +21,13 @@ import type { Route } from "./+types/work.$slug";
 // prerendered HTML file per project (T-020).
 //
 // No loader: the project comes from the bundled MDX modules, so client-side
-// navigation needs no data request. Unknown slugs reach this route through
-// the SPA fallback and throw; T-025 turns that into the proper 404 page.
+// navigation needs no data request. Unknown slugs render the 404 page (T-025):
+// Cloudflare serves them 404.html with a 404 status, and rendering the same
+// markup here keeps hydration clean. (A thrown `data()` from a component is
+// not a route error response, so it would show the generic error page.)
 export function meta({ params }: Route.MetaArgs) {
   const project = getProject(params.slug);
-  if (!project) return [];
+  if (!project) return notFoundMeta();
   return pageMeta({
     title: `${project.title} · ${profile.name}`,
     description: project.summary,
@@ -40,7 +41,7 @@ const mdxComponents = { Figure };
 
 export default function CaseStudy({ params }: Route.ComponentProps) {
   const project = getProject(params.slug);
-  if (!project) throw data(null, { status: 404 });
+  if (!project) return <NotFound />;
   const next = getNextProject(project.slug);
   const { Content } = project;
   const copy = work.caseStudy;

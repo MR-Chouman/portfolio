@@ -6,4 +6,5 @@ export default [
   route("work/:slug", "routes/work.$slug.tsx"),
   route("about", "routes/about.tsx"),
   route("style-tile", "routes/style-tile.tsx"),
+  route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

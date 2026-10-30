@@ -215,12 +215,30 @@ export const aboutSchema = z.strictObject({
   links: z.array(linkSchema).min(1).max(2),
 });
 
+// Copy for the 404 page and the generic error page (content/not-found.ts,
+// T-025).
+export const notFoundSchema = z.strictObject({
+  meta: z.strictObject({
+    title: text,
+    description: text.max(200),
+  }),
+  ...sectionCopy,
+  body: text,
+  links: z.array(linkSchema).min(1).max(4),
+  error: z.strictObject({
+    title: text,
+    body: text,
+    link: linkSchema,
+  }),
+});
+
 export type Metric = z.infer<typeof metricSchema>;
 export type Link = z.infer<typeof linkSchema>;
 export type Home = z.infer<typeof homeSchema>;
 export type Work = z.infer<typeof workSchema>;
 export type About = z.infer<typeof aboutSchema>;
 export type Contact = z.infer<typeof contactSchema>;
+export type NotFound = z.infer<typeof notFoundSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
 export type Experience = z.infer<typeof experienceSchema>;
