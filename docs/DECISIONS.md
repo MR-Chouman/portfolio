@@ -421,3 +421,17 @@ Status: Accepted · 2026-10-30 · Refines D-008, D-023, D-033, D-034
 - `playwright.config.ts` adds Firefox and WebKit projects that run only `tests/e2e/skin-switcher.spec.ts`. `ci-main` installs all three browsers (the cache key includes the browser set). The spec covers the keyboard, the description and announcement, fonts loaded before `data-skin` changes, an unchanged control position, the circular reveal, reduced motion, missing View Transitions and the per-skin preloads.
 
 **Consequences.** A skin added later needs entries in `SKINS`, `SKIN_FONTS`, `SKIN_PRELOADS` and `site.skinSwitcher.names` (a unit test checks the names). The command palette (T-043) can call `switchSkin` without an origin, so the reveal starts from the top centre. The e2e job in `ci-main` takes a little longer because of the two extra browsers.
+
+## D-036 · Command palette: cmdk in a native dialog, loaded on first open
+Status: Accepted · 2026-10-30 · Refines D-008, D-035
+
+**Context.** T-043 adds the command palette of REQUIREMENTS §6.3: open with Ctrl/Cmd+K, go to a page or case study, switch design or theme, download the CV; fully keyboard and screen-reader usable and lazy loaded. The task names `cmdk`, which depends on Radix Dialog and is over the ~10 kB gzipped threshold. The build and the trigger were chosen under `/run-phase` (F-030, F-031).
+
+**Decision.**
+- Dependency: `cmdk` 1.1.1 (pinned). It brings `@radix-ui/react-dialog` and a few small Radix packages; the palette chunk is about 17.7 kB gzipped. It is imported only by `app/components/layout/CommandPalette.tsx`, which `CommandMenu` loads with `React.lazy` on the first open (and prefetches on hover or focus of the header button). Home's initial JavaScript gains only the small `CommandMenu` component.
+- The dialog is a native modal `<dialog>` (`showModal`): it makes the page inert, keeps Tab inside and closes on Escape without extra code. The search field is focused explicitly after `showModal`, because browsers differ on what a dialog focuses first. When the dialog closes (Escape, the shortcut again, a command or a backdrop click), focus returns to the element that had it.
+- cmdk provides the combobox (`aria-activedescendant`, `aria-expanded`) and the labelled listbox with grouped options, filtering and arrow-key navigation with wrap-around. Commands: Pages (Home and the header navigation), Case studies (from `~/lib/projects`, already loaded on home), Preferences (`switchSkin` without an origin, so the reveal starts from the top centre as D-035 foresaw, and `setTheme`), Files (the CV, through a temporary download link). Design and theme changes are announced in a polite status region beside the button. Copy lives in `content/site.ts`.
+- The header button is an icon button like the theme and design controls, disabled until hydration, with `aria-haspopup="dialog"` and `aria-keyshortcuts="Control+K Meta+K"`. Ctrl/Cmd+K with Shift or Alt is left to the browser.
+- No animation is added (D-008); the active option uses an accent left border and the raised surface, from tokens.
+
+**Consequences.** A new page or command is one `Command.Item` and its copy. The e2e spec runs in Chromium only, like the other specs except the skin switcher; Firefox was checked locally. Any later change that adds a status region in the header must keep the e2e locators scoped (the skin switcher spec now targets its own region).

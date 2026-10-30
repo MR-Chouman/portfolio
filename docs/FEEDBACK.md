@@ -21,6 +21,11 @@ None.
 
 ## Resolved
 
+- **F-031** · resolved · 2026-10-30 · auto (recommended) · -> T-043, D-036
+  Should the command palette have a visible trigger, or only the Ctrl/Cmd+K shortcut? Chosen: a 36 px icon button (a terminal prompt) in the header between the CV link and the design switcher, named "Open command palette", with the shortcut in its title and `aria-keyshortcuts`; header gaps shrink below 640 px so everything stays on one row at 375 px. Alternatives: shortcut only (touch and mouse visitors would never find it); a wider "Search ⌘K" button (wraps the mobile header). Reason: discoverable on every device and consistent with the theme and design buttons. Owner to check: the icon and whether a visible label or shortcut hint is wanted.
+- **F-030** · resolved · 2026-10-30 · auto (recommended) · -> T-043, D-036
+  How should the palette be built, given that cmdk (named in the task) pulls in Radix Dialog and weighs about 17.7 kB gzipped? Chosen: cmdk 1.1.1 inside a native modal `<dialog>`, loaded lazily on first open, so the initial JavaScript does not grow. Alternatives: cmdk's own `Command.Dialog` (same bytes, adds a scroll lock and portal we do not need); a hand-written combobox (about 2 kB, but more ARIA to get right and maintain). Reason: the task names cmdk, its combobox and listbox semantics are proven, and lazy loading keeps the cost off every first load.
+
 - **F-029** · resolved · 2026-10-30 · auto (recommended) · -> T-042, D-035
   How should "works in Chrome, Safari and Firefox" be checked, when Playwright runs only Chromium? Chosen: Firefox and WebKit Playwright projects that run only the skin switcher spec, with `ci-main` installing the three browsers; WebKit, which lacks system libraries on the dev machine, was confirmed on draft verification PR #50 into `main` (its Playwright build has no View Transitions, so it ran the instant fallback). Alternatives: run every spec in all three browsers (about three times the e2e time); check Safari and Firefox by hand only (no regression guard). Reason: the switch is the cross-engine risk (View Transitions, Font Loading API), and the cost stays small.
 - **F-028** · resolved · 2026-10-30 · auto (recommended) · -> T-042, D-035
