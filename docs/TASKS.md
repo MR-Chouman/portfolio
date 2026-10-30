@@ -172,6 +172,12 @@ Current phase: **Phase 5: Lab demo**
   Done when: every component shows variants and states in both themes and with every accent.
 - **T-054** · todo · Lab page copy and source links
   Done when: `/lab` explains the patterns and links to the source on GitHub.
+- **T-055** · doing · Filled contact card
+  Owner request: the contact card uses the same filled background as the other cards instead of a transparent one, from tokens, in both themes and every accent.
+  Done when: the contact card matches the other cards' surface in both themes; contrast stays AA; checks pass.
+- **T-056** · todo · CV preview modal
+  Owner request: the CV link opens a modal that previews the PDF and offers a download. Native `<dialog>` (or the existing dialog primitive), focus trapped, Escape and a close button, focus returns to the trigger; copy in `content/`; no new dependency over ~10 kB. Inline PDF preview where the browser supports it; on phones that cannot show a PDF inline (Android Chrome, iOS Safari), the modal shows a short note with "Open" and "Download" instead of a broken preview. Never copy the phone number into pages or `content/` (D-018).
+  Done when: keyboard and screen-reader usable, preview works on desktop, phone fallback shown at 375 px, download works; unit and e2e tested.
 
 ## Phase 6: Quality and SEO (tag v0.7.0)
 
