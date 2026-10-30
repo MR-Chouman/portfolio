@@ -4,6 +4,7 @@ import { ButtonLink } from "~/components/ui";
 
 import { contact } from "../../../content/contact";
 import { site } from "../../../content/site";
+import { SkinSwitcher } from "./SkinSwitcher";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader() {
@@ -46,6 +47,7 @@ export function SiteHeader() {
             >
               {contact.cv.shortLabel}
             </ButtonLink>
+            <SkinSwitcher />
             <ThemeToggle />
           </div>
         </div>

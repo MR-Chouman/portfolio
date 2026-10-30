@@ -6,6 +6,13 @@ export const site = {
   skipLink: "Skip to content",
   navigationLabel: "Main",
   themeToggle: "Dark theme",
+  // The design (skin) switcher (T-042). `{design}` is replaced with a name.
+  skinSwitcher: {
+    label: "Switch design",
+    current: "Current design: {design}",
+    switched: "{design} design on",
+    names: { editorial: "Editorial", systems: "Systems" },
+  },
   navigation: [
     { label: "Work", href: "/work" },
     { label: "About", href: "/about" },
