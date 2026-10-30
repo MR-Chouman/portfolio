@@ -99,7 +99,7 @@ Current phase: **Phase 3: Case studies and imagery**
   Notes: D-030, superseded by D-031. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; the role and narrative were first placeholders (F-024), then written from the project's codebase and commit history at the owner's request. The owner then asked for the Outcome section to be removed from every case study. The three invented-data figures first added (F-023) and the figure tooling around them were removed on the owner's decision to show no screenshots for now (D-031).
 - **T-031** · done · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
-- **T-032** · review · Case study: EV charging platform (Owner review, D-018)
+- **T-032** · done · Case study: EV charging platform (Owner review, D-018)
   Done when: same structure; highlights the 132 screens and 50-module API layer.
 - **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
