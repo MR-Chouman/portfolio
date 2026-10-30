@@ -43,7 +43,7 @@ Status: Accepted · 2026-10-22
 **Consequences.** About one minute of CI per task PR; heavy checks only at phase boundaries. Both branches are protected and require their respective checks.
 
 ## D-005 · Skins are CSS-only over a single DOM; two skins
-Status: Accepted · 2026-10-22
+Status: Accepted · 2026-10-22 · Superseded by D-038
 
 **Context.** Visitors can choose the design they preview the site in. Different markup per skin would cause hydration mismatches, layout shift, and multiply maintenance and tests.
 
@@ -198,7 +198,7 @@ Status: Accepted · 2026-10-23 · Resolves the token part of F-002 (fonts are lo
 **Consequences.** Adding a color, font or radius means adding a token here first. The Systems skin (Phase 4) overrides the same properties under `[data-skin="systems"]`. The contrast ratios in the header must be rechecked whenever a color value changes.
 
 ## D-020 · Editorial skin: self-hosted variable fonts, skin files and a style tile
-Status: Accepted · 2026-10-23 · Refines D-019
+Status: Accepted · 2026-10-23 · Refines D-019 · Editorial skin superseded by D-038
 
 **Context.** T-011 builds the default skin. Fonts must be self-hosted (no third-party requests, D-014) and fast to load, and the skin must be checkable for contrast in both themes.
 
@@ -449,3 +449,16 @@ Status: Accepted · 2026-10-30 · Refines D-033, D-034
 
 **Consequences.** A new skin is added to the spec's list (the drift test fails otherwise) and gets the whole matrix. A new route is added to its route list. The spec runs in Chromium only, in `ci-main`.
 
+## D-038 · One design (Systems) with a six-color accent palette and a floating header
+Status: Accepted · 2026-10-30 · Supersedes D-005 and the Editorial skin of D-020 · Changes D-033 to D-037
+
+**Context.** After Phase 4 the owner judged the Systems skin much better than Editorial and asked for it to be the only design. Instead of a design switcher, visitors choose an accent color from a floating palette on the left of the page, and the header becomes a floating bar that is always visible. The owner chose the mobile behavior of the palette, the header style and the scheduling (start of Phase 5).
+
+**Decision.**
+- **One design.** Systems is the site's only look, in light and dark. The Editorial skin, its fonts (Fraunces), the skin switcher, the circular skin reveal, `?skin=` and the skin commands of the command palette are removed. Styles move from `[data-skin="systems"]` scopes into the base tokens and styles, so there is no skin layer left. The light/dark theme and its cross-fade stay.
+- **Accent palette.** Six accents: green (the current Systems teal-green, default), purple, gold, red, blue and orange. Each is a set of accent tokens per theme, tuned so every accent text and UI pair meets WCAG 2.2 AA in light and dark (gold and orange need darker shades in light). Set as `data-accent` on `<html>` by the pre-paint script, from `?accent=` first, then the stored choice (`localStorage`, try/catch), then green; the parameter is stored like `?skin=` was (D-034). Components keep using the semantic accent tokens only.
+- **Floating palette.** Fixed to the left edge, vertically centred, above content. From tablet width up it shows the six swatches in a vertical rail; on phones it collapses to one swatch showing the current accent that opens the six. It is a labelled radio group: keyboard reachable, arrow keys move between colors, the choice is announced, and each swatch has a text name (copy in `content/`). It never covers page content at 375 px.
+- **Floating header.** A detached, rounded bar inset from the screen edges with a small gap at the top, on a raised surface with a subtle shadow from tokens, fixed and always visible while scrolling. Pages reserve its height so nothing hides under it, and `scroll-padding-top` keeps anchor and focus targets visible.
+- The command palette gets one command per accent instead of the design command.
+
+**Consequences.** Less CSS and font weight on every page. Per-skin tests (D-037) become per-theme tests plus a contrast check per accent and theme. A second design is out of scope for v1. The style tile shows the accents instead of skins.

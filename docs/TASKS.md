@@ -136,6 +136,21 @@ Current phase: **Phase 5: Lab demo**
 
 ## Phase 5: Lab demo (tag v0.6.0)
 
+- **T-045** · todo · Single design: Systems only
+  Make Systems the only design (D-038): move its styles out of `[data-skin="systems"]` into the base tokens and styles; remove the Editorial skin, its fonts, the skin switcher and circular reveal, `?skin=`, the skin commands of the command palette and the skin layer of the pre-paint script; turn the per-skin tests into per-theme tests.
+  Done when: every page looks as it did in Systems, in both themes; no Editorial code, font or `skin` reference is left; checks pass.
+- **T-046** · todo · Accent mechanism and tokens
+  Six accents (green default, purple, gold, red, blue, orange) as accent tokens per theme, AA in light and dark; `app/lib/accent.ts`: get/set, `localStorage` (try/catch), `?accent=` param (stored), `data-accent` set by the pre-paint script; one command per accent in the command palette; accent names in `content/`.
+  Done when: no flash on reload; param works; contrast is unit tested for every accent and theme.
+- **T-047** · todo · Floating accent palette
+  Fixed to the left of every page, vertically centred: a vertical rail of six swatches from tablet width up, one swatch that opens the six on phones. Labelled radio group, arrow keys, announces the choice, visible focus.
+  Done when: keyboard and screen-reader usable, never covers content at 375/768/1440, unit and e2e tested.
+- **T-048** · todo · Floating header
+  Detached rounded bar inset from the edges with a gap at the top, raised surface and subtle shadow from tokens, always visible while scrolling; content and anchor/focus targets are never hidden under it (`scroll-padding-top`).
+  Done when: visible and usable on every page at 375/768/1440 in both themes; skip link and keyboard order still work; no layout shift; e2e tested.
+- **T-049** · todo · Accent and header QA
+  Playwright smoke and axe per theme; contrast per accent and theme on the built page; layout at 375/768/1440 with the floating header and palette; visual check of every accent.
+  Done when: all checks pass for every accent in both themes.
 - **T-050** · todo · Mock data layer
   Static JSON or MSW; no runtime server; seeded fake records.
   Done when: the data layer is typed and supports pagination, sorting and filtering.
@@ -147,7 +162,7 @@ Current phase: **Phase 5: Lab demo**
   Done when: keyboard accessible, validated, tested.
 - **T-053** · todo · Component gallery
   Shows the design-system approach with the primitives.
-  Done when: every component shows variants and states in both skins.
+  Done when: every component shows variants and states in both themes and with every accent.
 - **T-054** · todo · Lab page copy and source links
   Done when: `/lab` explains the patterns and links to the source on GitHub.
 
@@ -163,10 +178,10 @@ Current phase: **Phase 5: Lab demo**
   Budgets from REQUIREMENTS, font subsetting, image sizes, route-level code splitting, Lighthouse CI thresholds enforced.
   Done when: all targets met on the preview deployment.
 - **T-063** · todo · Accessibility audit
-  Keyboard, screen reader spot checks, axe per skin, reduced motion, zoom 200%.
+  Keyboard, screen reader spot checks, axe per theme, reduced motion, zoom 200%.
   Done when: no known WCAG 2.2 AA failures; findings recorded in FEEDBACK.
 - **T-064** · todo · Test coverage pass
-  Done when: critical flows (navigation, skin/theme switch, palette, lab table, CRUD) have e2e coverage.
+  Done when: critical flows (navigation, theme and accent switch, command palette, lab table, CRUD) have e2e coverage.
 
 ## Phase 7: Launch (tag v1.0.0)
 
