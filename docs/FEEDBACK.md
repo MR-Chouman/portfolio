@@ -21,6 +21,8 @@ None.
 
 ## Resolved
 
+- **F-026** · resolved · 2026-10-30 · auto (recommended) · -> T-040, D-033
+  What design direction should the Systems skin take, when the owner delegated design to Claude (F-002) but only for Editorial? Chosen: an admin-console look that matches the owner's work: cool neutral greys, a teal accent, blue focus ring, Geist headings with Geist Mono labels (no new font), tight 3-8 px radii, a faint blueprint grid and a few element-level touches (mono `#` before prose headings, tabular figures). Alternatives: a monospace-only terminal look (harder to read at large sizes, weaker hero); a dark-first high-contrast look (the skin must work equally in light). Reason: clearly distinct from Editorial, on-brand for a frontend lead of admin platforms, and free of new font weight. Owner to check: the accent hue and the background grid.
 - **F-023** · resolved · 2026-10-30 · auto (recommended) · -> T-030, D-030
   How can the airline case study ship 2-4 captioned images before the image pipeline (T-034) and without screenshots of the client's system (D-018)? Chosen: three illustrations of typical screens (weekly roster, leave approvals, qualifications) drawn as SVG with invented crew codes, flights, dates and counts, encoded to WebP and AVIF, each captioned "Illustration with invented ... data, not a screenshot of the client's system". Alternatives: anonymized crops of real screens with fake data (needs the owner's material and T-034); ship the case study without images (fails "Done when"). Reason: meets "Done when" with no client data at all; the owner can swap in crops during review or T-034.
 - **F-024** · resolved · 2026-10-30 · auto (recommended) · -> T-030

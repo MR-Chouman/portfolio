@@ -37,7 +37,7 @@ function themeBlock(css: string, marker: string): Palette {
   return palette as Palette;
 }
 
-const skins = ["editorial"];
+const skins = ["editorial", "systems"];
 
 describe.each(skins)("%s skin", (skin) => {
   const css = readFileSync(
@@ -75,5 +75,58 @@ describe.each(skins)("%s skin", (skin) => {
         contrast(palette["accent-fg"], palette.accent),
       ).toBeGreaterThanOrEqual(4.5);
     });
+  });
+});
+
+// Returns the selectors of style rules that are not inside a rule already
+// scoped to the skin (at-rules such as @media and @layer are skipped over).
+function unscopedSelectors(css: string, scope: string): string[] {
+  const source = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const offenders: string[] = [];
+  const stack: boolean[] = [];
+  let prelude = "";
+  for (const char of source) {
+    if (char === "{") {
+      const selector = prelude.trim();
+      const parentScoped = stack.at(-1) ?? false;
+      if (selector.startsWith("@")) {
+        stack.push(parentScoped);
+      } else {
+        const scoped =
+          parentScoped ||
+          selector.split(",").every((part) => part.includes(scope));
+        if (!scoped) offenders.push(selector);
+        stack.push(scoped);
+      }
+      prelude = "";
+    } else if (char === "}") {
+      stack.pop();
+      prelude = "";
+    } else if (char === ";") {
+      prelude = "";
+    } else {
+      prelude += char;
+    }
+  }
+  return offenders;
+}
+
+describe("systems skin scope", () => {
+  const css = readFileSync(
+    join(process.cwd(), "app/styles/skins/systems.css"),
+    "utf8",
+  );
+
+  it('scopes every rule to [data-skin="systems"]', () => {
+    expect(unscopedSelectors(css, '[data-skin="systems"]')).toEqual([]);
+  });
+
+  it("detects an unscoped rule", () => {
+    expect(
+      unscopedSelectors(
+        '[data-skin="systems"] { & h1 { color: red; } } h2 { color: red; }',
+        '[data-skin="systems"]',
+      ),
+    ).toEqual(["h2"]);
   });
 });

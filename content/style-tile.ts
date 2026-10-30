@@ -2,13 +2,13 @@
 // Samples use public, generic project facts (REQUIREMENTS section 4, D-018).
 export const styleTile = {
   meta: {
-    title: "Style tile · Editorial skin",
+    title: "Style tile",
     description:
-      "Tokens and UI primitives of the Editorial skin, in light and dark.",
+      "Tokens and UI primitives of the active skin, in light and dark.",
   },
   heading: "Style tile",
   intro:
-    "The Editorial skin's tokens and UI primitives, shown side by side in both themes. Each block names the primitive it uses.",
+    "The active skin's tokens and UI primitives, shown side by side in both themes. Each block names the primitive it uses.",
   themes: {
     light: "Light theme",
     dark: "Dark theme",
