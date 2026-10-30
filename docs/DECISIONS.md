@@ -544,3 +544,17 @@ Status: Accepted · 2026-10-30 · Extends D-002
 
 **Consequences.** No new dependency. Swapping in a real endpoint means replacing `createMockApi` with a `fetch` client of the same shape. T-052 adds create and update to the same client. Changing the seed, count or generator changes the demo data everywhere at once.
 
+## D-045 · Lab data table: URL state read by a clientLoader
+Status: Accepted · 2026-10-30 · Extends D-002, D-044
+
+**Context.** T-051 asks for a server-style data table with pagination, sorting, filters, URL-synced state and loading, empty and error states, whose state survives reload and back/forward. The site is prerendered with no server (D-002), and the data comes from the mock endpoint of D-044. The choice was made under `/run-phase` (F-042).
+
+**Decision.**
+- The URL is the only table state. `parseListQuery`/`toSearchParams` (D-044) read and write it; small pure helpers (`app/lib/lab/table.ts`) compute the next query for each control. Every change pushes a history entry; the search box commits 300 ms after typing stops, or at once on Enter.
+- The route's `clientLoader` (`app/lib/lab/client.ts`) reads the query from the request URL and calls the mock endpoint with the request's abort signal. React Router re-runs it on every search parameter change, reload and back/forward, so there is no effect or cache of our own; a superseded request is aborted. A failed request returns an error result with the query instead of throwing, so the page keeps its controls and offers "Try again" (a revalidation) instead of the route error page.
+- The prerendered HTML is the `HydrateFallback`: the same table markup in its loading state with default, disabled controls, so hydration never depends on the URL and the layout does not jump when the data arrives.
+- While a request runs, the controls already show the requested query (from the pending navigation) and the previous rows stay, dimmed and `aria-busy`; a polite status message announces "Loading" and then the range or the empty result.
+- The error state is shown on demand: "Simulate a server error" makes the next request fail once. A URL flag was rejected because a reload or retry would keep failing.
+- No table library: seven columns and one data source do not need one, and it keeps the bundle small.
+
+**Consequences.** No new dependency. The table code is client-only and reusable for T-052 (the drawer can revalidate the same loader after a mutation). Pushing a history entry per change means back steps through each filter change, which is what "survives back/forward" asks for.

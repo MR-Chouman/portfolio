@@ -252,6 +252,81 @@ export const notFoundSchema = z.strictObject({
   }),
 });
 
+// Copy for the lab page (/lab) and its data table demo (content/lab.ts,
+// T-051). The demo records are invented (D-044); this holds the page copy,
+// the table labels and the display names of the record fields' values.
+const labelsOf = <const K extends string>(keys: readonly K[]) =>
+  z.strictObject(
+    Object.fromEntries(keys.map((key) => [key, text])) as Record<
+      K,
+      typeof text
+    >,
+  );
+
+export const labSchema = z.strictObject({
+  meta: z.strictObject({
+    title: text,
+    description: text.max(200),
+  }),
+  header: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+  }),
+  table: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+    caption: text,
+    regionLabel: text,
+    columns: labelsOf([
+      "id",
+      "name",
+      "category",
+      "status",
+      "site",
+      "value",
+      "updatedAt",
+    ]),
+    filters: z.strictObject({
+      label: text,
+      search: text,
+      searchHint: text,
+      status: text,
+      category: text,
+      site: text,
+      clear: text,
+    }),
+    values: z.strictObject({
+      status: labelsOf(["active", "maintenance", "reserved", "retired"]),
+      category: labelsOf(["vehicle", "machinery", "it", "tooling", "safety"]),
+    }),
+    pagination: z.strictObject({
+      label: text,
+      pageSize: text,
+      previous: text,
+      next: text,
+      first: text,
+      last: text,
+      // "{from}–{to} of {total}" and "Page {page} of {pageCount}".
+      range: text.includes("{from}").includes("{to}").includes("{total}"),
+      page: text.includes("{page}").includes("{pageCount}"),
+    }),
+    loading: text,
+    empty: z.strictObject({
+      title: text,
+      body: text,
+    }),
+    error: z.strictObject({
+      title: text,
+      body: text,
+      retry: text,
+    }),
+    simulate: z.strictObject({
+      label: text,
+      hint: text,
+    }),
+  }),
+});
+
 export type Metric = z.infer<typeof metricSchema>;
 export type Link = z.infer<typeof linkSchema>;
 export type Home = z.infer<typeof homeSchema>;
@@ -259,6 +334,7 @@ export type Work = z.infer<typeof workSchema>;
 export type About = z.infer<typeof aboutSchema>;
 export type Contact = z.infer<typeof contactSchema>;
 export type NotFound = z.infer<typeof notFoundSchema>;
+export type Lab = z.infer<typeof labSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
 export type Experience = z.infer<typeof experienceSchema>;

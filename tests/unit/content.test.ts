@@ -69,6 +69,7 @@ describe("content in the repository", () => {
         "/",
         "/work",
         "/about",
+        "/lab",
         "/style-tile",
         "/404",
         ...slugs,

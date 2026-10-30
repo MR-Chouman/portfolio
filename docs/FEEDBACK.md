@@ -22,6 +22,9 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-042** · resolved · 2026-10-30 · auto (recommended) · -> T-051, D-045
+  How should the lab table keep and load its state, and how is the error state shown on a static demo? Chosen: the URL is the only state, read by the `/lab` route's `clientLoader`, which React Router re-runs on every change, reload and back/forward (each change pushes a history entry); the prerendered page is the loading table with default, disabled controls; the error state comes from a "Simulate a server error" button that fails the next request once. Alternatives: React state synced to the URL with an effect that fetches (duplicate state, manual abort and back/forward handling); a `?fail=1` URL flag for the error (a reload or retry keeps failing); `replace` instead of push for each change (back would leave the page instead of undoing a filter). Reason: the router already owns loading, aborting and history, so the table only reads and writes the URL. Owner to check: the `/lab` intro copy (placeholder until T-054) and whether the error button should stay visible on the public page.
+
 - **F-041** · resolved · 2026-10-30 · auto (recommended) · -> T-050, D-044
   Which mock data approach for the lab: static JSON or MSW? Chosen: seeded records generated in TypeScript plus a pure query function behind a fake async client (latency, abort, injectable error). Alternatives: a committed static JSON file (same data, but a large file to review and no generator to tune counts); MSW intercepting `fetch` (realistic network tab, but a heavy dependency, a service worker file and CSP changes on a static site). Reason: no dependency, deterministic builds, and the loading, empty and error states T-051 needs are still exercised.
 
