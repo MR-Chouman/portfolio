@@ -285,6 +285,27 @@ const blocksOf = <const K extends string>(keys: readonly K[]) =>
     >,
   );
 
+// A link into this site's public repository (T-054): a file or folder on
+// the production branch, so the lab can point at the code it runs.
+export const SOURCE_REPO = "https://github.com/MR-Chouman/portfolio";
+const sourceLinkSchema = z.strictObject({
+  label: text,
+  href: z
+    .string()
+    .regex(
+      /^https:\/\/github\.com\/MR-Chouman\/portfolio\/(blob|tree)\/main\/[\w./-]+$/,
+      `Link to a file (blob) or folder (tree) on main in ${SOURCE_REPO}`,
+    ),
+});
+
+// How a lab pattern works and where its code lives (T-054).
+const patternNotesSchema = z.strictObject({
+  title: text,
+  points: z.array(text).min(2).max(5),
+  sourceTitle: text,
+  source: z.array(sourceLinkSchema).min(1).max(4),
+});
+
 export const labSchema = z.strictObject({
   meta: z.strictObject({
     title: text,
@@ -293,10 +314,12 @@ export const labSchema = z.strictObject({
   header: z.strictObject({
     ...sectionCopy,
     intro: text,
+    source: sourceLinkSchema,
   }),
   table: z.strictObject({
     ...sectionCopy,
     intro: text,
+    notes: patternNotesSchema,
     caption: text,
     regionLabel: text,
     columns: labelsOf([
@@ -350,6 +373,7 @@ export const labSchema = z.strictObject({
   // The create and edit drawer (T-052). "{name}" and "{id}" are filled in.
   crud: z.strictObject({
     hint: text,
+    notes: patternNotesSchema,
     create: text,
     edit: text.includes("{name}"),
     editShort: text,
@@ -396,6 +420,7 @@ export const labSchema = z.strictObject({
   gallery: z.strictObject({
     ...sectionCopy,
     intro: text,
+    notes: patternNotesSchema,
     themes: labelsOf(["light", "dark"]),
     blocks: blocksOf([
       "buttons",

@@ -20,6 +20,7 @@ import { format } from "~/lib/lab/table";
 
 import { lab } from "../../../content/lab";
 import { site } from "../../../content/site";
+import { PatternNotes } from "./PatternNotes";
 import { StatusLabel } from "./StatusLabel";
 
 // The lab's component gallery (T-053, D-048): the primitives the table and
@@ -322,6 +323,7 @@ export function ComponentGallery({ className }: { className?: string }) {
         <ThemePanel theme="light" />
         <ThemePanel theme="dark" />
       </div>
+      <PatternNotes notes={copy.notes} className="mt-8" />
     </Section>
   );
 }

@@ -1,6 +1,7 @@
 import { AssetTable } from "~/components/lab/AssetTable";
 import { ComponentGallery } from "~/components/lab/ComponentGallery";
-import { Section } from "~/components/ui";
+import { PatternNotes } from "~/components/lab/PatternNotes";
+import { Link, Section } from "~/components/ui";
 import { createLabClient, type LabTableData } from "~/lib/lab/client";
 import { pageMeta } from "~/lib/seo";
 
@@ -10,7 +11,8 @@ import type { Route } from "./+types/lab";
 // The lab (/lab, REQUIREMENTS section 5): live admin patterns over invented
 // data (D-044). T-051 adds the server-style data table, T-052 the CRUD
 // drawer, T-053 the component gallery (static, so it is in the prerendered
-// page), T-054 the page copy.
+// page), T-054 the page copy: how each pattern works and links to its
+// source on GitHub.
 //
 // The table's data comes from a clientLoader, so it runs only in the browser
 // (D-002): the prerendered page is the HydrateFallback, and React Router
@@ -28,7 +30,7 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 clientLoader.hydrate = true as const;
 
 export function LabPage({ data }: { data: LabTableData | undefined }) {
-  const { header, table } = lab;
+  const { header, table, crud } = lab;
   return (
     <div className="page-container pt-section">
       <header className="max-w-reading">
@@ -37,6 +39,9 @@ export function LabPage({ data }: { data: LabTableData | undefined }) {
         </p>
         <h1 className="mt-2 text-4xl sm:text-5xl">{header.title}</h1>
         <p className="mt-4 text-lg text-fg-muted">{header.intro}</p>
+        <p className="mt-4">
+          <Link href={header.source.href}>{header.source.label}</Link>
+        </p>
       </header>
 
       <Section
@@ -46,6 +51,10 @@ export function LabPage({ data }: { data: LabTableData | undefined }) {
         className="mt-section"
       >
         <AssetTable data={data} client={client} />
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <PatternNotes notes={table.notes} />
+          <PatternNotes notes={crud.notes} />
+        </div>
       </Section>
 
       <ComponentGallery className="mt-section" />
