@@ -275,6 +275,16 @@ const labelsOf = <const K extends string>(keys: readonly K[]) =>
     >,
   );
 
+// A title and the primitives it shows, per gallery block (T-053).
+const blockCopy = z.strictObject({ title: text, components: text });
+const blocksOf = <const K extends string>(keys: readonly K[]) =>
+  z.strictObject(
+    Object.fromEntries(keys.map((key) => [key, blockCopy])) as Record<
+      K,
+      typeof blockCopy
+    >,
+  );
+
 export const labSchema = z.strictObject({
   meta: z.strictObject({
     title: text,
@@ -379,6 +389,63 @@ export const labSchema = z.strictObject({
       "valueWhole",
       "valueMax",
     ]),
+  }),
+  // The component gallery (T-053): the primitives in both themes and every
+  // accent. Each block names the primitives it shows; `variants` are the
+  // captions above each sample.
+  gallery: z.strictObject({
+    ...sectionCopy,
+    intro: text,
+    themes: labelsOf(["light", "dark"]),
+    blocks: blocksOf([
+      "buttons",
+      "links",
+      "tags",
+      "fields",
+      "chips",
+      "status",
+      "metrics",
+      "accents",
+    ]),
+    variants: labelsOf([
+      "primary",
+      "secondary",
+      "ghost",
+      "small",
+      "disabled",
+      "link",
+      "accent",
+      "muted",
+      "neutral",
+      "list",
+      "default",
+      "hint",
+      "select",
+      "invalid",
+      "unchecked",
+      "checked",
+    ]),
+    samples: z.strictObject({
+      buttons: labelsOf(["primary", "secondary", "ghost", "small", "link"]),
+      links: labelsOf(["accent", "muted"]),
+      tags: z.strictObject({
+        neutral: text,
+        accent: text,
+        list: z.array(text).min(1),
+      }),
+      fields: z.strictObject({
+        text: z.strictObject({ label: text, value: text }),
+        hint: z.strictObject({ label: text, value: text, hint: text }),
+        select: z.strictObject({ label: text }),
+        invalid: z.strictObject({ label: text, value: text, error: text }),
+        disabled: z.strictObject({ label: text, value: text }),
+      }),
+      chips: labelsOf(["unchecked", "checked", "disabled"]),
+      metrics: z.array(metricSchema).min(1),
+      // The accent rows: "{accent}" is filled with the accent's name.
+      accentRow: text.includes("{accent}"),
+      accentSamples: labelsOf(["button", "link", "tag", "chip"]),
+    }),
   }),
 });
 

@@ -1,5 +1,5 @@
-// Copy for the lab page (/lab), its server-style data table (T-051) and its
-// create and edit drawer (T-052).
+// Copy for the lab page (/lab), its server-style data table (T-051), its
+// create and edit drawer (T-052) and its component gallery (T-053).
 // Validated by labSchema at build time (content/load.ts). The records the
 // table lists are invented demo data generated in app/lib/lab/records.ts
 // (D-044). The page introduction is refined in T-054.
@@ -127,6 +127,94 @@ export const lab = {
       valueRequired: "Enter a value.",
       valueWhole: "Enter a whole number of 0 or more, digits only.",
       valueMax: "Enter 1000000 or less.",
+    },
+  },
+  gallery: {
+    eyebrow: "Pattern",
+    title: "Component gallery",
+    intro:
+      "The table and the drawer above are built from these primitives. Components use semantic color tokens only, so one set of markup serves both themes and all six accents: each panel below sets its own theme, and the accent rows set each accent in place. Hover, focus and use them to see the live states.",
+    themes: {
+      light: "Light theme",
+      dark: "Dark theme",
+    },
+    blocks: {
+      buttons: { title: "Buttons", components: "Button · ButtonLink" },
+      links: { title: "Links", components: "Link" },
+      tags: { title: "Tags", components: "Tag · TagList" },
+      fields: { title: "Form fields", components: "Field · controlStyles" },
+      chips: { title: "Filter chips", components: "CheckChip" },
+      status: { title: "Status labels", components: "StatusLabel" },
+      metrics: { title: "Metrics", components: "MetricList · Metric" },
+      accents: { title: "Every accent", components: "data-accent" },
+    },
+    variants: {
+      primary: "primary",
+      secondary: "secondary",
+      ghost: "ghost",
+      small: "small",
+      disabled: "disabled",
+      link: "link as button",
+      accent: "accent",
+      muted: "muted",
+      neutral: "neutral",
+      list: "list",
+      default: "default",
+      hint: "with hint",
+      select: "select",
+      invalid: "invalid",
+      unchecked: "unchecked",
+      checked: "checked",
+    },
+    samples: {
+      buttons: {
+        primary: "Publish",
+        secondary: "Discard",
+        ghost: "Reset view",
+        small: "Details",
+        link: "Browse case studies",
+      },
+      links: {
+        accent: "Read a case study",
+        muted: "My background",
+      },
+      tags: {
+        neutral: "Mock data",
+        accent: "Live",
+        list: ["React Router", "Zod", "Tailwind CSS"],
+      },
+      fields: {
+        text: { label: "Title", value: "Forklift 12" },
+        hint: {
+          label: "Budget (USD)",
+          value: "12500",
+          hint: "Digits only, for example 12500.",
+        },
+        select: { label: "Type" },
+        invalid: {
+          label: "Quantity",
+          value: "12.5",
+          error: "Enter a whole number.",
+        },
+        disabled: { label: "Reference", value: "AST-0001" },
+      },
+      chips: {
+        unchecked: "Draft",
+        checked: "Approved",
+        disabled: "Archived",
+      },
+      metrics: [
+        { value: "240", label: "Invented assets" },
+        { value: "4", label: "Statuses" },
+        { value: "3", label: "Page sizes" },
+      ],
+      accentRow: "{accent} accent",
+      accentSamples: {
+        button: "Primary",
+        link: "Link",
+        tag: "Tag",
+        chip: "Checked",
+      },
     },
   },
 } satisfies Lab;

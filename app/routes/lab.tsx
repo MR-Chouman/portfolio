@@ -1,4 +1,5 @@
 import { AssetTable } from "~/components/lab/AssetTable";
+import { ComponentGallery } from "~/components/lab/ComponentGallery";
 import { Section } from "~/components/ui";
 import { createLabClient, type LabTableData } from "~/lib/lab/client";
 import { pageMeta } from "~/lib/seo";
@@ -7,8 +8,9 @@ import { lab } from "../../content/lab";
 import type { Route } from "./+types/lab";
 
 // The lab (/lab, REQUIREMENTS section 5): live admin patterns over invented
-// data (D-044). T-051 adds the server-style data table; T-052 and T-053 add
-// the CRUD drawer and the component gallery, T-054 the page copy.
+// data (D-044). T-051 adds the server-style data table, T-052 the CRUD
+// drawer, T-053 the component gallery (static, so it is in the prerendered
+// page), T-054 the page copy.
 //
 // The table's data comes from a clientLoader, so it runs only in the browser
 // (D-002): the prerendered page is the HydrateFallback, and React Router
@@ -45,6 +47,8 @@ export function LabPage({ data }: { data: LabTableData | undefined }) {
       >
         <AssetTable data={data} client={client} />
       </Section>
+
+      <ComponentGallery className="mt-section" />
     </div>
   );
 }
