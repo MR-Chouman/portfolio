@@ -117,9 +117,10 @@ Current phase: **Phase 4: Skins and switcher**
   `app/styles/skins/systems.css`: different tokens plus structural CSS only, same markup.
   Done when: every page looks finished in both skins, both themes.
   Notes: D-033, F-026 (auto). Cool greys, teal accent, Geist headings and Geist Mono labels, 3-8 px radii, a blueprint grid from `--line`, all scoped to `[data-skin="systems"]`; no markup or new font. Checked with screenshots of every page at 1440 and 375 px in both themes. Unit tests run the contrast checks for both skins and reject unscoped rules; `tests/e2e/systems-skin.spec.ts` sets the skin on `<html>` (until T-041 adds `?skin=`) and runs axe on every page in both themes, plus token, nested-theme and 375 px overflow checks. The style tile copy now says "the active skin".
-- **T-041** · todo · Skin mechanism
+- **T-041** · done · Skin mechanism
   `app/lib/skin.ts`: get/set, `localStorage` (try/catch), `?skin=` param, system theme default; pre-paint script extended.
   Done when: no flash on reload; param works; unit tested.
+  Notes: D-034, F-027 (auto). The pre-paint script always sets `data-skin` (parameter, then stored choice, then `editorial`); a valid `?skin=` is stored, unknown values are ignored. The theme still defaults to the system preference. `prePaintScript` joins the theme and skin scripts in one inline script. `setSkin` applies instantly; T-042 adds the switcher and transition. Tested in `tests/unit/skin.test.tsx` and `tests/e2e/skin.spec.ts` (first-frame skin, reload, blocked storage).
 - **T-042** · todo · Skin switcher and transition
   Header control, keyboard accessible, announces state; View Transitions circular reveal from the control; preload the target skin's fonts before switching; instant when reduced motion/unsupported.
   Done when: switch works in Chrome, Safari and Firefox with a graceful fallback, no layout jump.
