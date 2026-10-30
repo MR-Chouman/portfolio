@@ -100,7 +100,7 @@ Current phase: **Phase 3: Case studies and imagery**
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
 - **T-032** · todo · Case study: EV charging platform (Owner review, D-018)
   Done when: same structure; highlights the 132 screens and 50-module API layer.
-- **T-033** · todo · Case study: hospital management platform (Owner review, D-018)
+- **T-033** · review · Case study: hospital management platform (Owner review, D-018)
   Done when: same structure; highlights the 57-component library and print/barcode/Excel workflows.
 - **T-034** · todo · Image pipeline (Owner review: anonymized crops)
   Script converting and resizing to AVIF/WebP with explicit dimensions; guidance for anonymized crops with fake data.
