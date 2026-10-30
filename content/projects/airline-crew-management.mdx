@@ -42,9 +42,3 @@ Letters are composed from templates with merge fields, and a template moves from
 ### Security and quality
 
 I moved the app to a strict Content Security Policy with a fresh nonce per request. That meant replacing every inline style with CSP-safe primitives, including chart sizing, and adding violation reporting. The code is covered by 168 unit and integration test files, with a 70% coverage floor, and Playwright end-to-end specs for the critical flows.
-
-## Outcome
-
-The platform runs crew operations across its modules on one shared foundation, and new modules ship by following the same feature shape.
-
-Placeholder: who uses it day to day and what changed for crew and crew control, with any numbers that can be shared.
