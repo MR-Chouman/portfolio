@@ -26,5 +26,7 @@ export const work = {
     metrics: "In numbers",
     next: "Next project",
     navigationLabel: "More case studies",
+    objectHint: "Drag or use the arrow keys to rotate.",
+    objectFallback: "This browser cannot show the 3D model.",
   },
 } satisfies Work;

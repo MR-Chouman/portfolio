@@ -107,6 +107,67 @@ test.describe("case study pages", () => {
   });
 });
 
+test.describe("case study 3D objects (T-034)", () => {
+  for (const slug of slugs) {
+    test(`/work/${slug} draws its object and turns it with the keys`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`/work/${slug}`);
+      const stage = page.locator(".project-object-stage");
+      await expect(stage).toHaveAttribute("data-ready", "true");
+      await expect(stage.locator("canvas")).toBeVisible();
+      await expect(stage).toHaveAttribute("data-yaw", /\d/);
+      const before = Number(await stage.getAttribute("data-yaw"));
+      await stage.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect(stage).toHaveAttribute(
+        "data-yaw",
+        String((before + 15) % 360),
+      );
+    });
+  }
+
+  test("spins when left alone, but not under reduced motion", async ({
+    page,
+  }) => {
+    const path = `/work/${slugs[0]}`;
+    const stage = page.locator(".project-object-stage");
+    const yaw = async () => Number(await stage.getAttribute("data-yaw"));
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(path);
+    await expect(stage).toHaveAttribute("data-yaw", /\d/);
+    const still = await yaw();
+    await page.waitForTimeout(1200);
+    expect(await yaw()).toBe(still);
+
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto(path);
+    await expect(stage).toHaveAttribute("data-yaw", /\d/);
+    const first = await yaw();
+    await expect.poll(yaw).not.toBe(first);
+  });
+
+  test("Three.js loads only on case study pages", async ({ page }) => {
+    const scripts: string[] = [];
+    page.on("request", (request) => {
+      if (request.resourceType() === "script") scripts.push(request.url());
+    });
+    for (const path of ["/", "/work", "/about"]) {
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+    }
+    expect(scripts.filter((url) => /\/scene-[^/]*\.js$/.test(url))).toEqual([]);
+    await page.goto(`/work/${slugs[0]}`);
+    await expect(page.locator(".project-object-stage")).toHaveAttribute(
+      "data-ready",
+      "true",
+    );
+    expect(scripts.some((url) => /\/scene-[^/]*\.js$/.test(url))).toBe(true);
+  });
+});
+
 for (const width of [375, 1440]) {
   test.describe(`work pages at ${width} px`, () => {
     test.use({ viewport: { width, height: 900 } });
