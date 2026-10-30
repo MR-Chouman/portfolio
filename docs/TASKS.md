@@ -156,7 +156,7 @@ Current phase: **Phase 5: Lab demo**
   Playwright smoke and axe per theme; contrast per accent and theme on the built page; layout at 375/768/1440 with the floating header and palette; visual check of every accent.
   Done when: all checks pass for every accent in both themes.
   Notes: D-043, F-040 (auto). `tests/e2e/per-accent.spec.ts` loads every route (home, `/work`, the four case studies, `/about`, `/style-tile`, a 404 path) with `?accent=` in a fresh context for each of the six accents and both themes: `data-theme`/`data-accent`, title, h1, header, footer, the matching palette radio checked, and no axe violations (108 tests). Per accent and theme it checks WCAG AA contrast on the tokens the browser resolves for the page and for the style tile's light and dark sections, and at 375, 768 and 1440 px on every page: no sideways scroll, the header bar inset inside the viewport, the h1 inside it, one palette control left of the content and below the bar (36 tests). A test fails if the spec's accent list and the built pre-paint script drift apart. 157 tests, all passing. Visual check: screenshots of home, a scrolled case study and the style tile at 1440 px and home (palette open) and the case study at 375 px, for every accent in both themes (60), reviewed by eye, no issue found; no baselines are committed. No app code changed.
-- **T-050** · todo · Mock data layer
+- **T-050** · doing · Mock data layer
   Static JSON or MSW; no runtime server; seeded fake records.
   Done when: the data layer is typed and supports pagination, sorting and filtering.
 - **T-051** · todo · Server-style data table
