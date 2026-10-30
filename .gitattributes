@@ -9,6 +9,7 @@
 *.webp binary
 *.avif binary
 *.woff2 binary
+*.ttf binary
 *.pdf binary
 
 package-lock.json linguist-generated=true
