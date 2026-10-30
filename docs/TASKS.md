@@ -148,7 +148,7 @@ Current phase: **Phase 5: Lab demo**
   Fixed to the left of every page, vertically centred: a vertical rail of six swatches from tablet width up, one swatch that opens the six on phones. Labelled radio group, arrow keys, announces the choice, visible focus.
   Done when: keyboard and screen-reader usable, never covers content at 375/768/1440, unit and e2e tested.
   Notes: D-041, F-037 and F-038 (auto). `AccentPalette` (after the header in `root.tsx`) is a `radiogroup` of six visually hidden native radios in round swatches with text names, a check mark on the current one, the focus ring on the swatch and a "<Name> accent on" status message. Phones get a 24 x 48 px accent tab at the edge that opens the rail (Escape, a press outside or focus leaving closes it). Swatches use their own `data-accent` and `.accent-swatch` (base.css). `--space-rail` and a `page-container` start padding keep content clear of it. Tests: `accent-palette.test.tsx`, `accent-palette.spec.ts` (every page at 375/768/1440, phone flow, keyboard, swatch colors per theme, axe). Screenshots checked by eye at 375 (closed and open, both themes), 768 and 1440.
-- **T-048** · todo · Floating header
+- **T-048** · doing · Floating header
   Detached rounded bar inset from the edges with a gap at the top, raised surface and subtle shadow from tokens, always visible while scrolling; content and anchor/focus targets are never hidden under it (`scroll-padding-top`).
   Done when: visible and usable on every page at 375/768/1440 in both themes; skip link and keyboard order still work; no layout shift; e2e tested.
 - **T-049** · todo · Accent and header QA
