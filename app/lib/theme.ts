@@ -6,7 +6,7 @@ export type Theme = "light" | "dark";
 
 export const THEME_STORAGE_KEY = "theme";
 const DARK_QUERY = "(prefers-color-scheme: dark)";
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+export const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 // Inlined in <head> by root.tsx, before the stylesheets. Kept as a string so
 // the bundler cannot rewrite it. Storage can throw (blocked site data), so it

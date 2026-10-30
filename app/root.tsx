@@ -17,12 +17,13 @@ import { prePaintScript } from "./lib/skin";
 import "./styles/base.css";
 import { notFound } from "../content/not-found";
 import { site } from "../content/site";
-import frauncesLatin from "@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url";
 import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 
-// Preload the default skin's latin fonts used above the fold (T-011).
+// Preload the latin Geist file every skin uses above the fold (T-011). Fonts
+// only one skin uses (Fraunces) are preloaded by the pre-paint script, for
+// that skin only (T-042).
 export const links: Route.LinksFunction = () =>
-  [geistLatin, frauncesLatin].map((href) => ({
+  [geistLatin].map((href) => ({
     rel: "preload",
     href,
     as: "font",

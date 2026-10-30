@@ -21,6 +21,11 @@ None.
 
 ## Resolved
 
+- **F-029** · resolved · 2026-10-30 · auto (recommended) · -> T-042, D-035
+  How should "works in Chrome, Safari and Firefox" be checked, when Playwright runs only Chromium? Chosen: Firefox and WebKit Playwright projects that run only the skin switcher spec, with `ci-main` installing the three browsers; WebKit, which lacks system libraries on the dev machine, was confirmed on draft verification PR #50 into `main` (its Playwright build has no View Transitions, so it ran the instant fallback). Alternatives: run every spec in all three browsers (about three times the e2e time); check Safari and Firefox by hand only (no regression guard). Reason: the switch is the cross-engine risk (View Transitions, Font Loading API), and the cost stays small.
+- **F-028** · resolved · 2026-10-30 · auto (recommended) · -> T-042, D-035
+  What form should the skin switcher take in the header? Chosen: a 36 px icon button (two overlapping squares) beside the theme toggle, named "Switch design", described by "Current design: <name>", with a polite status message "<name> design on" after each switch. Alternatives: a two-option radio group or segmented control with visible names (wider, wraps the header at 375 px); a button with the next design's name as visible text (a changing label is harder to learn). Reason: matches the theme toggle, fits the mobile header and gives screen readers both the action and the state. Owner to check: the icon and whether a visible label is wanted.
+
 - **F-027** · resolved · 2026-10-30 · auto (recommended) · -> T-041, D-034
   Should `?skin=` only preview a skin for that page load, or also store it as the visitor's choice? Chosen: a valid parameter is stored, so a shared link keeps its skin on later pages and visits, and the switcher (T-042) can change it back. Alternatives: apply for the current load only (lost on the next full page load), or strip the parameter from the URL after applying it. Reason: a link such as "see it in the Systems design" should behave like choosing that skin, and the per-skin tests (T-044) get the same result either way.
 - **F-026** · resolved · 2026-10-30 · auto (recommended) · -> T-040, D-033

@@ -63,8 +63,9 @@ jobs:
 
       - run: npm ci
 
-      # Browsers are cached per Playwright version (T-015). On a hit, only the
-      # system packages are installed; they live outside the cached folder.
+      # Browsers are cached per Playwright version and browser set (T-015). On
+      # a hit, only the system packages are installed; they live outside the
+      # cached folder. Firefox and WebKit run the skin switcher spec (T-042).
       - name: Read Playwright version
         id: playwright
         run: echo "version=$(node -p "require('./node_modules/@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
@@ -74,15 +75,15 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium-firefox-webkit
 
-      - name: Install Playwright browser
+      - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Install Playwright system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: npx playwright install-deps chromium firefox webkit
 
       # playwright.config.ts starts the site itself via webServer:
       # `npm run build && npm run preview` (sirv serving build/client on :4173).

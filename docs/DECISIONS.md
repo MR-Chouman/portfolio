@@ -408,3 +408,16 @@ Status: Accepted · 2026-10-30 · Refines D-005
 
 **Consequences.** Shared links with `?skin=` persist the skin for that visitor. The URL keeps the parameter; canonical URLs never include it. T-044 can drive per-skin checks with `?skin=` in a fresh browser context.
 
+
+## D-035 · Skin switcher: icon button, fonts first, circular View Transitions reveal
+Status: Accepted · 2026-10-30 · Refines D-008, D-023, D-033, D-034
+
+**Context.** T-042 adds the header control that switches skins (D-005, D-034). It must be keyboard and screen-reader usable, reveal the new skin with a circle from the control, never paint the new skin with fallback fonts, stay instant under reduced motion or without View Transitions, and work in Chrome, Safari and Firefox. The form of the control and the cross-browser check were chosen under `/run-phase` (F-028, F-029).
+
+**Decision.**
+- `SkinSwitcher` (`app/components/layout/SkinSwitcher.tsx`) is a 36 px icon button next to the theme toggle, named "Switch design". With two skins it moves to the next one (`nextSkin`). `aria-describedby` points to a hidden "Current design: Editorial" text, and a polite `role="status"` region announces "Systems design on" after a switch. Like the theme toggle, it is disabled until hydration. Copy lives in `content/site.ts`.
+- `switchSkin` (`app/lib/skin.ts`) first calls `loadSkinFonts`: `document.fonts.load` for every family of the target skin (`SKIN_FONTS`), capped at 1 s (`FONT_TIMEOUT_MS`) and never rejecting. Then it sets `data-skin-transition` on `<html>`, calls `document.startViewTransition(() => setSkin(skin))` and, once the transition is ready, animates `clip-path: circle()` on `::view-transition-new(root)` from the button's centre to the farthest viewport corner, using `--duration-slow` and `--easing-standard`. `base.css` turns off the root cross-fade while the attribute is set. With reduced motion or no View Transitions, it calls `setSkin` directly. If a second switch starts while fonts load, only the latest applies. The Web Animations API is not restricted by the CSP's `style-src`, and no library is added (D-008).
+- Per-skin preloading (D-033): root.tsx now preloads only Geist, which every skin uses. The pre-paint script adds a `<link rel="preload" as="font">` for each font only the active skin uses (`SKIN_PRELOADS`: Fraunces for Editorial), so Systems visitors no longer download Fraunces up front. The hashed file URL is written into the script at build time, and the CSP hash follows it (D-027).
+- `playwright.config.ts` adds Firefox and WebKit projects that run only `tests/e2e/skin-switcher.spec.ts`. `ci-main` installs all three browsers (the cache key includes the browser set). The spec covers the keyboard, the description and announcement, fonts loaded before `data-skin` changes, an unchanged control position, the circular reveal, reduced motion, missing View Transitions and the per-skin preloads.
+
+**Consequences.** A skin added later needs entries in `SKINS`, `SKIN_FONTS`, `SKIN_PRELOADS` and `site.skinSwitcher.names` (a unit test checks the names). The command palette (T-043) can call `switchSkin` without an origin, so the reveal starts from the top centre. The e2e job in `ci-main` takes a little longer because of the two extra browsers.

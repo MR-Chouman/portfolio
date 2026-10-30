@@ -201,6 +201,15 @@
   animation-timing-function: var(--easing-standard);
 }
 
+/* Skin switch (T-042): no cross-fade; switchSkin (app/lib/skin.ts) reveals
+   the new skin with a circle growing from the switcher, on the new
+   snapshot. Reduced motion skips the transition altogether. */
+:root[data-skin-transition]::view-transition-old(root),
+:root[data-skin-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 /*
  * Rotatable 3D object in the case study header (T-034, D-032). Horizontal
  * drags rotate it; vertical swipes still scroll the page on touch screens.
