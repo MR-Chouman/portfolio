@@ -8,6 +8,10 @@ const switcher = (page: Page) =>
 
 const html = (page: Page) => page.locator("html");
 
+// The switcher's own status region (the command palette has another one).
+const status = (page: Page) =>
+  page.locator('button[aria-label="Switch design"] ~ [role="status"]');
+
 // Records, at the moment `data-skin` changes, whether the transition marker
 // is set and whether every font of the new skin is already loaded.
 type Change = { skin: string; marked: boolean; fontsReady: boolean };
@@ -83,7 +87,7 @@ test("the switcher works from the keyboard and announces the design", async ({
   await switcher(page).focus();
   await page.keyboard.press("Enter");
   await expect(html(page)).toHaveAttribute("data-skin", "systems");
-  await expect(page.getByRole("status")).toHaveText("Systems design on");
+  await expect(status(page)).toHaveText("Systems design on");
   await expect(switcher(page)).toHaveAccessibleDescription(
     "Current design: Systems",
   );
@@ -98,7 +102,7 @@ test("the switcher works from the keyboard and announces the design", async ({
   await switcher(page).focus();
   await page.keyboard.press("Space");
   await expect(html(page)).toHaveAttribute("data-skin", "editorial");
-  await expect(page.getByRole("status")).toHaveText("Editorial design on");
+  await expect(status(page)).toHaveText("Editorial design on");
 });
 
 test("the target skin's fonts are loaded before it applies, with no layout jump", async ({
@@ -168,7 +172,7 @@ test("without View Transitions the switch still applies", async ({ page }) => {
 
   await switcher(page).click();
   await expect(html(page)).toHaveAttribute("data-skin", "systems");
-  await expect(page.getByRole("status")).toHaveText("Systems design on");
+  await expect(status(page)).toHaveText("Systems design on");
   expect((await recorded(page)).marked).toBe(false);
 });
 
