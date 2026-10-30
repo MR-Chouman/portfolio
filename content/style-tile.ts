@@ -3,12 +3,11 @@
 export const styleTile = {
   meta: {
     title: "Style tile",
-    description:
-      "Tokens and UI primitives of the active skin, in light and dark.",
+    description: "The site's tokens and UI primitives, in light and dark.",
   },
   heading: "Style tile",
   intro:
-    "The active skin's tokens and UI primitives, shown side by side in both themes. Each block names the primitive it uses.",
+    "The site's tokens and UI primitives, shown side by side in both themes. Each block names the primitive it uses.",
   themes: {
     light: "Light theme",
     dark: "Dark theme",

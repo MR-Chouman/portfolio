@@ -37,13 +37,13 @@ describe("SiteHeader", () => {
     );
   });
 
-  it("offers the CV download outside the navigation", () => {
+  it("offers the CV preview outside the navigation", () => {
     render(
       <MemoryRouter>
         <SiteHeader />
       </MemoryRouter>,
     );
-    const cv = screen.getByRole("link", { name: "Download CV (PDF)" });
+    const cv = screen.getByRole("link", { name: "View CV (PDF)" });
     expect(cv).toHaveTextContent(contact.cv.shortLabel);
     expect(cv).toHaveAttribute("href", contact.cv.href);
     expect(cv).toHaveAttribute("download", contact.cv.fileName);
@@ -85,5 +85,21 @@ describe("formatDate", () => {
   it("keeps the calendar day written in the string, whatever the offset", () => {
     expect(formatDate("2026-10-23T02:21:31+03:00")).toBe("23 October 2026");
     expect(formatDate("2026-10-23T23:30:00-05:00")).toBe("23 October 2026");
+  });
+});
+
+describe("SiteHeader floating bar", () => {
+  it("publishes the bar height for scroll-padding-top and clears it on unmount", () => {
+    const { unmount } = render(
+      <MemoryRouter>
+        <SiteHeader />
+      </MemoryRouter>,
+    );
+    const root = document.documentElement;
+    // jsdom has no layout, so the measured height is 0 px.
+    expect(root.style.getPropertyValue("--header-height")).toBe("0px");
+    expect(screen.getByRole("banner")).toHaveClass("site-header");
+    unmount();
+    expect(root.style.getPropertyValue("--header-height")).toBe("");
   });
 });

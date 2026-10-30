@@ -99,9 +99,55 @@ test("the header CV link is on every page and reachable by keyboard", async ({
     await page.goto(path);
     const cv = page
       .getByRole("banner")
-      .getByRole("link", { name: "Download CV (PDF)" });
+      .getByRole("link", { name: "View CV (PDF)" });
     await expect(cv, path).toHaveAttribute("href", "/cv.pdf");
     await cv.focus();
     await expect(cv, path).toBeFocused();
   }
 });
+
+// T-055: the contact card is filled like the About card and the work cards,
+// in both themes and every accent, and stays AA (axe on the card).
+const accents = ["green", "purple", "gold", "red", "blue", "orange"] as const;
+
+for (const theme of ["light", "dark"] as const) {
+  test(`the contact card matches the other cards' surface in ${theme}`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: theme });
+    for (const accent of accents) {
+      await page.goto(`/?accent=${accent}`);
+      await expect(page.locator("html")).toHaveAttribute("data-accent", accent);
+      const background = (name: string) =>
+        page
+          .getByRole("region", { name })
+          .evaluate((el) => getComputedStyle(el).backgroundColor);
+      const raised = await page.evaluate(() => {
+        const probe = document.createElement("div");
+        probe.style.backgroundColor = "var(--surface-raised)";
+        document.body.append(probe);
+        const value = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return value;
+      });
+      const card = await background("Get in touch");
+      expect(card, accent).not.toBe("rgba(0, 0, 0, 0)");
+      expect(card, accent).toBe(raised);
+      expect(card, accent).toBe(
+        await background("From biology to frontend lead"),
+      );
+      expect(card, accent).toBe(
+        await page
+          .getByRole("region", { name: "Four platforms, one foundation" })
+          .getByRole("article")
+          .first()
+          .evaluate((el) => getComputedStyle(el).backgroundColor),
+      );
+      const results = await new AxeBuilder({ page })
+        .include("#contact")
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(results.violations, accent).toEqual([]);
+    }
+  });
+}

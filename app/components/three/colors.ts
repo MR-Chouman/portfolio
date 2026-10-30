@@ -1,5 +1,5 @@
-// Colors of the 3D objects come from the design tokens (D-005, D-032), so
-// they follow every skin and theme. Tokens may use OKLCH, which Three.js
+// Colors of the 3D objects come from the design tokens (D-032), so
+// they follow the theme and the accent. Tokens may use OKLCH, which Three.js
 // cannot parse, so each one is painted on a 1x1 canvas and read back as an
 // sRGB number (0xrrggbb).
 
@@ -50,12 +50,12 @@ export function readColors(element: Element): ObjectColors {
   };
 }
 
-// Calls `listener` whenever the theme or skin on <html> changes.
+// Calls `listener` whenever the theme or accent on <html> changes.
 export function observeTokens(listener: () => void): () => void {
   const observer = new MutationObserver(listener);
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["data-theme", "data-skin"],
+    attributeFilter: ["data-theme", "data-accent"],
   });
   return () => observer.disconnect();
 }

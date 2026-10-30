@@ -109,7 +109,7 @@ test("it opens a case study", async ({ page }) => {
   await expect(page).toHaveURL(/\/work\/[a-z-]+\/?$/);
 });
 
-test("it switches the theme and the design", async ({ page }) => {
+test("it switches the theme", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await ready(page);
   const html = page.locator("html");
@@ -122,13 +122,10 @@ test("it switches the theme and the design", async ({ page }) => {
     page.getByRole("status").filter({ hasText: "Dark theme on" }),
   ).toHaveCount(1);
 
+  // The design command is gone (D-038): one design, no switch.
   await openPalette(page);
-  await page.keyboard.type("systems design");
-  await page.keyboard.press("Enter");
-  await expect(html).toHaveAttribute("data-skin", "systems");
-  await expect(
-    page.getByRole("status").filter({ hasText: "Systems design on" }),
-  ).toHaveCount(1);
+  await expect(page.getByRole("option", { name: /theme/ })).toHaveCount(1);
+  await expect(page.getByRole("option", { name: /design/i })).toHaveCount(0);
 });
 
 test("it downloads the CV", async ({ page }) => {
@@ -142,21 +139,15 @@ test("it downloads the CV", async ({ page }) => {
   );
 });
 
-for (const skin of ["editorial", "systems"]) {
-  for (const colorScheme of ["light", "dark"] as const) {
-    test(`no axe violations with it open (${skin}, ${colorScheme})`, async ({
-      page,
-    }) => {
-      await page.emulateMedia({ colorScheme });
-      await ready(page, `/?skin=${skin}`);
-      await page.keyboard.press("Control+k");
-      await expect(input(page)).toBeFocused();
-      const results = await new AxeBuilder({ page })
-        .include("dialog")
-        .analyze();
-      expect(results.violations).toEqual([]);
-    });
-  }
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`no axe violations with it open (${colorScheme})`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await ready(page);
+    await page.keyboard.press("Control+k");
+    await expect(input(page)).toBeFocused();
+    const results = await new AxeBuilder({ page }).include("dialog").analyze();
+    expect(results.violations).toEqual([]);
+  });
 }
 
 test("it fits a 375 px screen without horizontal scroll", async ({ page }) => {

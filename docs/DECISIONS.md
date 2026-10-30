@@ -43,7 +43,7 @@ Status: Accepted · 2026-10-22
 **Consequences.** About one minute of CI per task PR; heavy checks only at phase boundaries. Both branches are protected and require their respective checks.
 
 ## D-005 · Skins are CSS-only over a single DOM; two skins
-Status: Accepted · 2026-10-22
+Status: Accepted · 2026-10-22 · Superseded by D-038
 
 **Context.** Visitors can choose the design they preview the site in. Different markup per skin would cause hydration mismatches, layout shift, and multiply maintenance and tests.
 
@@ -198,7 +198,7 @@ Status: Accepted · 2026-10-23 · Resolves the token part of F-002 (fonts are lo
 **Consequences.** Adding a color, font or radius means adding a token here first. The Systems skin (Phase 4) overrides the same properties under `[data-skin="systems"]`. The contrast ratios in the header must be rechecked whenever a color value changes.
 
 ## D-020 · Editorial skin: self-hosted variable fonts, skin files and a style tile
-Status: Accepted · 2026-10-23 · Refines D-019
+Status: Accepted · 2026-10-23 · Refines D-019 · Editorial skin superseded by D-038
 
 **Context.** T-011 builds the default skin. Fonts must be self-hosted (no third-party requests, D-014) and fast to load, and the skin must be checkable for contrast in both themes.
 
@@ -448,4 +448,176 @@ Status: Accepted · 2026-10-30 · Refines D-033, D-034
 - The spec keeps its own skin list, since Playwright cannot import `app/lib/skin.ts` (it imports a font through Vite's `?url`); a test compares it with the list in the built pre-paint script.
 
 **Consequences.** A new skin is added to the spec's list (the drift test fails otherwise) and gets the whole matrix. A new route is added to its route list. The spec runs in Chromium only, in `ci-main`.
+
+## D-038 · One design (Systems) with a six-color accent palette and a floating header
+Status: Accepted · 2026-10-30 · Supersedes D-005 and the Editorial skin of D-020 · Changes D-033 to D-037
+
+**Context.** After Phase 4 the owner judged the Systems skin much better than Editorial and asked for it to be the only design. Instead of a design switcher, visitors choose an accent color from a floating palette on the left of the page, and the header becomes a floating bar that is always visible. The owner chose the mobile behavior of the palette, the header style and the scheduling (start of Phase 5).
+
+**Decision.**
+- **One design.** Systems is the site's only look, in light and dark. The Editorial skin, its fonts (Fraunces), the skin switcher, the circular skin reveal, `?skin=` and the skin commands of the command palette are removed. Styles move from `[data-skin="systems"]` scopes into the base tokens and styles, so there is no skin layer left. The light/dark theme and its cross-fade stay.
+- **Accent palette.** Six accents: green (the current Systems teal-green, default), purple, gold, red, blue and orange. Each is a set of accent tokens per theme, tuned so every accent text and UI pair meets WCAG 2.2 AA in light and dark (gold and orange need darker shades in light). Set as `data-accent` on `<html>` by the pre-paint script, from `?accent=` first, then the stored choice (`localStorage`, try/catch), then green; the parameter is stored like `?skin=` was (D-034). Components keep using the semantic accent tokens only.
+- **Floating palette.** Fixed to the left edge, vertically centred, above content. From tablet width up it shows the six swatches in a vertical rail; on phones it collapses to one swatch showing the current accent that opens the six. It is a labelled radio group: keyboard reachable, arrow keys move between colors, the choice is announced, and each swatch has a text name (copy in `content/`). It never covers page content at 375 px.
+- **Floating header.** A detached, rounded bar inset from the screen edges with a small gap at the top, on a raised surface with a subtle shadow from tokens, fixed and always visible while scrolling. Pages reserve its height so nothing hides under it, and `scroll-padding-top` keeps anchor and focus targets visible.
+- The command palette gets one command per accent instead of the design command.
+
+**Consequences.** Less CSS and font weight on every page. Per-skin tests (D-037) become per-theme tests plus a contrast check per accent and theme. A second design is out of scope for v1. The style tile shows the accents instead of skins.
+
+## D-039 · One design in the base styles; end-to-end tests in Chromium only
+Status: Accepted · 2026-10-30 · Implements D-038 · Changes D-020, D-035, D-037
+
+**Context.** T-045 makes Systems the only design (D-038). Its values were scoped to `[data-skin="systems"]` in `app/styles/skins/systems.css`, next to the Editorial skin, and the Firefox and WebKit Playwright projects existed only for the skin switcher (D-035).
+
+**Decision.**
+- Colors, fonts and radii live in `app/styles/tokens.css`, the only file allowed raw values: fonts and radii on `:root`, then the light, dark (system preference) and dark (explicit) color blocks with their contrast ratios. Theme selectors still match any element, so a section can show the other theme. The Systems element styles (blueprint grid on `html`, tabular numbers, heading weight and tracking, selection, solid header and footer, the prose `#` heading marker, mono blockquote and accent list markers) move unscoped into `base.css`. `app/styles/skins/` is gone.
+- `base.css` imports the Geist and Geist Mono Fontsource packages; `@fontsource-variable/fraunces` is uninstalled. `root.tsx` still preloads the latin Geist file.
+- The pre-paint script is the theme script alone (`themeScript`); `app/lib/skin.ts`, `useSkin`, the switcher, its circular reveal and the palette's design command are deleted. The 3D object colors follow `data-theme` only.
+- `tests/unit/theme-tokens.test.ts` (was `skins.test.ts`) checks tokens.css; `tests/e2e/per-theme.spec.ts` (was `per-skin.spec.ts`) runs every page in both themes and checks that the build ships no skin layer and no Fraunces file.
+- Playwright runs in Chromium only, and `ci-main` installs only Chromium (F-033). The theme cross-fade has an instant fallback and is unit tested.
+
+**Consequences.** A visitor who stored a `skin` value keeps a harmless, unused `localStorage` key. Pages render pixel for pixel as the Systems skin did, apart from the removed header button (checked by screenshot comparison against `dev` with `?skin=systems`). Cross-engine e2e can come back as a project in `playwright.config.ts` if a later feature needs it.
+
+## D-040 · Accent tokens per theme through `data-accent`, set before the first paint
+Status: Accepted · 2026-10-30 · Implements D-038
+
+**Context.** T-046 adds the six accents of D-038 (green default, purple, gold, red, blue, orange). Each must meet WCAG 2.2 AA in both themes, apply before the first paint, and leave components on the semantic `accent` tokens. Theme selectors also match nested elements (D-039), so a section in the other theme must keep the page's accent. The shades and the palette commands were chosen under `/run-phase` (F-035, F-036).
+
+**Decision.**
+- `tokens.css` has one block per accent, `[data-accent="<name>"]` (green also on `:root`, first, as the default), setting two raw values: `--accent-light` and `--accent-dark`. The theme blocks set `--accent: var(--accent-light)` or `var(--accent-dark)`; `--accent-fg` stays one value per theme. A nested `data-theme` section re-resolves `--accent` from the inherited pair, so it keeps the page's accent in its own theme.
+- `app/lib/accent.ts` holds the accent list, the `?accent=` parameter, `localStorage` (try/catch) and a small store (`setAccent`, `subscribeAccent`, `useAccent`), with the order of the pre-paint script: parameter (stored when valid), stored choice, green. `prePaintScript` joins the theme and accent scripts in one inline `<head>` script, so there is no flash on reload. A switch changes only color tokens and runs without a transition.
+- Accent names live in `content/site.ts` (`accents`), in the order of `ACCENTS`; a unit test keeps both in step. The command palette has one command per accent (F-036). 3D objects also redraw when `data-accent` changes.
+- `tests/unit/theme-tokens.test.ts` checks every accent with both themes (accent as text on both surfaces, `accent-fg` on the accent); `tests/e2e/accent.spec.ts` checks the first frame, the parameter, the contrast the browser resolves for every accent and theme, and the palette command.
+
+**Consequences.** A new accent is one `tokens.css` block, one entry in `ACCENTS`, one name in content and one in the e2e list. Swatches that show another accent than the current one (T-047) cannot reuse `--accent` on a nested `data-accent` alone, because `--accent` is resolved where the theme is set; they need the theme on the swatch too, or their own selectors.
+
+## D-041 · Floating accent palette: native radios, a phone tab and reserved left room
+Status: Accepted · 2026-10-30 · Implements D-038
+
+**Context.** T-047 adds the floating palette of D-038: fixed to the left, vertically centred, a rail of six swatches from tablet width up and one swatch that opens them on phones; a labelled radio group with arrow keys and an announcement, never covering content at 375, 768 and 1440 px. At 375 and 768 px the page gutter (16 to 23 px) is narrower than any usable control. The form of the phone control and the way content stays clear were chosen under `/run-phase` (F-037, F-038).
+
+**Decision.**
+- `app/components/layout/AccentPalette.tsx`, rendered once in `root.tsx` right after the header (so the keyboard reaches it after the header controls). It is a `div role="radiogroup"` named "Accent color" holding six native radio inputs (visually hidden) inside round swatch labels: the browser provides one tab stop, arrow keys that move and choose, and the checked state; each swatch has its name as text (`content/site.ts`), a check mark on the current accent (not color alone) and the focus ring on the swatch through `has-focus-visible`. A polite status message says "<Name> accent on". Controls are disabled until hydration, like the other preferences.
+- Phones (below 48rem): a 24 x 48 px tab flush with the left edge, filled with the current accent and named "Accent color: <Name>", with `aria-expanded` and `aria-controls`; it shows the rail beside it. Escape closes it and returns focus to the tab; a press outside or focus moving elsewhere closes it; choosing does not, so arrow keys keep working.
+- Swatches carry their own `data-accent`; `.accent-swatch` in `base.css` paints `--accent-light` or `--accent-dark` for the page's theme (D-040 consequence).
+- `--space-rail` (2rem on phones, 3.25rem from 48rem) in `tokens.css` is the room kept free on the left. `page-container`'s start padding is the larger of the gutter and what is still missing once the auto margin is counted, so wide screens are unchanged and narrow ones start content after the palette.
+- `tests/unit/accent-palette.test.tsx` covers the group, choice, storage, announcement, tab and closing rules; `tests/e2e/accent-palette.spec.ts` checks every page at 375, 768 and 1440 px (palette right edge never past the content's left edge, no sideways scroll), the centred fixed position, the phone flow, keyboard and focus ring, swatch colors per theme and axe.
+
+**Consequences.** Content on phones is 16 px narrower and on tablets about 29 px narrower. A layout that does not use `page-container` must keep its own content clear of `--space-rail`. The open phone rail sits over the page until closed, like a menu.
+
+## D-042 · Floating header: a sticky bar and a measured scroll padding
+Status: Accepted · 2026-10-30 · Implements D-038
+
+**Context.** T-048 turns the header into a detached, rounded bar inset from the edges with a gap at the top, on the raised surface with a subtle shadow from tokens, always in view while scrolling. Anchor and focus targets must never end up under it, the skip link and keyboard order must keep working, and nothing may shift. At 375 px the bar wraps to two rows (about 120 px), from about 640 px it is one row (about 72 px). The positioning and the way the offset is known were chosen under `/run-phase` (F-039).
+
+**Decision.**
+- The `<header>` is `position: sticky` (`.site-header` in `base.css`) with `top` and `margin-top` set to `--space-header-gap` (0.75rem), z-index 30 (below the accent palette at 40 and the skip link at 50). Sticky keeps it in the flow, so the page starts below it as before and hydration moves nothing. Its box is transparent and `pointer-events: none`; the bar inside `page-container` is `pointer-events-auto`, `rounded-xl`, `border-line`, `bg-surface-raised` and `shadow-raised`.
+- `shadow-raised` is a new token: `@theme inline` resets the `shadow-*` namespace and maps `--shadow-raised` to `--elevation-raised`, set in each theme block (a deeper, darker shadow in dark).
+- `useHeaderOffset` measures the bar with a `ResizeObserver` and writes `--header-height` on `<html>`; `html { scroll-padding-top: calc(var(--header-height) + 2 * var(--space-header-gap)) }`. A CSS fallback (7.5rem, 4.5rem from 40rem) covers the page before hydration. Writing a custom property never changes layout.
+- `tests/e2e/floating-header.spec.ts` checks every page at 375, 768 and 1440 px in both themes (rounded, shadowed, inset, same place after scrolling to the end, controls usable), anchor and focus targets landing below the bar, the published height, layout shift and the skip link above the bar.
+
+**Consequences.** Content scrolls behind the bar and shows in the gap above it, as with any floating bar. A hard-coded offset would break on zoom or wrapped labels; the measured one follows them. Other surfaces that float over the page can reuse `shadow-raised`.
+
+## D-043 · Accent and header QA: one spec over every accent, theme, page and width
+Status: Accepted · 2026-10-30 · Extends D-037, D-040, D-041, D-042
+
+**Context.** T-049 asks for smoke and axe checks per theme, contrast per accent and theme on the built page, the layout at 375, 768 and 1440 px with the floating header and accent palette, and a visual check of every accent, passing for all six accents in both themes. `per-theme.spec.ts` covered both themes with the default accent only; the accent, palette and header specs each checked their own part. The width of the matrix was chosen under `/run-phase` (F-040).
+
+**Decision.**
+- `tests/e2e/per-accent.spec.ts` loads every route with `?accent=` in a fresh context for each accent and theme (theme from the emulated color scheme) and checks the `data-theme` and `data-accent` attributes, title, h1, header, footer, the checked palette radio and axe (WCAG 2.2 AA tags).
+- Contrast per accent and theme is checked on the tokens the browser resolves, on the page and inside the style tile's nested light and dark sections, with the shared helper (`tests/unit/helpers/contrast.ts`).
+- Layout per accent, theme and width on every route: no sideways scroll, the header bar inset inside the viewport, the h1 inside it, exactly one visible palette control, left of the content and below the header bar.
+- The spec keeps its own accent list (Playwright cannot import `app/lib/accent.ts`); a test compares it with the list in the built pre-paint script.
+- The visual check stays a by-eye review of screenshots when accents, the header or the palette change; no baselines are committed (D-037).
+
+**Consequences.** A new accent is added to the spec's list (the drift test fails otherwise) and gets the whole matrix; a new route is added to its route list. The spec adds 157 tests (about 2.5 minutes locally) to the Chromium e2e run in `ci-main`.
+
+## D-044 · Lab mock data: seeded in-memory records behind a fake async endpoint
+Status: Accepted · 2026-10-30 · Extends D-002
+
+**Context.** T-050 asks for a typed mock data layer with pagination, sorting and filtering for the `/lab` demo, with no runtime server (D-002) and seeded fake records, from static JSON or MSW. The choice was made under `/run-phase` (F-041).
+
+**Decision.**
+- Records are generated in TypeScript (`app/lib/lab/records.ts`) from a seeded mulberry32 PRNG and a fixed base date, not committed as a JSON file and not dated from "now", so the data is the same on every build, prerender and test run. They describe an invented equipment inventory (assets, sites, categories, statuses): no people, customers, orders or client names. The record vocabulary is demo data, not site copy, so it stays out of `content/`.
+- Queries are a pure function (`app/lib/lab/query.ts`) shaped like a list endpoint: filters, a sort field and direction with a stable tie-break by id, a page size from a fixed list, a clamped page, and a result with `total` and `pageCount`. The same module parses and writes URL search parameters (defaults omitted, invalid values fall back), so the table (T-051) keeps its state in the URL.
+- A small fake client (`app/lib/lab/api.ts`) wraps the queries in promises with a simulated latency, `AbortSignal` support, cloned results and an injectable failure, so the UI exercises real loading, cancel and error paths.
+- No MSW: it adds a service worker file, a dependency well over 10 kB gzipped and CSP work, and offers nothing a static site needs over an in-process function.
+
+**Consequences.** No new dependency. Swapping in a real endpoint means replacing `createMockApi` with a `fetch` client of the same shape. T-052 adds create and update to the same client. Changing the seed, count or generator changes the demo data everywhere at once.
+
+## D-045 · Lab data table: URL state read by a clientLoader
+Status: Accepted · 2026-10-30 · Extends D-002, D-044
+
+**Context.** T-051 asks for a server-style data table with pagination, sorting, filters, URL-synced state and loading, empty and error states, whose state survives reload and back/forward. The site is prerendered with no server (D-002), and the data comes from the mock endpoint of D-044. The choice was made under `/run-phase` (F-042).
+
+**Decision.**
+- The URL is the only table state. `parseListQuery`/`toSearchParams` (D-044) read and write it; small pure helpers (`app/lib/lab/table.ts`) compute the next query for each control. Every change pushes a history entry; the search box commits 300 ms after typing stops, or at once on Enter.
+- The route's `clientLoader` (`app/lib/lab/client.ts`) reads the query from the request URL and calls the mock endpoint with the request's abort signal. React Router re-runs it on every search parameter change, reload and back/forward, so there is no effect or cache of our own; a superseded request is aborted. A failed request returns an error result with the query instead of throwing, so the page keeps its controls and offers "Try again" (a revalidation) instead of the route error page.
+- The prerendered HTML is the `HydrateFallback`: the same table markup in its loading state with default, disabled controls, so hydration never depends on the URL and the layout does not jump when the data arrives.
+- While a request runs, the controls already show the requested query (from the pending navigation) and the previous rows stay, dimmed and `aria-busy`; a polite status message announces "Loading" and then the range or the empty result.
+- The error state is shown on demand: "Simulate a server error" makes the next request fail once. A URL flag was rejected because a reload or retry would keep failing.
+- No table library: seven columns and one data source do not need one, and it keeps the bundle small.
+
+**Consequences.** No new dependency. The table code is client-only and reusable for T-052 (the drawer can revalidate the same loader after a mutation). Pushing a history entry per change means back steps through each filter change, which is what "survives back/forward" asks for.
+
+## D-046 · CV preview: a native dialog over the download link, with a same-origin frame for the PDF only
+
+Status: Accepted · 2026-10-30 · Extends D-018, D-027, D-036
+
+**Context.** T-056 asks for the CV link to open a modal that previews the PDF and offers a download, with a note instead of a broken preview on phones that cannot show a PDF inline. The site sends `frame-ancestors 'none'` and `X-Frame-Options: DENY` on every path (D-027), which would block the PDF in a frame on our own pages. No PDF library may be added (over ~10 kB). The choices were made under `/run-phase` (F-043, F-044).
+
+**Decision.**
+
+- `CvLink` (`app/components/layout/CvLink.tsx`) is used by the header and the home contact card. It stays a real `/cv.pdf` download link (works before hydration and without JavaScript); once hydrated, a plain left click opens the preview, while modified and middle clicks keep the browser's behaviour. The link's name is "View CV" (`contact.cv.previewLabel`), with `aria-haspopup="dialog"`; the command palette keeps its direct "Download CV" command.
+- The preview is a native modal `<dialog>` like the command palette (D-036): the page behind is inert, Escape, the Close button and a click on the backdrop close it, focus starts on Close and returns to the link. It is mounted only while open, so the PDF is fetched only on request.
+- The PDF is shown in an `<iframe>` (the page CSP's `object-src 'none'` rules out `<object>`/`<embed>`) only when `navigator.pdfViewerEnabled` is not false and the screen is not phone-like (`(max-width: 39.99rem), (hover: none) and (pointer: coarse)`). Otherwise (Android Chrome, iOS Safari, narrow windows, browsers without a viewer) the dialog shows a short note. "Open in a new tab" and "Download" are always offered.
+- `public/_headers` gives `/cv.pdf` alone `Content-Security-Policy: frame-ancestors 'self'` and `X-Frame-Options: SAMEORIGIN`, detaching the site-wide values first. Other sites still cannot frame the CV, and every other path keeps `frame-ancestors 'none'` and `DENY`. The e2e header replay now applies each path's matching rules (with detach), so the framed PDF is tested with the headers Cloudflare sends.
+
+**Consequences.** No new dependency. The preview uses the browser's own PDF viewer, so it looks different per browser and is not shown in headless test Chromium (the tests report a viewer and check the frame and its headers). The detach-then-set behaviour of Cloudflare's `_headers` must be checked once on the `dev` preview (F-043).
+
+## D-047 · Lab CRUD drawer: a native dialog, Zod (mini) in the browser, optimistic rows that settle on the reload
+
+Status: Accepted · 2026-10-30 · Extends D-044, D-045, D-046
+
+**Context.** T-052 asks for create and edit in a drawer, with Zod validation and optimistic updates with rollback, keyboard accessible and tested, on the `/lab` table (D-045) over the mock endpoint (D-044). Zod so far ran only at build time over `content/`. The choices were made under `/run-phase` (F-045, F-046).
+
+**Decision.**
+
+- The drawer (`app/components/lab/AssetDrawer.tsx`) is a native modal `<dialog>` pinned to the right edge, full height, up to 28rem wide (the full width on phones), like the CV preview (D-046): the page behind is inert, Escape, Close, Cancel and a backdrop click close it, focus starts on the first field and returns to the button that opened it ("New asset" or the row's "Edit"). It slides in with `@starting-style` and the duration token, which is 0 under reduced motion. It is mounted only while open.
+- Validation is one Zod schema per side in `app/lib/lab/asset-form.ts`: `assetFormSchema` parses the form's strings (the value as digits only), `assetInputSchema` checks the typed input in the mock endpoint, as a real API would. Zod messages are error codes, mapped to copy in `content/lab.ts` (`crud.errors`), so the copy stays in `content/` and the content schema checks there is a message for every code. The form checks on submit (focus moves to the first invalid field), then live on every change; each field has `aria-invalid` and its error in `aria-describedby`, with an icon beside the text so the error never relies on color.
+- The browser imports `zod/mini`, Zod's tree-shakable build, not the classic API. The `/lab` route chunk goes from about 6.3 kB to 15.5 kB gzipped with the drawer and the checks it uses; other routes are unchanged. Zod stays a dev dependency, since Vite bundles it at build time.
+- The mock endpoint gets `createAsset` (next id, `AST-0241` first) and `updateAsset` over a private copy of the records, so changes last until a reload; `fail: true` makes a save fail for the demo, from a "Make this save fail" switch in the drawer.
+- Optimistic updates are pending changes laid over the loader's rows (`app/lib/lab/optimistic.ts`): an edit replaces its row, a create shows on top with "New" as its id, both marked "Saving…" with their Edit button kept but inactive (so returned focus stays). On failure the change is dropped (the rollback: the rows never changed) and an alert says the save was undone. On success the route's loader revalidates and the change stays "settled" over the rows shown before, until the reloaded rows replace them, so the row never flickers back to its old values between the reload resolving and React rendering it.
+- No router `clientAction` or fetcher: one in-flight fetcher per submission loses its result once idle, while a few lines of state give concurrent saves, a rollback notice and pure, unit-tested merging.
+
+**Consequences.** No new dependency. Reusing the drawer for another record type means a new form schema and copy, with the same dialog and pending-change helpers. A real endpoint replaces `createMockApi`'s mutations with `fetch` calls of the same shape.
+
+## D-048 · Lab component gallery: theme panels, per-accent rows, and the lab's parts as primitives
+
+Status: Accepted · 2026-10-31 · Extends D-038, D-040, D-047
+
+**Context.** T-053 asks for a component gallery on `/lab` that shows the design-system approach: every component with its variants and states in both themes and with every accent. The internal style tile (`/style-tile`, not indexed) already shows the site primitives in two theme panels. The choices were made under `/run-phase` (F-047).
+
+**Decision.**
+
+- The gallery is a static section of `/lab` (`app/components/lab/ComponentGallery.tsx`), so it is in the prerendered page. It has a light and a dark panel, each a `section` with its own `data-theme` (the tokens resolve per element, D-040), with one block per primitive and a caption naming each variant or state.
+- Every accent is shown at once, without a second accent control: the last block of each panel has one row per accent carrying `data-accent` and the panel's `data-theme` together, so `--accent` resolves to that accent's value for that theme. The rows hold the accent-colored primitives (primary button, link, accent tag, checked chip, active status). The rest of the gallery follows the page accent from the floating palette (T-047).
+- Hover and focus are not faked: the samples are live components, and only states that are props (disabled, invalid, checked) are set statically.
+- The drawer's labelled field and the table's checkbox chip move to `app/components/ui/Field.tsx` (`Field`, `controlStyles`, `fieldDescribedBy`, `CheckChip`), and the status label to `app/components/lab/StatusLabel.tsx`, so the gallery shows the same parts the table and drawer are built from. Their markup and classes do not change, apart from a disabled style on controls and chips.
+- Sample labels differ from the table's and drawer's ("Publish", "Draft", "Title"), so role and label queries on the page stay unambiguous.
+
+**Consequences.** No new dependency. `/lab` gets longer, and the six accent rows repeat their sample names in each panel, each row a group named "<Accent> accent". A new primitive should get a gallery block in the same PR. The style tile stays as the internal token reference.
+
+## D-049 · Lab source links: files on `main` in the site's repository, checked against the tree
+
+Status: Accepted · 2026-10-31 · Extends D-045, D-047, D-048
+
+**Context.** T-054 asks `/lab` to explain its patterns and link to their source on GitHub. The repository is public (D-011) and the footer already links to it. The choices were made under `/run-phase` (F-048).
+
+**Decision.**
+
+- Each pattern gets a notes card (`app/components/lab/PatternNotes.tsx`) next to its demo: how it works as a short list, and links to its main files. The page intro links to the lab folder. The copy and URLs live in `content/lab.ts`.
+- Links point at the `main` branch (`/blob/main/<file>` or `/tree/main/<folder>`), the code the production site is built from, rather than a commit hash. `labSchema` accepts only those URLs in `https://github.com/MR-Chouman/portfolio` (`SOURCE_REPO` in `content/schema.ts`).
+- A unit test resolves every link to a local path and checks it exists as a file (`blob`) or folder (`tree`), so moving or renaming a linked file fails the tests instead of leaving a dead link.
+
+**Consequences.** No new dependency. Links to files added in a phase 404 on GitHub until that phase is merged into `main`; the `dev` preview shows them before that. Renaming a linked file means updating `content/lab.ts` in the same PR.
 

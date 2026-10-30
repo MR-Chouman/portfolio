@@ -14,6 +14,7 @@ import {
   isPaletteShortcut,
 } from "~/components/layout/CommandMenu";
 import { downloadCv } from "~/components/layout/CommandPalette";
+import { ACCENTS } from "~/lib/accent";
 import { projects } from "~/lib/projects";
 
 import { contact } from "../../content/contact";
@@ -62,7 +63,7 @@ beforeEach(() => {
   );
   Element.prototype.scrollIntoView = () => {};
   html.dataset.theme = "light";
-  html.dataset.skin = "editorial";
+  html.dataset.accent = "green";
   localStorage.clear();
 });
 
@@ -155,7 +156,6 @@ describe("CommandMenu", () => {
     for (const project of projects) {
       expect(option(new RegExp(project.title))).toBeInTheDocument();
     }
-    expect(option("Switch to Systems design")).toBeInTheDocument();
     expect(option(copy.theme.dark)).toBeInTheDocument();
     expect(option(new RegExp(contact.cv.label))).toBeInTheDocument();
   });
@@ -202,13 +202,24 @@ describe("CommandMenu", () => {
     expect(screen.getByRole("status")).toHaveTextContent(copy.themeOn.dark);
   });
 
-  it("switches the design and announces it", async () => {
+  it("has one command per accent", async () => {
     renderMenu();
     await openWithShortcut();
-    fireEvent.click(option("Switch to Systems design"));
-    await waitFor(() => expect(html.dataset.skin).toBe("systems"));
-    await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent("Systems design on"),
+    for (const accent of ACCENTS) {
+      expect(
+        option(`${site.accents.names[accent]} ${copy.accent}`),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it("switches the accent, stores it and announces it", async () => {
+    renderMenu();
+    await openWithShortcut();
+    fireEvent.click(option(`${site.accents.names.purple} ${copy.accent}`));
+    expect(html.dataset.accent).toBe("purple");
+    expect(localStorage.getItem("accent")).toBe("purple");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      `${site.accents.names.purple} ${copy.accentOn}`,
     );
   });
 

@@ -1,3 +1,4 @@
+import { CvLink } from "~/components/layout/CvLink";
 import {
   ButtonLink,
   Link,
@@ -132,7 +133,7 @@ export default function Home() {
           id="contact"
           eyebrow={contact.eyebrow}
           title={contact.title}
-          className={`rounded-xl border border-line p-6 sm:p-8 ${anchorTarget}`}
+          className={`rounded-xl border border-line bg-surface-raised p-6 sm:p-8 ${anchorTarget}`}
         >
           <p className="max-w-reading text-fg-muted">{contact.body}</p>
           <ul className="mt-6 flex flex-wrap gap-3">
@@ -145,17 +146,12 @@ export default function Home() {
               </ButtonLink>
             </li>
             <li>
-              <ButtonLink
-                href={contactDetails.cv.href}
-                download={contactDetails.cv.fileName}
-                type="application/pdf"
-                variant="secondary"
-              >
-                {contactDetails.cv.label}
+              <CvLink variant="secondary">
+                {contactDetails.cv.previewLabel}
                 <span className="font-mono text-xs text-fg-muted">
                   {contactDetails.cv.format}
                 </span>
-              </ButtonLink>
+              </CvLink>
             </li>
             <li>
               <ButtonLink href={contactDetails.github.href} variant="secondary">

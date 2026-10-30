@@ -1,4 +1,4 @@
-// WCAG 2.2 contrast for OKLCH colors, as written in the skin files or as the
+// WCAG 2.2 contrast for OKLCH colors, as written in tokens.css or as the
 // minified build serves them (lightness as a percentage, e.g.
 // `oklch(95% .004 250)`).
 

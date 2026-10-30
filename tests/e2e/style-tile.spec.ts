@@ -13,7 +13,7 @@ test.describe("style tile", () => {
     );
   });
 
-  test("loads the Editorial fonts", async ({ page }) => {
+  test("loads only the Geist fonts", async ({ page }) => {
     await page.goto("/style-tile");
     const loaded = await page.evaluate(async () => {
       await document.fonts.ready;
@@ -22,7 +22,7 @@ test.describe("style tile", () => {
         .map((face) => face.family.replaceAll('"', ""));
     });
     expect(new Set(loaded)).toEqual(
-      new Set(["Geist Variable", "Fraunces Variable", "Geist Mono Variable"]),
+      new Set(["Geist Variable", "Geist Mono Variable"]),
     );
   });
 

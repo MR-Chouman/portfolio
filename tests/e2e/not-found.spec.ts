@@ -34,9 +34,20 @@ test("client-side navigation to a missing route shows the 404 page", async ({
   page,
 }) => {
   await page.goto("/");
-  // The Lab route lands in Phase 5.
-  await page.getByRole("link", { name: "Lab", exact: true }).click();
-  await expect(page).toHaveURL("/lab");
+  await expect(page.getByRole("banner")).toBeVisible();
+  // Every site link points at a real page now that /lab exists (T-051), so
+  // navigate through the hydrated router, as an in-app link to a missing
+  // route would.
+  await page.waitForFunction(() => "__reactRouterDataRouter" in window);
+  await page.evaluate(async () => {
+    const router = (
+      window as unknown as {
+        __reactRouterDataRouter: { navigate(to: string): Promise<void> };
+      }
+    ).__reactRouterDataRouter;
+    await router.navigate("/no-such-page");
+  });
+  await expect(page).toHaveURL("/no-such-page");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
 });
 

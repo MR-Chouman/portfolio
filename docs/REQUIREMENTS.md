@@ -46,23 +46,23 @@ Contact is a `mailto:` link plus GitHub (D-018). CV is downloadable as PDF. No c
 
 ## 6. Features
 
-1. **Two polished skins** (Editorial default, Systems), each with light and dark. Visitor can switch design and theme. Choice persists and can be set with `?skin=` (D-005).
-2. **Switch transitions** use the View Transitions API: circular reveal for skin change, short cross-fade for light/dark. Instant when reduced motion is requested or the API is missing.
-3. **Command palette** (Ctrl/Cmd+K): navigate, switch design/theme, download CV.
+1. **One design** (Systems), with light and dark, and a **choice of six accent colors** (green default, purple, gold, red, blue, orange) from a floating palette on the left of every page; on phones it collapses to one swatch that opens the six. Accent and theme persist, and the accent can be set with `?accent=` (D-038).
+2. **Floating header**: a detached, rounded bar inset from the screen edges, always visible while scrolling (D-038). Theme changes use a short View Transitions cross-fade, instant when reduced motion is requested or the API is missing.
+3. **Command palette** (Ctrl/Cmd+K): navigate, switch theme and accent color, download CV.
 4. **Per-route SEO**: title, description, canonical, Open Graph and Twitter tags, sitemap, robots, JSON-LD `Person`.
 5. **Generated Open Graph images** per case study (build time).
 6. **Content layer**: typed and Zod-validated; invalid content fails the build.
-7. **3D project objects** (D-032): one low-poly Three.js model per case study, colored by the active skin and theme, rotatable by drag and keyboard, still under reduced motion.
+7. **3D project objects** (D-032): one low-poly Three.js model per case study, colored by the active accent and theme, rotatable by drag and keyboard, still under reduced motion.
 
 ## 7. Non-functional requirements
 
-- **Performance** (mobile, default skin): Lighthouse >= 95 in performance, accessibility, best practices, SEO; LCP < 2.0 s; CLS < 0.05; initial JS <= ~110 kB gzipped and CSS <= ~25 kB gzipped on home (targets, tuned in T-062). The 3D objects load only on case study pages, after first paint, and do not count towards home's initial JS.
-- **Accessibility**: WCAG 2.2 AA in every skin and theme; full keyboard use; visible focus; skip link; reduced-motion support; axe checks in Playwright per skin.
+- **Performance** (mobile, default accent): Lighthouse >= 95 in performance, accessibility, best practices, SEO; LCP < 2.0 s; CLS < 0.05; initial JS <= ~110 kB gzipped and CSS <= ~25 kB gzipped on home (targets, tuned in T-062). The 3D objects load only on case study pages, after first paint, and do not count towards home's initial JS.
+- **Accessibility**: WCAG 2.2 AA in every accent and theme; full keyboard use; visible focus; skip link; reduced-motion support; axe checks in Playwright per theme, and contrast checks per accent and theme.
 - **Responsive**: designed mobile-first from 375 px; no horizontal scroll.
 - **Browsers**: current and previous major versions of Chrome, Edge, Safari, Firefox. View Transitions are an enhancement, never required.
 - **Privacy**: no cookies, no third-party trackers, no personal phone number or address on the site's pages (the downloadable CV PDF may include the phone number, D-018). Analytics via Cloudflare Web Analytics only (T-072).
 - **Resilience**: works with JavaScript disabled for reading content (prerendered HTML).
-- **Maintainability**: all copy in `content/`; skins via tokens; tests in CI (D-004).
+- **Maintainability**: all copy in `content/`; theme and accent via tokens; tests in CI (D-004).
 
 ## 8. Constraints
 
@@ -72,7 +72,7 @@ Contact is a `mailto:` link plus GitHub (D-018). CV is downloadable as PDF. No c
 
 ## 9. Out of scope for v1
 
-Blog, CMS, Arabic/RTL (candidate for v1.1), contact form with a backend, a third skin, user accounts, server-side anything.
+Blog, CMS, Arabic/RTL (candidate for v1.1), contact form with a backend, a second design (skin), user accounts, server-side anything.
 
 ## 10. Success criteria
 

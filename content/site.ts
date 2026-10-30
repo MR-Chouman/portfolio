@@ -1,4 +1,4 @@
-// Site-wide copy: header, navigation and footer (T-012).
+// Site-wide copy: header, navigation, footer and preferences (T-012).
 // Contact details and the CV link live in content/contact.ts (T-024, D-018).
 export const site = {
   name: "Mohamad Rida Chouman",
@@ -6,16 +6,8 @@ export const site = {
   skipLink: "Skip to content",
   navigationLabel: "Main",
   themeToggle: "Dark theme",
-  // The design (skin) switcher (T-042). `{design}` is replaced with a name.
-  skinSwitcher: {
-    label: "Switch design",
-    current: "Current design: {design}",
-    switched: "{design} design on",
-    names: { editorial: "Editorial", systems: "Systems" },
-  },
   // The command palette (T-043), opened with Ctrl/Cmd+K or the header
-  // button. `{design}` is replaced with a design name; the CV command uses
-  // the labels in content/contact.ts.
+  // button. The CV command uses the labels in content/contact.ts.
   commandPalette: {
     open: "Open command palette",
     label: "Command palette",
@@ -31,12 +23,31 @@ export const site = {
     },
     home: "Home",
     caseStudy: "Case study",
-    switchDesign: "Switch to {design} design",
     theme: {
       dark: "Switch to dark theme",
       light: "Switch to light theme",
     },
     themeOn: { dark: "Dark theme on", light: "Light theme on" },
+    // One command per accent: "<name> accent", announced as
+    // "<name> accent on". The names come from `accents` below.
+    accent: "accent",
+    accentOn: "accent on",
+  },
+  // The accent colors a visitor can choose (T-046, D-038), in the order of
+  // app/lib/accent.ts. Used by the command palette and the floating palette.
+  accents: {
+    label: "Accent color",
+    // The floating palette (T-047): the phone button is named
+    // "<label>: <name>", and a choice is announced as "<name> <on>".
+    on: "accent on",
+    names: {
+      green: "Green",
+      purple: "Purple",
+      gold: "Gold",
+      red: "Red",
+      blue: "Blue",
+      orange: "Orange",
+    },
   },
   navigation: [
     { label: "Work", href: "/work" },

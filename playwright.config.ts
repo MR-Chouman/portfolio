@@ -12,21 +12,8 @@ export default defineConfig({
     baseURL: `http://localhost:${port}`,
     trace: "on-first-retry",
   },
-  projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    // The skin switch (T-042) must work in every major engine; the other
-    // specs run in Chromium only, to keep CI fast.
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-      testMatch: "skin-switcher.spec.ts",
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-      testMatch: "skin-switcher.spec.ts",
-    },
-  ],
+  // Chromium only, to keep CI fast (D-039).
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   // Tests run against the prerendered static output, as deployed.
   webServer: {
     command: "npm run build && npm run preview",
