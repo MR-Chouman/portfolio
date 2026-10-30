@@ -1,6 +1,6 @@
+import { ProjectObject } from "~/components/three/ProjectObject";
 import {
   Anchor,
-  Figure,
   Link,
   Metric,
   MetricList,
@@ -16,9 +16,10 @@ import { work } from "../../content/work";
 import type { Route } from "./+types/work.$slug";
 
 // Case study template (T-022, REQUIREMENTS section 5): summary header with
-// role, stack and metrics, the MDX body (its sections are the file's `##`
-// headings, its images use <Figure>), and a link to the next project. One
-// prerendered HTML file per project (T-020).
+// role, stack and metrics beside the project's rotatable 3D object (T-034),
+// the MDX body (its sections are the file's `##` headings), and a link to
+// the next project. One prerendered HTML file per project (T-020). Case
+// studies have no images for now (D-031).
 //
 // No loader: the project comes from the bundled MDX modules, so client-side
 // navigation needs no data request. Unknown slugs render the 404 page (T-025):
@@ -36,9 +37,6 @@ export function meta({ params }: Route.MetaArgs) {
   });
 }
 
-// Components MDX files may use without importing them.
-const mdxComponents = { Figure };
-
 export default function CaseStudy({ params }: Route.ComponentProps) {
   const project = getProject(params.slug);
   if (!project) return <NotFound />;
@@ -55,21 +53,29 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
         </Link>
       </p>
 
-      <header className="mt-8 max-w-reading">
-        <p className="font-mono text-xs tracking-wider text-accent uppercase">
-          {project.sector}
-        </p>
-        <h1 className="mt-2 text-4xl sm:text-5xl">{project.title}</h1>
-        <p className="mt-4 text-lg text-fg-muted">{project.summary}</p>
-        <dl className="mt-8 grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-x-8">
-          <dt className="text-sm text-fg-muted">{copy.role}</dt>
-          <dd>{project.role}</dd>
-          <dt className="text-sm text-fg-muted">{copy.stack}</dt>
-          <dd>
-            <TagList items={project.stack} />
-          </dd>
-        </dl>
-      </header>
+      <div className="mt-8 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)]">
+        <header className="max-w-reading">
+          <p className="font-mono text-xs tracking-wider text-accent uppercase">
+            {project.sector}
+          </p>
+          <h1 className="mt-2 text-4xl sm:text-5xl">{project.title}</h1>
+          <p className="mt-4 text-lg text-fg-muted">{project.summary}</p>
+          <dl className="mt-8 grid gap-4 sm:grid-cols-[auto_1fr] sm:gap-x-8">
+            <dt className="text-sm text-fg-muted">{copy.role}</dt>
+            <dd>{project.role}</dd>
+            <dt className="text-sm text-fg-muted">{copy.stack}</dt>
+            <dd>
+              <TagList items={project.stack} />
+            </dd>
+          </dl>
+        </header>
+        <ProjectObject
+          kind={project.object.kind}
+          label={project.object.label}
+          hint={copy.objectHint}
+          fallback={copy.objectFallback}
+        />
+      </div>
 
       <section aria-labelledby="case-study-metrics" className="mt-10">
         <h2 id="case-study-metrics" className="sr-only">
@@ -87,7 +93,7 @@ export default function CaseStudy({ params }: Route.ComponentProps) {
       </section>
 
       <Prose className="mt-12">
-        <Content components={mdxComponents} />
+        <Content />
       </Prose>
 
       {next && (

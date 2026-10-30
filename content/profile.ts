@@ -1,19 +1,18 @@
 // The owner's profile: hero, metrics, About story, skills, education.
 // Validated by profileSchema at build time (content/load.ts).
 //
-// Facts and numbers come from REQUIREMENTS section 4. Text marked
-// "Placeholder" is replaced with the owner's approved copy in T-035 (F-010,
-// F-015).
+// Final copy from T-035. Numbers match REQUIREMENTS section 4; every other
+// fact restates the owner's published CV (public/cv.pdf). Clients and
+// employers are never named (D-018).
 import type { Profile } from "./schema";
 
 export const profile = {
   name: "Mohamad Rida Chouman",
   role: "Frontend lead",
-  // Direction from REQUIREMENTS section 3; final wording in T-035.
   headline:
     "Frontend lead building enterprise admin platforms: 4 systems, 260+ screens, one reusable foundation.",
   summary:
-    "Placeholder: a two-sentence introduction, written and approved in T-035.",
+    "I lead a frontend team that builds administration and operations platforms for clients in aviation, business services, EV charging and healthcare. Shared component libraries and reusable CRUD and server-side table patterns keep new screens quick to build and every platform consistent.",
   metrics: [
     { value: "4", label: "Admin platforms" },
     { value: "260+", label: "Admin screens" },
@@ -22,30 +21,49 @@ export const profile = {
   // The About story, one string per paragraph, following the arc in
   // REQUIREMENTS section 4.
   story: [
-    "Placeholder: how the path started in biology, written and approved in T-035.",
-    "Placeholder: the move to bioinformatics (an MSc with machine learning on protein sequences), written and approved in T-035.",
-    "Placeholder: the step into frontend work and to leading enterprise admin platforms, written and approved in T-035.",
+    "I started in biology, with a bachelor's degree from the Lebanese University in 2018.",
+    "From there I moved to bioinformatics. My MSc thesis used machine learning (Random Forest, XGBoost, LightGBM and ensemble models) to predict SNO sites in protein sequences.",
+    "In 2023 I switched to software through a full-stack bootcamp, worked as an application analyst, and joined a software company as a frontend developer in August 2024. Since January 2026 I have led its frontend team across four client platforms, built on shared component libraries and reusable CRUD and server-side table patterns.",
   ],
   skills: [
     {
       group: "Frameworks",
-      items: ["React", "Next.js"],
+      items: ["React", "Next.js (App Router)", "React Router"],
     },
     {
       group: "Languages",
-      items: ["TypeScript"],
+      items: ["TypeScript", "JavaScript", "HTML", "CSS"],
     },
     {
-      group: "State and styling",
-      items: ["Redux Toolkit", "Tailwind CSS"],
+      group: "State and data",
+      items: ["Redux Toolkit", "RTK Query", "TanStack Query"],
+    },
+    {
+      group: "Styling and UI",
+      items: ["Tailwind CSS", "PrimeReact"],
+    },
+    {
+      group: "Testing and quality",
+      items: ["Vitest", "React Testing Library", "Playwright", "ESLint"],
     },
   ],
   education: [
     {
       degree: "MSc",
       field: "Bioinformatics",
-      institution: "Placeholder: university, confirmed in T-035",
-      note: "Machine learning on protein sequences.",
+      institution: "Tarbiat Modares University",
+      note: "Thesis: predicting SNO sites in proteins with machine learning.",
+    },
+    {
+      degree: "BSc",
+      field: "Biology",
+      institution: "Lebanese University",
+    },
+    {
+      degree: "Certificate",
+      field: "Full-stack web development",
+      institution: "SEF Full Stack Web Developer Bootcamp",
+      note: "2023.",
     },
   ],
 } satisfies Profile;
