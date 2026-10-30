@@ -87,10 +87,10 @@ Current phase: **Phase 2: Content and pages**
   404 page; `public/_headers` with long-cache for hashed assets and sensible security headers.
   Done when: an unknown URL returns the 404 page with a 404 status on the Cloudflare preview.
   Notes: D-027. A catch-all route renders the 404 page (copy in `content/not-found.ts`); it is prerendered at `/404` and moved to `build/client/404.html` after the build, which Pages serves with a 404 status. Unknown case study slugs and client-side navigation to missing routes (`/lab` until Phase 5) show the same page. `_headers` long-caches `/assets/*` and sets a CSP whose inline script hashes are filled in at build time, plus HSTS, nosniff, frame, referrer, permissions and opener policies. Playwright checks the 404 page (three URL shapes, axe in both themes at 375 and 1440 px), the built `_headers`, and replays the CSP on every page type. Only `dev` is built by Cloudflare, so the 404 status on the preview is checked right after the merge (F-016); before it, the `dev` preview answered unknown URLs with a 200.
-- **T-026** · blocked · Private CV folder (Owner action, waits on F-019)
+- **T-026** · done · Private CV folder (Owner action, F-019)
   `private/` exists and Git ignores everything in it except its `.gitkeep` (created with F-007's triage). The owner adds the current CV PDF there (the version with the Gmail address).
   Done when: the CV is in `private/` and `git status` does not show it.
-  Notes: preparation checked 2026-10-30: `.gitignore` has `/private/*` and `!/private/.gitkeep`, only `private/.gitkeep` is tracked, and a probe `private/__probe.pdf` was reported as ignored (`!!`) and absent from `git status`. Only the owner step in F-019 remains.
+  Notes: preparation checked 2026-10-30: `.gitignore` has `/private/*` and `!/private/.gitkeep`, only `private/.gitkeep` is tracked, and a probe `private/__probe.pdf` was reported as ignored (`!!`) and absent from `git status`. Only the owner step in F-019 remains. Done 2026-10-30: the owner added `private/cv.pdf`; it is ignored by `/private/*`, absent from `git status`, and `git ls-files private` lists only `private/.gitkeep` (F-019 resolved).
 
 ## Phase 3: Case studies and imagery (tag v0.4.0)
 
