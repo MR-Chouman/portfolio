@@ -22,6 +22,11 @@ Item format: `F-001 · status · date · source (owner | self | review | auto (r
 
 ## Resolved
 
+- **F-036** · resolved · 2026-10-30 · auto (recommended) · -> T-046, D-040
+  What form do the accent commands take in the command palette? Chosen: six commands "Green accent" ... "Orange accent" in the Preferences group after the theme command, searchable by "accent color", each storing the choice and announcing "<Name> accent on"; the current accent is not marked. Alternatives: one "Change accent" command opening a sub-list (cmdk pages, more state and code); list only the five other accents (the list would change order and length on every switch). Reason: the task asks for one command per accent, and the floating palette (T-047) is where the current choice is shown.
+- **F-035** · resolved · 2026-10-30 · auto (recommended) · -> T-046, D-040
+  Which shades should the six accents use, when the owner named only the hues? Chosen: green keeps the Systems teal-green; purple, gold, red, blue and orange use OKLCH shades at about the same lightness as green, all inside the sRGB gamut: about L 0.52 in light (gold reads as a dark olive gold and orange as a burnt orange, so text stays readable) and L 0.78-0.85 in dark; every accent is 5.0-6.0:1 as text on the light surfaces and 8.5-12.2:1 on the dark ones, and `accent-fg` keeps at least 5.2:1 on every accent. Alternatives: brighter, more saturated light shades (gold and orange fail AA as text); a separate `accent-fg` per accent (not needed, every pair passes). Reason: AA everywhere with one consistent weight across accents. Owner to check: the six colors by eye in both themes (T-049 adds the visual check).
+
 - **F-033** · resolved · 2026-10-30 · auto (recommended) · -> T-045, D-039
   The Firefox and WebKit Playwright projects ran only the skin switcher spec, which T-045 deletes. What happens to them? Chosen: remove both projects and install only Chromium in `ci-main`. Alternatives: point them at the theme spec (cross-engine coverage of the cross-fade, but slower CI and WebKit checks only on a PR into `main`); keep them with no spec (installs browsers for nothing). Reason: no remaining feature needs another engine; the theme cross-fade has an instant fallback and is unit tested.
 
