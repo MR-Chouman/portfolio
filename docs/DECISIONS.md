@@ -462,3 +462,17 @@ Status: Accepted · 2026-10-30 · Supersedes D-005 and the Editorial skin of D-0
 - The command palette gets one command per accent instead of the design command.
 
 **Consequences.** Less CSS and font weight on every page. Per-skin tests (D-037) become per-theme tests plus a contrast check per accent and theme. A second design is out of scope for v1. The style tile shows the accents instead of skins.
+
+## D-039 · One design in the base styles; end-to-end tests in Chromium only
+Status: Accepted · 2026-10-30 · Implements D-038 · Changes D-020, D-035, D-037
+
+**Context.** T-045 makes Systems the only design (D-038). Its values were scoped to `[data-skin="systems"]` in `app/styles/skins/systems.css`, next to the Editorial skin, and the Firefox and WebKit Playwright projects existed only for the skin switcher (D-035).
+
+**Decision.**
+- Colors, fonts and radii live in `app/styles/tokens.css`, the only file allowed raw values: fonts and radii on `:root`, then the light, dark (system preference) and dark (explicit) color blocks with their contrast ratios. Theme selectors still match any element, so a section can show the other theme. The Systems element styles (blueprint grid on `html`, tabular numbers, heading weight and tracking, selection, solid header and footer, the prose `#` heading marker, mono blockquote and accent list markers) move unscoped into `base.css`. `app/styles/skins/` is gone.
+- `base.css` imports the Geist and Geist Mono Fontsource packages; `@fontsource-variable/fraunces` is uninstalled. `root.tsx` still preloads the latin Geist file.
+- The pre-paint script is the theme script alone (`themeScript`); `app/lib/skin.ts`, `useSkin`, the switcher, its circular reveal and the palette's design command are deleted. The 3D object colors follow `data-theme` only.
+- `tests/unit/theme-tokens.test.ts` (was `skins.test.ts`) checks tokens.css; `tests/e2e/per-theme.spec.ts` (was `per-skin.spec.ts`) runs every page in both themes and checks that the build ships no skin layer and no Fraunces file.
+- Playwright runs in Chromium only, and `ci-main` installs only Chromium (F-033). The theme cross-fade has an instant fallback and is unit tested.
+
+**Consequences.** A visitor who stored a `skin` value keeps a harmless, unused `localStorage` key. Pages render pixel for pixel as the Systems skin did, apart from the removed header button (checked by screenshot comparison against `dev` with `?skin=systems`). Cross-engine e2e can come back as a project in `playwright.config.ts` if a later feature needs it.

@@ -31,7 +31,7 @@
 - [ ] `npm run typecheck`
 - [ ] `npm run test`
 - [ ] `npm run build`
-- [ ] Accessible: keyboard use, focus visible, contrast OK in both themes (and both skins once they exist)
+- [ ] Accessible: keyboard use, focus visible, contrast OK in both themes
 - [ ] No confidential data, secrets, or personal contact details added
 
 ## Notes for review

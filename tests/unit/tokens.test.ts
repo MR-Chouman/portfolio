@@ -5,11 +5,11 @@ import { describe, expect, it } from "vitest";
 const appDir = join(process.cwd(), "app");
 const tokensCss = readFileSync(join(appDir, "styles/tokens.css"), "utf8");
 
-// Token files (tokens.css, skins/) are the only place raw values may live.
+// tokens.css is the only place raw values may live.
 function sourceFiles(): string[] {
   return readdirSync(appDir, { recursive: true, encoding: "utf8" })
     .filter((file) => /\.(tsx?|css)$/.test(file))
-    .filter((file) => !/^styles[\\/](tokens\.css|skins[\\/])/.test(file))
+    .filter((file) => !/^styles[\\/]tokens\.css$/.test(file))
     .map((file) => join(appDir, file));
 }
 
@@ -42,7 +42,7 @@ describe("design token contract", () => {
     }
   });
 
-  it("finds no raw color, font or radius values outside token files", () => {
+  it("finds no raw color, font or radius values outside tokens.css", () => {
     const offenders = sourceFiles().flatMap((file) =>
       readFileSync(file, "utf8")
         .split("\n")

@@ -12,7 +12,7 @@ export interface FigureProps {
 // A captioned image for case studies (T-022). MDX files use it as
 // <Figure src="..." alt="..." caption="..." width={..} height={..} /> without
 // importing it: the case study route passes it in `components`. Styles come
-// from `.prose-content` (base.css), so skins can restyle it.
+// from `.prose-content` (base.css).
 export function Figure({
   src,
   alt,

@@ -30,7 +30,7 @@ describe("3D object colors (T-034)", () => {
     expect(toRgb("not-a-color", context({}))).toBe(0x808080);
   });
 
-  it("calls back when the theme or skin on <html> changes", async () => {
+  it("calls back when the theme on <html> changes, until stopped", async () => {
     const listener = vi.fn();
     const stop = observeTokens(listener);
     document.documentElement.dataset.theme = "dark";
@@ -38,10 +38,9 @@ describe("3D object colors (T-034)", () => {
     expect(listener).toHaveBeenCalled();
     stop();
     listener.mockClear();
-    document.documentElement.dataset.skin = "systems";
+    document.documentElement.dataset.theme = "light";
     await Promise.resolve();
     expect(listener).not.toHaveBeenCalled();
     delete document.documentElement.dataset.theme;
-    delete document.documentElement.dataset.skin;
   });
 });

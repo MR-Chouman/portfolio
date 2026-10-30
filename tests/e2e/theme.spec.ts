@@ -80,7 +80,7 @@ test("the toggle works from the keyboard and the choice survives a reload", asyn
   await expect(toggle(page)).toHaveAttribute("aria-pressed", "true");
 });
 
-test("the toggle is reachable by Tab after the navigation, the CV link, the command palette button and the design switcher", async ({
+test("the toggle is reachable by Tab after the navigation, the CV link and the command palette button", async ({
   page,
 }) => {
   await page.goto("/");
@@ -93,10 +93,6 @@ test("the toggle is reachable by Tab after the navigation, the CV link, the comm
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("button", { name: "Open command palette" }),
-  ).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(
-    page.getByRole("button", { name: "Switch design" }),
   ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(toggle(page)).toBeFocused();
