@@ -307,3 +307,16 @@ Status: Accepted · 2026-10-30 · Refines D-002, D-023
 - `npm run preview` serves `404.html` as its fallback, like Pages (sirv answers it with a 200 status). Playwright checks the built `404.html` and `_headers`, and replays the CSP on each page type to prove it blocks nothing (hydration, the theme toggle).
 
 **Consequences.** One site-wide policy lists about two hashes per prerendered page; with 16 hashes the CSP line is about 1,100 characters, so roughly 15 more pages fit before the build stops and the policy must move to per-path rules. Anything that loads a third-party script or connects elsewhere (Cloudflare Web Analytics in T-072) must extend `script-src` and `connect-src`. Inline `style` attributes are blocked by `style-src 'self'`; styles stay in CSS (setting styles from JavaScript is unaffected). `__spa-fallback.html` is still emitted but Pages no longer uses it.
+
+## D-028 · TypeScript 7 for type checking, TypeScript 6 kept for the compiler API
+
+Status: Accepted · 2026-10-30
+
+**Context.** The owner asked to move from TypeScript 5.9 to 7.0 (Dependabot PR #27). TypeScript 7 is the native (Go) compiler: its `typescript` package ships `tsc` but no JavaScript compiler API until at least 7.1. typescript-eslint imports that API, and every release (8.72.1, canary 8.72.2-alpha) declares `typescript >=4.8.4 <6.1.0`, so `npm ci` fails on #27 with ERESOLVE. The maintainers say TS 7 support is blocked on a TS 7 API (typescript-eslint#10940, #12518) and point to the side-by-side setup in Microsoft's TypeScript 7.0 announcement.
+
+**Decision.** Follow that setup, with npm aliases and no `overrides`, `--force` or `--legacy-peer-deps`:
+- `"typescript": "npm:@typescript/typescript6@^6.0.2"`: the official compatibility package. It re-exports the TypeScript 6 API (and a `tsc6` binary), so typescript-eslint gets a version inside its supported range.
+- `"typescript-7": "npm:typescript@^7.0.2"`: the real TypeScript 7 compiler. `npm run typecheck` calls it by path (`node node_modules/typescript-7/bin/tsc`), because the TypeScript 6 package that `@typescript/typescript6` depends on also installs a `tsc` binary and wins the `node_modules/.bin/tsc` link.
+- typescript-eslint is the only dependency that imports the compiler API. Vite, Vitest, React Router typegen and MDX do not, so nothing else changes. The tsconfig already uses only options TS 7 accepts (`moduleResolution: bundler`, no `baseUrl`, `esModuleInterop` on, explicit `types`), and the code type-checks cleanly with no changes.
+
+**Consequences.** CI type checking runs on TS 7. Lint type information comes from TS 6, which shares TS 7's type checker logic. Editors that read `node_modules/typescript` find the compatibility package rather than a full TS install, so use the editor's bundled TypeScript (or the TS 7 extension). Once typescript-eslint supports TS 7 (expected after TS 7.1 ships an API), drop both aliases for a plain `"typescript": "^7"` and restore `tsc` in the typecheck script. Dependabot may propose bumping the aliased packages oddly; check what it targets before accepting.
