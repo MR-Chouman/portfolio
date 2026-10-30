@@ -1,6 +1,6 @@
 # TASKS
 
-Current phase: **Phase 3: Case studies and imagery**
+Current phase: **Phase 4: Skins and switcher**
 
 ## Rules
 
