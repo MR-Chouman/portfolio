@@ -19,6 +19,7 @@ const routes = [
   "/work",
   ...slugs.map((slug) => `/work/${slug}`),
   "/about",
+  "/lab",
   "/style-tile",
   "/not-a-page",
 ];

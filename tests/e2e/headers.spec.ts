@@ -28,6 +28,7 @@ const pages = [
   "/work",
   "/work/airline-crew-management",
   "/about",
+  "/lab",
   "/style-tile",
   "/no-such-page",
 ];
