@@ -21,6 +21,11 @@ None.
 
 ## Resolved
 
+- **F-023** · resolved · 2026-10-30 · auto (recommended) · -> T-030, D-030
+  How can the airline case study ship 2-4 captioned images before the image pipeline (T-034) and without screenshots of the client's system (D-018)? Chosen: three illustrations of typical screens (weekly roster, leave approvals, qualifications) drawn as SVG with invented crew codes, flights, dates and counts, encoded to WebP and AVIF, each captioned "Illustration with invented ... data, not a screenshot of the client's system". Alternatives: anonymized crops of real screens with fake data (needs the owner's material and T-034); ship the case study without images (fails "Done when"). Reason: meets "Done when" with no client data at all; the owner can swap in crops during review or T-034.
+- **F-024** · resolved · 2026-10-30 · auto (recommended) · -> T-030
+  What copy goes into the airline case study before the owner writes it? Chosen: the sections "Context", "What I owned", "Scope", "Key decisions" (with "Single sign-on", "Rostering" and "Approvals") and "Outcome"; sentences state only REQUIREMENTS section 4 facts (aviation, Next.js, TypeScript, Microsoft SSO, 25 modules, the six module areas), and everything else, including the role, is a marked placeholder saying what the owner should write. Alternatives: draft the full story for the owner to correct; keep the four T-022 headings. Reason: the structure "Done when" asks for, with no invented claim about the owner's work; the owner fills it in the Owner review.
+
 - **F-019** · resolved · 2026-10-30 · self · -> T-026
   Owner action: copy the current CV PDF (the version with the Gmail address) into `private/` and confirm Git ignores it. Done 2026-10-30: the owner saved it as `private/cv.pdf`; `git check-ignore -v private/cv.pdf` prints the `/private/*` rule, `git status` lists nothing under `private/`, and `git ls-files private` lists only `private/.gitkeep`.
 - **F-007** · resolved · 2026-10-30 · owner · -> T-024, T-026

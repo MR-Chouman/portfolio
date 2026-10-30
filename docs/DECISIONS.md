@@ -333,3 +333,17 @@ Status: Accepted · 2026-10-30 · Refines D-006 · Supersedes the origin in D-01
 - The old `portfolio-4q6` project stops building and is retired by the owner once the new one serves production.
 
 **Consequences.** Canonical and Open Graph URLs point at the new origin once this reaches `main` at the next phase release; until then production pages carry the old origin. Earlier mentions of `portfolio-4q6` in DECISIONS and FEEDBACK stay as history. T-071 uses the new origin.
+
+## D-030 · Case study figures: invented-data illustrations, AVIF with WebP fallback, checked at build time
+
+Status: Accepted · 2026-10-30 · Refines D-018, D-026 · Resolves F-023
+
+**Context.** T-030 needs 2-4 captioned images in the airline case study, but D-018 rules out screenshots of client systems and the image pipeline (T-034) does not exist yet. CLAUDE.md asks for AVIF/WebP images with explicit dimensions.
+
+**Decision.**
+- Case study images are illustrations of typical screens drawn with invented data (crew codes such as "Crew 0142", flight numbers with an "XX" prefix, made-up dates and counts), and each caption says so. Their sources are SVG files in `content/projects/figures/<slug>/`; the served files are WebP and AVIF in `public/images/work/<slug>/`.
+- For T-030 the SVGs were rendered to PNG with Playwright's Chromium (site fonts) and encoded once with ffmpeg (`libwebp` quality 85, `libaom-av1` still picture CRF 30, 4:4:4). T-034 replaces these one-off steps with the image script and re-runs it on these sources.
+- `Figure` takes an optional `avif` prop and then renders a `<picture>` with an `image/avif` source before the WebP `<img>`.
+- `content/figures.ts` checks every `<Figure />` in project MDX at build time (through `content/load.ts`): files under `/images/work/<slug>/`, WebP required and AVIF optional, both present in `public/`, non-empty alt and caption, and `width`/`height` equal to the size read from each file's header.
+
+**Consequences.** A wrong path, a missing file or a stale size fails `npm run build`. No new dependency. Figures must be self-closing JSX with string and integer props so the build-time reader can parse them.

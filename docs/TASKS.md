@@ -94,8 +94,9 @@ Current phase: **Phase 3: Case studies and imagery**
 
 ## Phase 3: Case studies and imagery (tag v0.4.0)
 
-- **T-030** · todo · Case study: airline crew management platform (Owner review, D-018)
+- **T-030** · review · Case study: airline crew management platform (Owner review, D-018)
   Done when: MDX validated; has context, role, scope, key decisions (SSO, rostering, approvals), outcome, and 2-4 captioned images.
+  Notes: D-030. The MDX has "Context", "What I owned", "Scope", "Key decisions" ("Single sign-on", "Rostering", "Approvals") and "Outcome"; it states only REQUIREMENTS facts and leaves the role and the narrative as marked placeholders for the owner (F-024). Three captioned figures (weekly roster, leave approvals, qualifications) are illustrations with invented data, not screenshots (F-023): SVG sources in `content/projects/figures/airline-crew-management/`, WebP and AVIF in `public/images/work/airline-crew-management/` (1440x900, 36-52 kB each), encoded once with ffmpeg until T-034's script. `Figure` serves AVIF through `<picture>` with the WebP fallback. The build now validates every `<Figure />` in project MDX (path, both files present, alt, caption, and width/height against the file headers). Playwright checks that the figures load AVIF with captions; axe stays clean in both themes at 375 and 1440 px.
 - **T-031** · todo · Case study: business operations platform (Owner review, D-018)
   Done when: same structure; highlights the shared CRUD and server-side table data layer.
 - **T-032** · todo · Case study: EV charging platform (Owner review, D-018)
